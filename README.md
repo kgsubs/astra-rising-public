@@ -164,25 +164,32 @@ Four models failed outright, returning nothing usable. A player waiting on a dic
 
 ---
 
-## Stack and Quickstart
+## Stack
 
-**Application:** Node, Express 5, SQLite via better-sqlite3 in WAL mode
-**Frontend:** React via pre-compiled `React.createElement`, precompiled Tailwind output, no build step at runtime
-**AI:** Google Gemini primary, Groq fallback, both over the OpenAI chat-completions format
-**Testing:** Jest plus standalone smoke and regression scripts
-**Deployment:** nginx reverse proxy, systemd unit, Let's Encrypt
+| Layer | Choice | Notes |
+|---|---|---|
+| **Runtime** | Node, Express 5 | Single process, no worker tier |
+| **Database** | SQLite via better-sqlite3, WAL mode | Synchronous API, so the data layer carries no async plumbing |
+| **Frontend** | React, pre-compiled | `React.createElement` calls committed directly; no JSX step at build or runtime |
+| **Styling** | Tailwind, precompiled output | The runtime was removed; a new class needs `npm run build:css` or it does nothing |
+| **Icons** | lucide-react, slimmed | Cut to the 19 icons actually used, taking the bundle to 8 KB |
+| **Primary model** | Google Gemini 2.5 Flash | 250 requests a day on the free tier |
+| **Fallback model** | Groq, gpt-oss-120b | 100,000 tokens a day; the chain falls through on 429 or 5xx |
+| **Provider interface** | OpenAI chat-completions format | Both providers speak it, so adding a third is a registry entry |
+| **Rules** | Five JSON rulesets | Loaded and cached at startup, gated by an id blocklist |
+| **Sessions** | Token plus a 10-character save code | No accounts, no passwords, no authentication surface |
+| **Testing** | Jest, plus standalone smoke and regression scripts | Sequential, since the database is shared state |
+| **Web server** | nginx reverse proxy | Terminates TLS, forwards to the app on 3500 |
+| **Process supervision** | systemd unit | Restarts on failure |
+| **TLS** | Let's Encrypt | Issued and renewed by certbot |
 
-Credentials are redacted, so this repository is not runnable as published. With your own provider key:
+### Deliberate omissions
 
-```bash
-git clone https://github.com/kgsubs/astra-rising-public.git
-cd astra-rising-public
-npm install
-cp .env.example .env        # add GEMINI_API_KEY or GROQ_API_KEY
-npm start                   # http://localhost:3500
-npm test                    # 67 tests, no keys required
-npm run build:css           # only after adding a Tailwind class
-```
+- **No SPA build step.** JSX compilation was removed rather than maintained; the frontend ships as pre-compiled calls.
+- **No bundler.** No Webpack, no Vite. The only build command left compiles the stylesheet.
+- **No ORM.** Every query is written out in `db.js`, which keeps the SQL visible and the test mocks trivial.
+- **No cache server.** Rules live in process memory from startup; nothing waits on disk or on Redis.
+- **No paid tier.** Model choice, the roughly 800-token rules budget and the request limits all exist to keep running cost at zero.
 
 ---
 
