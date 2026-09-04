@@ -133,6 +133,8 @@ The result overturned the obvious choice. Frontier models were unusable for this
 | llama-3.3-70b-versatile | 1.0s | Selected as fallback |
 | gemini-2.5-flash-lite | 1.1s | Fast, weaker narration |
 
+The Groq fallback did not survive the provider. `llama-3.3-70b-versatile` was decommissioned in September 2026 and began answering every call with `404 model_not_found`, which silently emptied the fallback chain whenever the primary was busy. The measurement above stands as it was taken; the running fallback is now `openai/gpt-oss-120b`.
+
 Four models failed outright, returning nothing usable. A player waiting on a dice roll will tolerate a few seconds and abandon at twenty, so latency and free-tier economics decided this, not benchmark scores.
 
 ---
