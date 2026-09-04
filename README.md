@@ -193,9 +193,9 @@ Four models failed outright, returning nothing usable. A player waiting on a dic
 
 ---
 
-## Where the Evidence Is
+## Planning Docs
 
-The code layout is in the project structure above. These are the places that show the thinking rather than the implementation.
+Everything written before and around the code. Kept unedited.
 
 | Path | Contents |
 |---|---|
@@ -203,7 +203,7 @@ The code layout is in the project structure above. These are the places that sho
 | `planning/packets/` | The build packets the specification was decomposed into |
 | `planning/experiments/model-bakeoff/` | The 46-model evaluation: harness, prompt, raw results |
 | `planning/deploy/` | nginx vhost, systemd unit, setup script |
-| `CLAUDE.md` | Working notes on the constraints, kept so they are not rediscovered |
+| `CLAUDE.md` | Working notes on the project's constraints |
 | `public/data/ip-registry.json` | The 78-mapping substitution registry |
 
 ---
