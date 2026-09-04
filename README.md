@@ -64,6 +64,34 @@ Two paths through every turn, split by whether the answer must be exact.
 
 ---
 
+### Project structure
+
+```
+.
+|-- server.js                          Express entry, routing, rate limiting, sessions
+|-- db.js                              SQLite schema, migrations, every query
+|-- build.js                           Legacy JSX compiler, superseded (see Trade-offs)
+|-- server/
+|   |-- ruleLoader.js                  Ruleset loading, in-memory cache, id blocklist
+|   `-- services/
+|       |-- ruleEngine.js              Deterministic game mechanics
+|       |-- promptRulesInjector.js     Assembles the rules context for each prompt
+|       |-- aiProviders.js             Provider registry, free-tier ceilings, quota math
+|       `-- ipSanitizer.js             Applies the substitution registry on ingest
+|-- public/
+|   |-- index.html                     Loads React and the precompiled bundle
+|   |-- app.js                         Frontend, pre-compiled React.createElement calls
+|   |-- app.css                        Precompiled Tailwind output, no runtime
+|   |-- data/rules/                    Five rulesets loaded at startup
+|   |-- data/ip-registry.json          78 proper-noun substitutions
+|   `-- vendor/                        React, ReactDOM, slimmed icon bundle
+|-- tests/                             Jest: API integration and frontend
+|-- server/tests/                      Rules engine, prompt injection, smoke and regression
+`-- planning/                          Specification, build packets, experiments, deploy
+```
+
+---
+
 ## Safety, Cost and Reliability
 
 **Model behaviour**
@@ -153,23 +181,30 @@ npm install
 cp .env.example .env        # add GEMINI_API_KEY or GROQ_API_KEY
 npm start                   # http://localhost:3500
 npm test                    # 67 tests, no keys required
+npm run build:css           # only after adding a Tailwind class
 ```
 
 ---
 
-## Repository Map
+## Where the Evidence Is
+
+The code layout is in the project structure above. These are the places that show the thinking rather than the implementation.
 
 | Path | Contents |
 |---|---|
-| `server.js` | Routes, rate limiting, session management |
-| `db.js` | SQLite schema, migrations and every query |
-| `server/ruleLoader.js` | Ruleset caching and blocklist enforcement |
-| `server/services/ruleEngine.js` | Deterministic game mechanics |
-| `server/services/promptRulesInjector.js` | Builds the rules context for each prompt |
-| `server/services/aiProviders.js` | Provider registry, free-tier ceilings, quota-day math |
-| `public/data/ip-registry.json` | The 78-mapping substitution registry |
 | `planning/prd/` | Product specification, versions 2 and 3 |
-| `planning/packets/` | Build packets the specification was decomposed into |
-| `planning/experiments/model-bakeoff/` | The 46-model evaluation, harness and raw results |
+| `planning/packets/` | The build packets the specification was decomposed into |
+| `planning/experiments/model-bakeoff/` | The 46-model evaluation: harness, prompt, raw results |
 | `planning/deploy/` | nginx vhost, systemd unit, setup script |
-| `server/tests/`, `tests/` | Jest suites and standalone smoke scripts |
+| `CLAUDE.md` | Working notes on the constraints, kept so they are not rediscovered |
+| `public/data/ip-registry.json` | The 78-mapping substitution registry |
+
+---
+
+## Trade-offs
+
+- **The JSX build step was removed, not fixed.** `build.js` still exists but errors: the frontend was extracted from an inline Babel block into `public/app.js` as pre-compiled `React.createElement` calls, which removed a build stage from every change at the cost of readability in the frontend source. `npm run build:css` remains, and any new Tailwind class needs it or the class silently does nothing.
+- **SQLite rather than a client-server database.** `better-sqlite3` is synchronous, which keeps the data layer free of async plumbing and makes the tests fast, but it ties the application to one machine. A second instance would need the database moved before anything else.
+- **Free-tier ceilings as a design constraint, not an afterthought.** Provider selection, the roughly 800-token rules budget and the request limits all exist to keep this running at zero cost. A paid tier would justify a slower, stronger model and a larger rules context, and the provider layer is structured so that swap is a configuration change.
+- **Rules cached at startup, not hot-reloaded.** All five rulesets load into memory once and stay there, so a rules edit needs a restart. For a rule set that changes rarely this trades operational flexibility for a guarantee that no request ever waits on disk.
+- **Tests run sequentially.** The suite shares one database, so `--runInBand` is required. That caps the suite at 1.4 seconds today and would need per-test isolation before it could grow much further.
