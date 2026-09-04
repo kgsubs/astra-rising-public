@@ -1,8 +1,10 @@
-# Astra Rising | AI Game Master for a Science-Fiction Tabletop RPG
+# Astra Rising
 
-> **Product case study.** Tabletop role-playing needs a game master, which is the scarcest resource at any table. Astra Rising runs a full session against a language model while keeping the rules, dice and character state on the server, so the model narrates but never adjudicates. Model selection was decided by benchmarking 46 models across three providers rather than by reputation.
+Astra Rising is a browser-based science-fiction tabletop RPG run by an AI game master. It narrates a live session with a language model, computes every rule, dice roll and character state on the server rather than in the prompt, and persists progress to SQLite so a player can resume with a save code and no account.
 
-**Live: [astrarising.com](https://astrarising.com)** | Solo build | 101 commits
+This repository is a hands-on case study in dividing a problem between what a language model does well and what it must never be trusted with, choosing a model by measurement rather than reputation, and running a production AI feature inside free-tier quotas.
+
+**Live: [astrarising.com](https://astrarising.com)**
 
 | | |
 |---|---|
@@ -11,17 +13,17 @@
 
 ---
 
-## Problem and Framing
+## Problem Framing
 
-**User pain.** A tabletop group needs one person to prepare the scenario, arbitrate the rules and improvise the world. That person is hard to find and harder to schedule, so games stall between sessions or never start.
+Tabletop role-playing needs a game master: one person to prepare the scenario, arbitrate the rules and improvise the world. That person is the scarcest resource at any table, hard to find and harder to schedule, so games stall between sessions or never start at all.
 
-**Why a language model fits, and where it does not.** Improvised narration is exactly what these models are good at. Arithmetic under a rulebook is exactly what they are bad at: percentile checks, initiative order, stamina thresholds and weapon damage are deterministic and unforgiving, and a model that gets them subtly wrong produces a game that feels arbitrary. The design splits on that line.
+A language model is well suited to half of that job and badly suited to the other half. Improvised narration is what these models do best. Arithmetic under a rulebook is what they do worst, and percentile checks, initiative order, stamina thresholds and weapon damage are deterministic and unforgiving. A model that gets them subtly wrong produces a game that feels arbitrary, which is worse than no game.
 
-**Solution.** The model narrates and offers choices. A server-side rules engine computes every number, and the results are injected into the prompt as pre-computed facts rather than left for the model to derive.
+Astra Rising splits on exactly that line. The model narrates and offers choices. A server-side rules engine computes every number, and the results enter the prompt as settled facts rather than as something for the model to work out.
 
 ---
 
-## Architecture
+## System Architecture
 
 Two paths through every turn, split by whether the answer must be exact.
 
