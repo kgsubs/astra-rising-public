@@ -1,0 +1,192 @@
+{
+  "star_frontiers_rules_system": {
+    "name": "Astra Rising Complete Rules Reference",
+    "version": "1.0",
+    "description": "Unified AI-readable rule system for Astra Rising RPG",
+    "files": [
+      {
+        "id": "alpha_dawn_basic",
+        "file": "rules_alpha_dawn_basic.json",
+        "type": "core",
+        "name": "Astra Rising Core Rules",
+        "description": "Foundational rules for character creation, combat, and gameplay",
+        "dependencies": [],
+        "supplements": [
+          "alpha_dawn_expanded",
+          "zebulons_guide",
+          "knight_hawks"
+        ],
+        "required": true
+      },
+      {
+        "id": "alpha_dawn_expanded",
+        "file": "rules_alpha_dawn_expanded.json",
+        "type": "expansion",
+        "name": "Astra Rising Core Extended Rules",
+        "description": "Additional skills, detailed equipment, advanced combat options",
+        "dependencies": [
+          "alpha_dawn_basic"
+        ],
+        "supplements": [
+          "zebulons_guide",
+          "knight_hawks"
+        ],
+        "required": false
+      },
+      {
+        "id": "knight_hawks",
+        "file": "rules_knight_hawks.json",
+        "type": "expansion",
+        "name": "Knights Rising",
+        "description": "Starship combat, construction, and space travel rules",
+        "dependencies": [
+          "alpha_dawn_basic"
+        ],
+        "supplements": [
+          "knight_hawks_expanded"
+        ],
+        "required": false
+      },
+      {
+        "id": "knight_hawks_expanded",
+        "file": "rules_knight_hawks_expanded.json",
+        "type": "expansion",
+        "name": "Knights Rising Extended",
+        "description": "Advanced ship construction, economic ventures, company charters",
+        "dependencies": [
+          "alpha_dawn_basic",
+          "knight_hawks"
+        ],
+        "supplements": [],
+        "required": false
+      },
+      {
+        "id": "zebulons_guide",
+        "file": "rules_zebulons_guide.json",
+        "type": "major_expansion",
+        "name": "Korvath's Guide to the Frontier",
+        "description": "Resolution Table system, 3 new races, 6 professions, 100+ skills",
+        "dependencies": [
+          "alpha_dawn_basic"
+        ],
+        "supplements": [
+          "alpha_dawn_expanded",
+          "knight_hawks"
+        ],
+        "required": false,
+        "note": "Replaces simple percentile rolls with Resolution Table"
+      },
+      {
+        "id": "gamma_dawn",
+        "file": "rules_gamma_dawn.json",
+        "type": "alternate_expansion",
+        "name": "Gamma Rising",
+        "description": "Optional rules: psionics, mutations, cybernetics, variant races",
+        "dependencies": [
+          "alpha_dawn_basic"
+        ],
+        "supplements": [
+          "alpha_dawn_expanded",
+          "zebulons_guide",
+          "knight_hawks"
+        ],
+        "required": false,
+        "note": "These rules are optional and may replace or augment standard rules"
+      }
+    ],
+    "usage_guide": {
+      "minimum_required": [
+        "alpha_dawn_basic"
+      ],
+      "recommended_core": [
+        "alpha_dawn_basic",
+        "alpha_dawn_expanded"
+      ],
+      "full_experience": [
+        "alpha_dawn_basic",
+        "alpha_dawn_expanded",
+        "zebulons_guide",
+        "knight_hawks"
+      ],
+      "space_campaign": [
+        "alpha_dawn_basic",
+        "knight_hawks",
+        "knight_hawks_expanded"
+      ],
+      "ground_campaign": [
+        "alpha_dawn_basic",
+        "alpha_dawn_expanded",
+        "zebulons_guide"
+      ]
+    },
+    "ai_query_patterns": {
+      "character_creation": {
+        "ability_scores": "alpha_dawn_basic.character_creation.ability_scores",
+        "races": "alpha_dawn_basic.character_creation.races OR zebulons_guide.new_races",
+        "skills": "alpha_dawn_basic.skills OR zebulons_guide.expanded_skill_system",
+        "professions": "zebulons_guide.professions"
+      },
+      "combat": {
+        "basic": "alpha_dawn_basic.combat",
+        "expanded": "alpha_dawn_expanded.combat_expanded",
+        "resolution_table": "zebulons_guide.resolution_table",
+        "weapons": "alpha_dawn_expanded.equipment.weapons",
+        "armor": "alpha_dawn_expanded.equipment.armor"
+      },
+      "starships": {
+        "basics": "knight_hawks.starship_basics",
+        "types": "knight_hawks.ship_types",
+        "weapons": "knight_hawks.ship_weapons",
+        "defenses": "knight_hawks.defenses",
+        "combat": "knight_hawks.starship_combat",
+        "skills": "knight_hawks.spaceship_skills",
+        "expanded": "knight_hawks_expanded"
+      },
+      "equipment": {
+        "weapons": "alpha_dawn_expanded.equipment.weapons",
+        "armor": "alpha_dawn_expanded.equipment.armor",
+        "gear": "alpha_dawn_expanded.equipment.gear"
+      },
+      "optional_rules": {
+        "psionics": "gamma_dawn.psionics",
+        "mutations": "gamma_dawn.mutations",
+        "cybernetics": "gamma_dawn.cybernetics",
+        "reputation": "gamma_dawn.reputation_system"
+      }
+    },
+    "quick_reference": {
+      "dice_system": {
+        "primary": "d100 (percentile)",
+        "secondary": "d10 for damage, initiative",
+        "resolution_table": "d100 with column shifts (Korvath's Guide)"
+      },
+      "ability_scores": {
+        "pairs": [
+          "STR/STA",
+          "DEX/RS",
+          "INT/LOG",
+          "PER/LDR"
+        ],
+        "generation": "Roll d100 for each pair",
+        "racial_modifiers": "Apply based on chosen race"
+      },
+      "skill_checks": {
+        "basic": "Roll d100 vs (1/2 ability + 10% per skill level)",
+        "resolution_table": "Roll on table based on skill level and modifiers"
+      },
+      "combat_initiative": {
+        "basic": "1d10 + (RS/10, round up)"
+      },
+      "damage": {
+        "hit_points": "STA score",
+        "unconscious": "0 STA",
+        "death": "-30 STA"
+      }
+    },
+    "versioning": {
+      "current": "1.0",
+      "last_updated": "2026-03-11",
+      "compatibility": "All files designed to work together as unified system"
+    }
+  }
+}

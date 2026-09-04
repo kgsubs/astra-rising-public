@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Astra Rising</title>
+  <link rel="stylesheet" href="/vendor/fonts/fonts.css" />
+  <link rel="stylesheet" href="/app.css" />
+  <script src="/vendor/react.production.min.js"></script>
+  <script src="/vendor/react-dom.production.min.js"></script>
+  <script>window.react = window.React;</script>
+  <script src="/vendor/lucide-react.slim.js"></script>
+  <script src="/data/game-data.js"></script>
+</head>
+<style>
+  html { font-size: 150%; background: #111827; overflow: hidden; height: 100dvh; }
+  body { font-family: 'Karla', sans-serif; background: #111827; overflow-y: auto; overflow-x: hidden; height: 100dvh; }
+  .sf-game-root { height: 100dvh !important; }
+  .sf-app-shell { max-width: 1280px; width: 100%; margin-left: auto; margin-right: auto; background: #111827; min-height: 100dvh; overflow-x: hidden; }
+  .sf-dm-bubble p, .sf-player-bubble p { overflow-wrap: break-word; word-break: break-word; }
+  .sf-chat-scroll { overflow-wrap: break-word; word-break: break-word; scrollbar-width: none; }
+  .sf-chat-scroll::-webkit-scrollbar { display: none; }
+  .sf-actions-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.2s ease; }
+  .sf-actions-panel.open { grid-template-rows: 1fr; }
+  .sf-actions-panel > div { overflow: hidden; }
+  @keyframes goldPulse {
+    0%, 100% { opacity: 0.55; filter: drop-shadow(0 0 0px rgba(250,204,21,0)); }
+    50%       { opacity: 1;    filter: drop-shadow(0 0 6px rgba(250,204,21,0.95)); }
+  }
+  .gold-shine {
+    animation: goldPulse 2.8s ease-in-out infinite;
+    color: rgb(250,204,21) !important;
+  }
+  @keyframes sfCardSelect {
+    0%   { box-shadow: none; }
+    22%  { box-shadow: 0 0 0 3px rgba(250,204,21,0.9), 0 0 18px rgba(250,204,21,0.5); }
+    44%  { box-shadow: none; }
+    66%  { box-shadow: 0 0 0 3px rgba(250,204,21,0.9), 0 0 18px rgba(250,204,21,0.5); }
+    88%, 100% { box-shadow: none; }
+  }
+  .sf-card-select { animation: sfCardSelect 0.5s ease-in-out forwards; }
+  @keyframes doublePulse {
+    0%   { transform: scale(1); }
+    18%  { transform: scale(1.07); }
+    36%  { transform: scale(1); }
+    54%  { transform: scale(1.04); }
+    72%  { transform: scale(1); }
+    100% { transform: scale(1); }
+  }
+  .double-pulse { animation: doublePulse 0.45s ease-in-out forwards; }
+
+  /* Disable hover styles on touch-only devices (prevents sticky hover after tap) */
+  @media (hover: none) {
+    .sf-card-btn:hover { background-color: rgb(31 41 55) !important; border-color: rgb(55 65 81) !important; }
+    .sf-card-btn:hover .sf-card-title { color: rgb(243 244 246) !important; }
+  }
+
+  /* Hide scrollbars inside sidebar */
+  .sf-sidebar ::-webkit-scrollbar { display: none; }
+  .sf-sidebar { scrollbar-width: none; }
+
+  /* Backdrop shown behind sidebar on tablet/mobile */
+  .sf-sidebar-backdrop { display: none; }
+  @media (max-width: 1024px) {
+    .sf-sidebar-backdrop {
+      display: block;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 49;
+    }
+  }
+
+  /* ── Character select row cards ─────────────────────────────── */
+  /* Mobile: image stacks full-width above text, locked to natural 3:2 ratio */
+  .sf-char-row-btn { flex-direction: column; }
+  .sf-char-portrait-wrap { width: 100% !important; aspect-ratio: 512 / 342; border-radius: 10px 10px 0 0 !important; overflow: hidden; }
+  .sf-char-portrait { width: 100%; height: 100%; display: block; object-fit: cover; border-radius: 0; }
+  /* Tablet+: image left 50%, content right — aspect-ratio locks natural proportions */
+  @media (min-width: 601px) {
+    .sf-char-row-btn { flex-direction: row; align-items: flex-start; }
+    .sf-char-portrait-wrap { width: 50% !important; aspect-ratio: 512 / 342; flex-shrink: 0; border-radius: 10px 0 0 10px !important; overflow: hidden; }
+    .sf-char-portrait { width: 100%; height: 100%; display: block; object-fit: cover; }
+  }
+
+  /* ── Tablet (iPad) ──────────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    /* Sidebar: float over content instead of pushing it */
+    .sf-sidebar { position: fixed !important; top: 0; left: 0; height: 100dvh !important; z-index: 50; box-shadow: 4px 0 24px rgba(0,0,0,0.6); }
+    /* Give main area its own stacking context so sidebar overlays it */
+    .sf-game-root { position: relative; height: 100dvh !important; }
+    /* Hide all three badges on tablet — scene header truncates gracefully */
+    .sf-badge-sm { display: none !important; }
+  }
+
+  /* ── Mobile phone ───────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    /* Reset the 150% base font so rem units don't balloon */
+    html { font-size: 112.5% !important; } /* 18px base: +2px across all rem-sized text */
+    /* Remove desktop zoom on setup screens */
+    .sf-setup { zoom: 1 !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+    /* Adventure grid: 2-col → 1-col */
+    .sf-story-grid { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+    /* Message bubbles: full width for DM, 88% for player */
+    .sf-dm-bubble  { max-width: 100% !important; }
+    .sf-player-bubble { max-width: 88% !important; }
+    /* Chat scroll: tighter padding */
+    .sf-chat-scroll { padding: 0.625rem !important; }
+    /* Player input bar: tighter */
+    .sf-player-input { padding: 0.5rem 0.625rem !important; padding-bottom: calc(0.5rem + env(safe-area-inset-bottom)) !important; }
+    /* Top bar: tighter horizontal padding */
+    .sf-top-bar { padding-left: 0.5rem !important; padding-right: 0.5rem !important; gap: 0.25rem !important; }
+    /* Hide all badges on phones — scene header fills the bar */
+    .sf-badge-sm { display: none !important; }
+  }
+</style>
+<body>
+  <div id="root"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+{
+  "ruleset": {
+    "id": "knight_hawks",
+    "name": "Astra Rising: Knights Rising",
+    "version": "1.0",
+    "type": "expansion",
+    "description": "Starship combat, construction, and space travel rules for Astra Rising",
+    "dependencies": [
+      "alpha_dawn_basic"
+    ],
+    "supplements": [
+      "knight_hawks_expanded"
+    ],
+    "adds_to_core": [
+      "Starship combat",
+      "Ship construction",
+      "Space travel",
+      "Spaceship skills"
+    ]
+  },
+  "starship_basics": {
+    "hull_sizes": {
+      "description": "Ships are classified by hull size (1-20)",
+      "hull_points": "Hull Size x 5",
+      "dcr": "(Hull Size x 3) + 20",
+      "examples": {
+        "1": "Fighter",
+        "3": "Assault Scout",
+        "5": "Frigate",
+        "6": "Destroyer",
+        "20": "Battleship",
+        "12-14": "Light Cruiser",
+        "16-18": "Heavy Cruiser"
+      }
+    },
+    "ship_statistics": {
+      "adf": {
+        "name": "Acceleration/Deceleration Factor",
+        "description": "How fast ship can speed up or slow down",
+        "range": "1-5",
+        "effect": "ADF = number of hexes speed can change per turn"
+      },
+      "mr": {
+        "name": "Maneuver Rating",
+        "description": "How many 60-degree turns ship can make per turn",
+        "range": "1-5"
+      },
+      "hull_points": {
+        "description": "Ship's structural integrity",
+        "calculation": "Hull Size x 5"
+      },
+      "dcr": {
+        "name": "Damage Control Rating",
+        "description": "Crew's ability to repair damage in combat",
+        "calculation": "(Hull Size x 3) + 20"
+      }
+    }
+  },
+  "ship_types": {
+    "fighter": {
+      "hull_size": 1,
+      "adf": 5,
+      "mr": 5,
+      "hull_points": 5,
+      "dcr": 23,
+      "crew": 1,
+      "weapons": "Assault rockets only",
+      "cost": "50000 Cr",
+      "description": "Fast attack craft, no interstellar capability"
+    },
+    "assault_scout": {
+      "hull_size": 3,
+      "adf": 4,
+      "mr": 4,
+      "hull_points": 15,
+      "dcr": 29,
+      "crew": "4-6",
+      "weapons": "Assault rockets, laser battery",
+      "cost": "250000 Cr",
+      "description": "Versatile scout vessel, interstellar capable"
+    },
+    "frigate": {
+      "hull_size": 5,
+      "adf": 3,
+      "mr": 3,
+      "hull_points": 25,
+      "dcr": 35,
+      "crew": "25-30",
+      "weapons": "Laser battery, proton battery, torpedo",
+      "cost": "800000 Cr",
+      "description": "Patrol vessel, common CFW warship"
+    },
+    "destroyer": {
+      "hull_size": 6,
+      "adf": 3,
+      "mr": 3,
+      "hull_points": 30,
+      "dcr": 38,
+      "crew": "40-50",
+      "weapons": "Laser battery, proton battery, electron battery, torpedo",
+      "cost": "1200000 Cr",
+      "description": "Heavy combat vessel"
+    },
+    "light_cruiser": {
+      "hull_size": "12-14",
+      "adf": 2,
+      "mr": 2,
+      "hull_points": "60-70",
+      "dcr": "56-62",
+      "crew": "200+",
+      "weapons": "Multiple batteries, torpedoes",
+      "cost": "5000000+ Cr",
+      "description": "Fast, well-armed capital ship"
+    },
+    "heavy_cruiser": {
+      "hull_size": "16-18",
+      "adf": 1,
+      "mr": 1,
+      "hull_points": "80-90",
+      "dcr": "68-74",
+      "crew": "300+",
+      "weapons": "Extensive batteries, multiple torpedoes",
+      "cost": "8000000+ Cr",
+      "description": "Old battleships, still formidable"
+    },
+    "battleship": {
+      "hull_size": 20,
+      "adf": 1,
+      "mr": 1,
+      "hull_points": 100,
+      "dcr": 80,
+      "crew": "400+",
+      "weapons": "Maximum armament",
+      "cost": "15000000+ Cr",
+      "description": "Mightiest warship, rare and powerful"
+    }
+  },
+  "ship_weapons": {
+    "assault_rocket": {
+      "mhs": 1,
+      "damage": "20 hull points",
+      "range": "4 hexes",
+      "ammo": "Limited (usually 4-6)",
+      "notes": "Fighter/Scout only, one shot per launcher per turn"
+    },
+    "rocket_battery": {
+      "mhs": 5,
+      "damage": "20 hull points per rocket",
+      "range": "6 hexes",
+      "rate": "Up to 4 rockets per turn",
+      "ammo": "20 rockets per battery"
+    },
+    "laser_cannon": {
+      "mhs": 5,
+      "damage": "1d10 per SEU expended",
+      "range": "10 hexes",
+      "notes": "Forward firing only, uses ship's power"
+    },
+    "laser_battery": {
+      "mhs": 3,
+      "damage": "1d10 per SEU expended",
+      "range": "9 hexes",
+      "notes": "Turret mounted, 360-degree arc"
+    },
+    "proton_battery": {
+      "mhs": 10,
+      "damage": "20-80 hull points (2d10 x 4)",
+      "range": "12 hexes",
+      "notes": "Heavy weapon, significant damage"
+    },
+    "electron_battery": {
+      "mhs": 6,
+      "damage": "10-40 hull points (1d10 x 4)",
+      "range": "9 hexes",
+      "notes": "Medium weapon, reliable"
+    },
+    "torpedo": {
+      "mhs": 7,
+      "damage": "40-80 hull points (4d10 x 2)",
+      "range": "4 hexes",
+      "notes": "Devastating but short-ranged"
+    },
+    "mine": {
+      "mhs": 5,
+      "damage": "30-120 hull points (3d10 x 4)",
+      "notes": "Deployed in hex, detonates on contact"
+    }
+  },
+  "defenses": {
+    "reflective_hull": {
+      "cost": "10000 Cr x Hull Size",
+      "effect": "Reflects laser weapons (no damage)",
+      "mhs": 0
+    },
+    "masking_screen": {
+      "cost": "5000 Cr x Hull Size",
+      "effect": "Blocks energy weapons for 1 turn",
+      "usage": "One use, must be replaced"
+    },
+    "interceptor_missile": {
+      "name": "ICM",
+      "cost": "2000 Cr each",
+      "effect": "Destroys incoming torpedoes/rockets (60% base chance)",
+      "usage": "Expended when used"
+    },
+    "electron_screen": {
+      "cost": "15000 Cr x Hull Size",
+      "effect": "Absorbs electron battery damage"
+    },
+    "proton_screen": {
+      "cost": "20000 Cr x Hull Size",
+      "effect": "Absorbs proton battery damage"
+    },
+    "stasis_screen": {
+      "cost": "25000 Cr x Hull Size",
+      "effect": "Immobilizes attacking ship for 1 turn"
+    }
+  },
+  "starship_combat": {
+    "combat_map": {
+      "scale": "1 hex = 10000 km",
+      "turn_length": "10 minutes"
+    },
+    "combat_sequence": [
+      "Plot movement secretly",
+      "Move ships simultaneously",
+      "Resolve combat"
+    ],
+    "movement": {
+      "acceleration": "Change speed by ADF each turn",
+      "turning": "One 60-degree turn per MR point per turn",
+      "gravity": "Ships must move at least 1 hex per turn or drift"
+    },
+    "to_hit": {
+      "base": "50% for most weapons",
+      "modifiers": {
+        "target_size": "+10% per hull size above 5, -10% per hull size below 5",
+        "range": "-10% per hex beyond half maximum range",
+        "gunnery_skill": "+5% per skill level"
+      }
+    },
+    "damage": {
+      "hull_damage": "Reduce hull points",
+      "system_damage": "When hull points reduced, roll on damage table",
+      "destruction": "At 0 hull points, ship destroyed"
+    },
+    "damage_control": {
+      "description": "Crew can repair damage during combat",
+      "chance": "DCR rating",
+      "success": "Restore 1 system or 5 hull points"
+    }
+  },
+  "interstellar_travel": {
+    "the_void": {
+      "description": "Hyperspace realm that shortens travel time",
+      "entry": "Ship must reach 1% light speed (3000 km/s)",
+      "travel_time": "3-15 seconds subjective time",
+      "distance": "Light-years traveled depend on astrogation"
+    },
+    "astrogation": {
+      "description": "Plotting courses through the Void",
+      "safe_jumps": "10 hours plotting per light-year",
+      "risk_jumps": "Faster plotting with chance of misjump",
+      "misjump": "Emerge at random location within range circle"
+    },
+    "risk_jumping": {
+      "description": "Faster plotting with increased danger",
+      "time_saved": "Reduce plotting time, increase misjump chance",
+      "misjump_effects": [
+        "Emerge in wrong system",
+        "Emerge in empty space",
+        "Ship damage",
+        "Lost in space"
+      ]
+    }
+  },
+  "spaceship_skills": {
+    "description": "Skills for operating starships",
+    "piloting": {
+      "foundation": "Technological PSA level 6, Computer level 2",
+      "subskills": [
+        {
+          "name": "Evasion",
+          "effect": "+3% per level to avoid being hit"
+        },
+        {
+          "name": "Increase MR",
+          "effect": "Temporarily increase MR by 1 (costs 5% power)"
+        },
+        {
+          "name": "Accuracy",
+          "effect": "+5% per level to hit with ship weapons"
+        }
+      ]
+    },
+    "astrogation": {
+      "foundation": "Computer level 6",
+      "subskills": [
+        {
+          "name": "Plot Interstellar Jumps",
+          "effect": "Navigate through the Void"
+        },
+        {
+          "name": "Risk Jumping",
+          "effect": "Jump faster with reduced safety"
+        },
+        {
+          "name": "Find Location",
+          "effect": "30% + 10% per level to determine position after misjump"
+        },
+        {
+          "name": "Chart Routes",
+          "effect": "Create safe, fast routes between systems"
+        }
+      ]
+    },
+    "engineering": {
+      "foundation": "Technological PSA level 4, Robotics level 2",
+      "subskills": [
+        {
+          "name": "Ship Design",
+          "effect": "Design and modify starships"
+        },
+        {
+          "name": "Damage Control",
+          "effect": "+10% per level to repair systems in combat"
+        },
+        {
+          "name": "Stress Analysis",
+          "effect": "Identify ship weaknesses, improve performance"
+        }
+      ]
+    },
+    "gunnery": {
+      "foundation": "Beam Weapons level 6 OR Projectile Weapons level 4, Jyro level 2",
+      "subskills": [
+        {
+          "name": "Improve Accuracy",
+          "effect": "+5% per level to hit with ship weapons"
+        },
+        {
+          "name": "Selective Targeting",
+          "effect": "-30% to hit specific systems"
+        }
+      ]
+    }
+  },
+  "ship_construction": {
+    "description": "Building custom starships",
+    "steps": [
+      "Choose hull size",
+      "Install engines (determines ADF)",
+      "Install maneuvering jets (determines MR)",
+      "Add weapons (limited by MHS)",
+      "Add defenses",
+      "Add special equipment"
+    ],
+    "costs": {
+      "hull": "Variable by size",
+      "engines": "10000 Cr per ADF point x Hull Size",
+      "maneuvering": "5000 Cr per MR point x Hull Size",
+      "weapons": "By weapon type",
+      "defenses": "By defense type"
+    }
+  },
+  "ai_reference": {
+    "quick_combat": {
+      "initiative": "Plot movement, move simultaneously, resolve combat",
+      "to_hit": "50% + modifiers + (Gunnery 5% per level)",
+      "damage": "Apply to hull points, check for system damage"
+    },
+    "ship_stats_lookup": {
+      "hull_points": "Hull Size x 5",
+      "dcr": "(Hull Size x 3) + 20",
+      "weapon_damage": "By weapon type",
+      "defense_effect": "By defense type"
+    }
+  }
+}

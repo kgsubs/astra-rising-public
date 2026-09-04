@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Canonical IP substitution registry for Astra Rising. All Star Frontiers proper nouns map to their approved replacements.",
+    "usage": "ipSanitizer.js applies this registry to campaign content on ingest. game-data.js and rules JSONs are patched directly."
+  },
+  "races": {
+    "Vrusk": "Krix",
+    "Dralasite": "Moluun",
+    "Yazirian": "Skrath",
+    "Humma": "Grak",
+    "Ifshnit": "Chiivari",
+    "Osakar": "Ossivaan"
+  },
+  "npc_races": {
+    "Ul-Mor": "Ul'Mek",
+    "Kurabanda": "Kruvaan",
+    "Edestekai": "Ashtekkai",
+    "Eorna": "Aelunn",
+    "Heliopes": "Solari",
+    "Heliope": "Solari",
+    "Ela-Eorn": "Ela-Vaen"
+  },
+  "creatures": {
+    "Quickdeath": "Razorback",
+    "quickdeath": "razorback",
+    "kudas": "striders",
+    "Kuda": "Strider",
+    "kuda": "strider",
+    "Canyon Loper": "Rift Stalker",
+    "Frost Worm": "Glacial Crawler"
+  },
+  "factions": {
+    "United Planetary Federation": "Concordat of Free Worlds",
+    "Pan-Galactic Corporation": "Helix Combine",
+    "Pan-Galactic Holo-News": "Helix Holo-News",
+    "Cassidine Development Corporation": "Arcadia Development Consortium",
+    "Capellan Free Merchants": "Rimward Free Merchants",
+    "Council of Worlds": "Assembly of Worlds",
+    "Streel Corporation": "Nexarion Group",
+    "Pan-Galactic": "Helix Combine",
+    "Star Law": "Apex Law",
+    "Streel": "Nexarion Group",
+    "UPF": "CFW",
+    "PGC": "Helix Combine",
+    "CDC": "ADC",
+    "CFM": "RFM",
+    "Sathar": "The Vaash"
+  },
+  "locations": {
+    "Morgaine's World": "Vael's Reach",
+    "Gran Quivera": "Procyus Prime",
+    "Pale Station": "Waystation Pell",
+    "Minotaur Station": "Waystation Kador",
+    "Karakaras Station": "Waystation Thresh",
+    "Oberon Station": "Waystation Null",
+    "Station Prometheus": "Station Kairos",
+    "Mhemne Station": "Waystation Murn",
+    "Outpost Zeta-7": "Station Lethis",
+    "Zebulon system": "Korvath system",
+    "Dramune system": "Kelvarn system",
+    "Cassidine system": "Halcyon system",
+    "Tristkar system": "Valdris system",
+    "Sundown system": "Vashara system",
+    "Volturnus": "Cethara",
+    "Alcazzar": "Glacivaar",
+    "Starmist": "Vashara",
+    "Kraatar": "Kaarath",
+    "Clarion": "Tessavar",
+    "Zebulon": "Korvath",
+    "Dramune": "Kelvarn",
+    "Cassidine": "Halcyon",
+    "Zeta-7": "Station Lethis",
+    "Port Loren": "Port Meridian",
+    "Triad": "Nexus"
+  },
+  "rulesets": {
+    "Star Frontiers RPG - Complete Rules Reference": "Astra Rising Complete Rules Reference",
+    "Star Frontiers: Alpha Dawn Basic Rules": "Astra Rising Core Rules",
+    "Star Frontiers: Alpha Dawn Expanded Rules": "Astra Rising Core Extended Rules",
+    "Star Frontiers: Zebulon's Guide to Frontier Space": "Astra Rising: Korvath's Guide to the Frontier",
+    "Star Frontiers: Gamma Dawn": "Astra Rising: Gamma Rising",
+    "Zebulon's Guide to Frontier Space": "Korvath's Guide to the Frontier",
+    "Alpha Dawn Basic Rules": "Astra Rising Core Rules",
+    "Alpha Dawn Expanded Rules": "Astra Rising Core Extended Rules",
+    "Knight Hawks Expansion": "Knights Rising Extended",
+    "Knight Hawks": "Knights Rising",
+    "Zebulon's Guide": "Korvath's Guide",
+    "Alpha Dawn": "Astra Rising Core",
+    "Gamma Dawn": "Gamma Rising",
+    "Star Frontiers": "Astra Rising"
+  },
+  "misc": {
+    "Soller Chili Parlor": "Nebula Chili Parlor",
+    "VSS Centispeed": "KXS Centispeed",
+    "Pan-Gal": "Helix Standard",
+    "star_frontiers.db": "astra_rising.db"
+  }
+}

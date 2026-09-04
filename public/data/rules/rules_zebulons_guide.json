@@ -1,0 +1,517 @@
+{
+  "ruleset": {
+    "id": "zebulons_guide",
+    "name": "Astra Rising: Korvath's Guide to the Frontier",
+    "version": "1.0",
+    "type": "major_expansion",
+    "description": "Major expansion adding new races, the Resolution Table system, professions, and 100+ skills",
+    "dependencies": [
+      "alpha_dawn_basic"
+    ],
+    "supplements": [
+      "alpha_dawn_expanded",
+      "knight_hawks"
+    ],
+    "adds_to_core": [
+      "Resolution Table",
+      "3 new races",
+      "6 professions",
+      "100+ skills",
+      "Specialization system"
+    ],
+    "replaces_core": [
+      "Simple percentile rolls replaced with Resolution Table"
+    ]
+  },
+  "resolution_table": {
+    "description": "Revolutionary mechanic replacing simple percentile rolls",
+    "columns": {
+      "description": "Columns represent skill level or difficulty",
+      "values": [
+        "-X",
+        "-5",
+        "-4",
+        "-3",
+        "-2",
+        "-1",
+        "0",
+        "/0",
+        "+1",
+        "+2",
+        "+3",
+        "+4",
+        "+5",
+        "+X"
+      ],
+      "skill_mapping": {
+        "0": "Level 0 (unskilled)",
+        "1-5": "Levels 1-5",
+        "6+": "Level 6+",
+        "/0": "Base chance without skill"
+      }
+    },
+    "results": {
+      "cobalt": {
+        "description": "Maximum success",
+        "effect": "Full damage, maximum effect, critical success"
+      },
+      "blue": {
+        "description": "Good success",
+        "effect": "75% of maximum effect"
+      },
+      "green": {
+        "description": "Moderate success",
+        "effect": "50% of maximum effect"
+      },
+      "yellow": {
+        "description": "Minimal success",
+        "effect": "25% of maximum effect"
+      },
+      "white": {
+        "description": "Failure",
+        "effect": "No effect, action fails"
+      }
+    },
+    "column_shifts": {
+      "description": "Modifiers that shift which column is used",
+      "positive_cs": "Easier task - shift right (+10% per CS in old system)",
+      "negative_cs": "Harder task - shift left (-10% per CS in old system)",
+      "examples": {
+        "good_conditions": "+1 to +2 CS",
+        "poor_conditions": "-1 to -2 CS",
+        "dexterity_modifier": "Based on DEX score"
+      }
+    },
+    "dexterity_modifiers": {
+      "01-30": "-2 CS",
+      "31-40": "-1 CS",
+      "41-55": "0 CS",
+      "56-70": "+1 CS",
+      "71-100": "+2 CS",
+      "100+": "+3 CS"
+    }
+  },
+  "new_races": {
+    "description": "Three rim races added after Second Neg War",
+    "humma": {
+      "description": "Large, powerful marsupial-like humanoids",
+      "ability_modifiers": {
+        "STR": "+10",
+        "STA": "+10",
+        "PER": "-10",
+        "LDR": "-10"
+      },
+      "special_abilities": [
+        {
+          "name": "Spring Charge",
+          "description": "Can leap 20 meters forward in combat, +10% to hit on charge attack"
+        },
+        {
+          "name": "Poison Resistance",
+          "description": "+20% to resist poison and toxins"
+        },
+        {
+          "name": "Prehensile Tail",
+          "description": "Can use tail to hold items, +5% to climbing"
+        }
+      ],
+      "movement": "10 meters/turn",
+      "size": "Large"
+    },
+    "ifshnit": {
+      "description": "Small, goat-like humanoids, expert traders",
+      "ability_modifiers": {
+        "STR": "-5",
+        "STA": "-5",
+        "INT": "+5",
+        "LOG": "+5"
+      },
+      "special_abilities": [
+        {
+          "name": "Inner Eyelids",
+          "description": "Can close transparent inner lids, immune to eye irritants"
+        },
+        {
+          "name": "Innate Skill",
+          "description": "Free level 1 in Appraisal, Gemology, or Haggling"
+        },
+        {
+          "name": "Trade Instinct",
+          "description": "+10% to all commercial transactions"
+        }
+      ],
+      "movement": "10 meters/turn",
+      "size": "Small"
+    },
+    "osakar": {
+      "description": "Tall, thin humanoids with exceptional senses",
+      "ability_modifiers": {
+        "STR": "+5",
+        "STA": "+5",
+        "DEX": "+5",
+        "RS": "+5",
+        "PER": "-10",
+        "LDR": "-10"
+      },
+      "special_abilities": [
+        {
+          "name": "Highly Developed Smell",
+          "description": "+2 CS to Tracking, can identify individuals by scent"
+        },
+        {
+          "name": "Linguistic Aptitude",
+          "description": "Can learn 4 languages at character creation"
+        },
+        {
+          "name": "Sensory Awareness",
+          "description": "+10% to detect hidden objects or creatures"
+        }
+      ],
+      "movement": "12 meters/turn",
+      "size": "Medium"
+    },
+    "mechanons": {
+      "description": "Robot-evolved race (NPCs primarily)",
+      "note": "Not recommended as player characters",
+      "ability_modifiers": {
+        "STR": "+20",
+        "STA": "+10",
+        "DEX": "+10",
+        "RS": "+10",
+        "INT": "-20",
+        "LOG": "+10",
+        "PER": "-20",
+        "LDR": "+20"
+      },
+      "special_abilities": [
+        "Ambidexterity",
+        "Built-in weapons and optics",
+        "Immune to poison, disease, vacuum",
+        "Do not heal naturally (must be repaired)"
+      ]
+    }
+  },
+  "professions": {
+    "description": "Six professional paths with free skills",
+    "enforcer": {
+      "description": "Combat specialist, security, law enforcement",
+      "free_skill": "Endurance",
+      "focus": "Combat skills, physical abilities",
+      "typical_skills": [
+        "Beam Weapons",
+        "Melee Weapons",
+        "Martial Arts",
+        "Endurance",
+        "Intimidation"
+      ]
+    },
+    "techex": {
+      "description": "Technical expert, engineer, computer specialist",
+      "free_skill": "Agility",
+      "focus": "Technical equipment, computers, robots",
+      "typical_skills": [
+        "Computers",
+        "Robotics",
+        "Technician",
+        "Engineering",
+        "Machinery"
+      ]
+    },
+    "scispec": {
+      "description": "Scientist, researcher, medical professional",
+      "free_skill": "Intelligence",
+      "focus": "Scientific research, medicine, programming",
+      "typical_skills": [
+        "Medical",
+        "Chemistry",
+        "Physics",
+        "Biology",
+        "Computer Programming"
+      ]
+    },
+    "explorer": {
+      "description": "Scout, survivalist, alien contact specialist",
+      "free_skill": "Charisma",
+      "focus": "Scouting, survival, first contact",
+      "typical_skills": [
+        "Environmental",
+        "Tracking",
+        "Stealth",
+        "Alien Contact",
+        "Survival"
+      ]
+    },
+    "mentalist": {
+      "description": "Psionic abilities (optional rules)",
+      "free_skill": "None",
+      "focus": "Mental powers, telepathy, telekinesis",
+      "note": "Requires optional psionics rules"
+    },
+    "spacer": {
+      "description": "Spaceship operations specialist",
+      "free_skill": "None (requires Knights Rising)",
+      "focus": "Piloting, astrogation, engineering, gunnery",
+      "typical_skills": [
+        "Piloting",
+        "Astrogation",
+        "Engineering",
+        "Gunnery"
+      ]
+    }
+  },
+  "expanded_skill_system": {
+    "description": "100+ skills organized by PSA",
+    "skill_costs": {
+      "professional": {
+        "description": "Skills within your profession's PSA",
+        "level_1": "1 XP",
+        "level_2": "2 XP",
+        "level_3": "4 XP",
+        "level_4": "6 XP",
+        "level_5": "8 XP",
+        "level_6": "10 XP"
+      },
+      "non_professional": {
+        "description": "Skills outside your profession's PSA",
+        "level_1": "2 XP",
+        "level_2": "4 XP",
+        "level_3": "8 XP",
+        "level_4": "12 XP",
+        "level_5": "16 XP",
+        "level_6": "20 XP"
+      }
+    },
+    "military_skills": {
+      "beam_weapons": {
+        "description": "Laser and energy weapons",
+        "subskills": [
+          "Pistol",
+          "Rifle",
+          "Heavy"
+        ]
+      },
+      "projectile_weapons": {
+        "description": "Bullet and jyro weapons",
+        "subskills": [
+          "Pistol",
+          "Rifle",
+          "Machine Gun",
+          "Heavy"
+        ]
+      },
+      "melee_weapons": {
+        "description": "Hand-to-hand weapons",
+        "subskills": [
+          "Edged",
+          "Blunt",
+          "Vibro",
+          "Sonic"
+        ]
+      },
+      "martial_arts": {
+        "description": "Unarmed combat techniques",
+        "special": "Each level adds +5 to punching damage"
+      },
+      "grenades": {
+        "description": "Thrown explosives"
+      },
+      "demolitions": {
+        "description": "Explosives and sabotage"
+      },
+      "rockets": {
+        "description": "Rocket launchers and missiles"
+      },
+      "thrown_weapons": {
+        "description": "Knives, spears, other thrown weapons"
+      },
+      "archaic_weapons": {
+        "description": "Primitive weapons (bows, crossbows)"
+      }
+    },
+    "technological_skills": {
+      "computers": {
+        "description": "Computer operation and programming",
+        "subskills": [
+          "Operate",
+          "Program",
+          "Defeat Security",
+          "Write Code",
+          "Data Analysis",
+          "Information Search"
+        ]
+      },
+      "robotics": {
+        "description": "Robot construction and repair",
+        "subskills": [
+          "Operate",
+          "Repair",
+          "Modify",
+          "Design",
+          "Activate/Deactivate",
+          "List Commands",
+          "Bypass Security",
+          "Alter Functions",
+          "Alter Appearance"
+        ]
+      },
+      "technician": {
+        "description": "Machinery operation and repair",
+        "subskills": [
+          "Operate Machinery",
+          "Repair Machinery",
+          "Detect Alarms",
+          "Defeat Alarms",
+          "Open Locks"
+        ]
+      },
+      "engineering": {
+        "description": "Design and construction of complex systems"
+      },
+      "machinery": {
+        "description": "Heavy equipment operation"
+      },
+      "electronics": {
+        "description": "Electronic systems and circuits"
+      },
+      "cybernetics": {
+        "description": "Cybernetic implant technology"
+      },
+      "weapons_technician": {
+        "description": "Weapon maintenance and modification"
+      }
+    },
+    "biosocial_skills": {
+      "environmental": {
+        "description": "Survival and nature lore",
+        "subskills": [
+          "Survival",
+          "Tracking",
+          "Stealth",
+          "Camouflage",
+          "Climbing",
+          "Swimming"
+        ]
+      },
+      "medical": {
+        "description": "Healing and treatment",
+        "subskills": [
+          "Diagnosis",
+          "Treatment: Wounds",
+          "Treatment: Disease",
+          "Treatment: Poison",
+          "Treatment: Radiation",
+          "Surgery",
+          "Psychiatry"
+        ]
+      },
+      "psychosocial": {
+        "description": "Social interaction and psychology",
+        "subskills": [
+          "Persuasion",
+          "Bluff",
+          "Intimidation",
+          "Interrogation",
+          "Leadership",
+          "Psychology"
+        ]
+      },
+      "botany": {
+        "description": "Plant science"
+      },
+      "zoology": {
+        "description": "Animal science"
+      },
+      "chemistry": {
+        "description": "Chemical science"
+      },
+      "physics": {
+        "description": "Physical science"
+      },
+      "biology": {
+        "description": "Life science"
+      },
+      "geology": {
+        "description": "Earth science"
+      },
+      "anthropology": {
+        "description": "Study of cultures"
+      },
+      "linguistics": {
+        "description": "Language study"
+      }
+    }
+  },
+  "specialization": {
+    "description": "Focus on specific subskills",
+    "mechanic": "+10% to specific subskill for XP cost equal to Level 1 skill",
+    "examples": {
+      "military": "Specialize in Laser Pistol (+10%)",
+      "technological": "Specialize in Computer Programming (+10%)",
+      "biosocial": "Specialize in Wound Treatment (+10%)"
+    }
+  },
+  "ability_modifiers": {
+    "description": "Ability scores affect skill checks",
+    "modifiers": {
+      "01-10": "-20%",
+      "11-20": "-15%",
+      "21-30": "-10%",
+      "31-40": "-5%",
+      "41-50": "0%",
+      "51-60": "+5%",
+      "61-70": "+10%",
+      "71-80": "+15%",
+      "81-90": "+20%",
+      "91-100": "+25%",
+      "100+": "+30%"
+    }
+  },
+  "combat_resolution_table": {
+    "description": "Using Resolution Table for combat",
+    "weapon_damage": {
+      "max_10": {
+        "cobalt": 10,
+        "blue": 7,
+        "green": 5,
+        "yellow": 2
+      },
+      "max_20": {
+        "cobalt": 20,
+        "blue": 15,
+        "green": 10,
+        "yellow": 5
+      },
+      "max_30": {
+        "cobalt": 30,
+        "blue": 22,
+        "green": 15,
+        "yellow": 7
+      },
+      "max_40": {
+        "cobalt": 40,
+        "blue": 30,
+        "green": 20,
+        "yellow": 10
+      }
+    },
+    "automatic_results": {
+      "01-02": "Automatic hit with maximum damage (even at -1 RS)",
+      "25_or_less": "Always hits (even on -X column)",
+      "98-00": "Always misses (even on +X column)"
+    }
+  },
+  "ai_reference": {
+    "resolution_table_usage": {
+      "determine_column": "Base on skill level or difficulty",
+      "apply_modifiers": "Column shifts from conditions, DEX, etc.",
+      "roll_d100": "Find result on table",
+      "interpret_result": "Cobalt/Blue/Green/Yellow/White"
+    },
+    "skill_lookup": {
+      "psa": "Military, Technological, or Biosocial",
+      "cost": "Professional or Non-professional",
+      "base_chance": "Usually 1/2 ability score",
+      "per_level": "+10% or Resolution Table shift"
+    }
+  }
+}

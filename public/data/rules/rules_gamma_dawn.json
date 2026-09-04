@@ -1,0 +1,399 @@
+{
+  "ruleset": {
+    "id": "gamma_dawn",
+    "name": "Astra Rising: Gamma Rising",
+    "version": "1.0",
+    "type": "alternate_expansion",
+    "description": "Alternate rules, optional systems, and variant gameplay options for Astra Rising",
+    "dependencies": [
+      "alpha_dawn_basic"
+    ],
+    "supplements": [
+      "alpha_dawn_expanded",
+      "zebulons_guide",
+      "knight_hawks"
+    ],
+    "adds_to_core": [
+      "Alternate combat",
+      "Psionics",
+      "Mutations",
+      "Cybernetics",
+      "Variant races"
+    ],
+    "notes": "These rules are optional and may be used alongside or instead of standard rules"
+  },
+  "alternate_combat": {
+    "description": "Variant combat resolution systems",
+    "action_points": {
+      "description": "Characters have Action Points per turn",
+      "base": "DEX / 10 (round up)",
+      "costs": {
+        "move": "1 AP per 5 meters",
+        "attack": "2 AP",
+        "aimed_shot": "3 AP",
+        "reload": "2 AP",
+        "use_item": "1-3 AP"
+      }
+    },
+    "hit_locations": {
+      "description": "Optional location-based damage",
+      "roll": "d10 after successful hit",
+      "locations": {
+        "1": "Head (x3 damage, -20% to hit)",
+        "2-3": "Torso (normal damage)",
+        "4-5": "Arms (normal damage, may drop weapon)",
+        "6-8": "Legs (normal damage, may fall)",
+        "9-10": "Vitals (x2 damage)"
+      }
+    },
+    "critical_hits": {
+      "description": "Special effects on exceptional rolls",
+      "trigger": "Roll 01-05 on attack",
+      "effects": [
+        "Double damage",
+        "Disarm opponent",
+        "Stun opponent (lose next action)",
+        "Bypass armor"
+      ]
+    },
+    "suppression_fire": {
+      "description": "Area denial with automatic weapons",
+      "effect": "Enemies in area must make RS check or be pinned (-20% to actions)"
+    }
+  },
+  "psionics": {
+    "description": "Optional mental powers system",
+    "availability": "Requires Mentalist profession (Korvath's Guide)",
+    "power_points": {
+      "base": "INT + LOG",
+      "recovery": "1 per hour of rest"
+    },
+    "disciplines": {
+      "telepathy": {
+        "description": "Mental communication and reading",
+        "powers": [
+          {
+            "name": "Mind Reading",
+            "cost": "5 PP",
+            "effect": "Read surface thoughts"
+          },
+          {
+            "name": "Mental Communication",
+            "cost": "3 PP per minute",
+            "effect": "Silent communication with target"
+          },
+          {
+            "name": "Suggestion",
+            "cost": "10 PP",
+            "effect": "Implant simple idea in target's mind"
+          }
+        ]
+      },
+      "telekinesis": {
+        "description": "Move objects with mind",
+        "powers": [
+          {
+            "name": "Levitation",
+            "cost": "5 PP",
+            "effect": "Lift self or object (STR equivalent = level x 10)"
+          },
+          {
+            "name": "Telekinetic Shield",
+            "cost": "8 PP",
+            "effect": "Deflect attacks (-20% to be hit)"
+          },
+          {
+            "name": "TK Strike",
+            "cost": "10 PP",
+            "effect": "Mental attack (2d10 damage)"
+          }
+        ]
+      },
+      "precognition": {
+        "description": "Sense future events",
+        "powers": [
+          {
+            "name": "Danger Sense",
+            "cost": "5 PP",
+            "effect": "Warns of imminent danger"
+          },
+          {
+            "name": "Foresight",
+            "cost": "15 PP",
+            "effect": "Glimpse possible futures"
+          }
+        ]
+      },
+      "pyrokinesis": {
+        "description": "Control fire and heat",
+        "powers": [
+          {
+            "name": "Ignite",
+            "cost": "5 PP",
+            "effect": "Start fire on flammable material"
+          },
+          {
+            "name": "Heat Blast",
+            "cost": "10 PP",
+            "effect": "Fire attack (3d10 damage)"
+          }
+        ]
+      }
+    },
+    "psionic_combat": {
+      "description": "Mental combat between psionicists",
+      "resolution": "Opposed INT + skill levels",
+      "damage": "PP loss, mental trauma, unconsciousness"
+    }
+  },
+  "mutations": {
+    "description": "Genetic alterations from radiation, chemicals, or experimentation",
+    "sources": [
+      "Radiation exposure",
+      "Chemical contamination",
+      "Genetic experimentation",
+      "Alien influence"
+    ],
+    "mutation_table": {
+      "beneficial": [
+        {
+          "name": "Regeneration",
+          "effect": "Heal 1 STA per hour"
+        },
+        {
+          "name": "Enhanced Senses",
+          "effect": "+20% to detection rolls"
+        },
+        {
+          "name": "Natural Armor",
+          "effect": "Absorb 1/4 damage"
+        },
+        {
+          "name": "Adrenal Boost",
+          "effect": "+10 STR/STA for 1 turn, once per day"
+        },
+        {
+          "name": "Poison Resistance",
+          "effect": "Immune to most toxins"
+        }
+      ],
+      "detrimental": [
+        {
+          "name": "Physical Deformity",
+          "effect": "-10 PER, social penalties"
+        },
+        {
+          "name": "Mental Instability",
+          "effect": "Random mood swings, -10 LOG"
+        },
+        {
+          "name": "Weakened Immune System",
+          "effect": "Double damage from disease/poison"
+        },
+        {
+          "name": "Photosensitivity",
+          "effect": "-20% in bright light"
+        }
+      ],
+      "cosmetic": [
+        "Unusual skin color",
+        "Glowing eyes",
+        "Extra digits",
+        "Unusual hair growth"
+      ]
+    }
+  },
+  "cybernetics": {
+    "description": "Mechanical enhancements and replacements",
+    "cyber_points": {
+      "description": "Maximum cybernetics a body can handle",
+      "base": "STA / 10",
+      "cost_per_implant": "1-5 points"
+    },
+    "implants": {
+      "limb_replacement": {
+        "description": "Prosthetic limbs with enhancements",
+        "cost": "2000-10000 Cr",
+        "enhancements": [
+          "Increased strength (+10 STR)",
+          "Concealed weapon",
+          "Tool integration"
+        ]
+      },
+      "ocular_implants": {
+        "description": "Enhanced vision",
+        "cost": "3000-8000 Cr",
+        "functions": [
+          "Night vision",
+          "Telescopic sight",
+          "Thermal imaging",
+          "Camera/recording"
+        ]
+      },
+      "neural_implants": {
+        "description": "Brain-computer interface",
+        "cost": "5000-15000 Cr",
+        "functions": [
+          "Direct computer interface",
+          "Skill chip slots",
+          "Memory enhancement",
+          "Math coprocessor"
+        ]
+      },
+      "skeletal_reinforcement": {
+        "description": "Enhanced bone structure",
+        "cost": "10000 Cr",
+        "effect": "+20 STA, immune to breaking bones"
+      },
+      "subdermal_armor": {
+        "description": "Armor beneath the skin",
+        "cost": "8000 Cr",
+        "effect": "Absorb 1/4 damage from physical attacks"
+      },
+      "weapon_implants": {
+        "description": "Concealed weapons",
+        "cost": "3000-10000 Cr",
+        "options": [
+          "Retractable blade",
+          "Mini-laser",
+          "Poison injector"
+        ]
+      }
+    },
+    "cyberpsychosis": {
+      "description": "Mental deterioration from too many implants",
+      "trigger": "Exceed cyber point limit",
+      "effects": [
+        "Loss of empathy",
+        "Mood swings",
+        "Obsessive behavior",
+        "Detachment from humanity"
+      ]
+    }
+  },
+  "variant_races": {
+    "description": "Alternate racial options",
+    "saurians": {
+      "description": "Reptilian humanoids",
+      "modifiers": {
+        "STR": "+5",
+        "DEX": "-5",
+        "INT": "-5",
+        "LOG": "+5"
+      },
+      "abilities": [
+        "Cold-blooded (slow in cold, fast in heat)",
+        "Natural claws (1d10 damage)",
+        "Enhanced smell"
+      ]
+    },
+    "felinoids": {
+      "description": "Cat-like humanoids",
+      "modifiers": {
+        "DEX": "+10",
+        "RS": "+10",
+        "STR": "-5",
+        "STA": "-5"
+      },
+      "abilities": [
+        "Night vision",
+        "Silent movement (+20% stealth)",
+        "Retractable claws (1d10 damage)"
+      ]
+    },
+    "synthetics": {
+      "description": "Androids and artificial beings",
+      "modifiers": {
+        "STR": "+10",
+        "STA": "+10",
+        "LOG": "+10",
+        "INT": "-10",
+        "PER": "-10",
+        "LDR": "-10"
+      },
+      "abilities": [
+        "Immune to poison, disease",
+        "Vacuum survival",
+        "No natural healing (requires repair)",
+        "Detectable by scanners"
+      ]
+    }
+  },
+  "environmental_hazards": {
+    "expanded": {
+      "radiation": {
+        "levels": [
+          {
+            "level": "Low",
+            "effect": "Minor sickness, -10% to actions"
+          },
+          {
+            "level": "Medium",
+            "effect": "Radiation sickness, 1d10 damage per day"
+          },
+          {
+            "level": "High",
+            "effect": "Severe sickness, 2d10 damage per day, mutation risk"
+          },
+          {
+            "level": "Lethal",
+            "effect": "Death in hours without protection"
+          }
+        ],
+        "protection": "Lead shielding, anti-rad drugs, suits"
+      },
+      "extreme_temperatures": {
+        "heat": {
+          "description": "Above 50°C",
+          "effect": "1d10 damage per hour without protection",
+          "protection": "Cooling suits, shade, water"
+        },
+        "cold": {
+          "description": "Below -20°C",
+          "effect": "1d10 damage per hour without protection",
+          "protection": "Heated suits, shelter"
+        }
+      },
+      "vacuum": {
+        "description": "Space exposure",
+        "effects": [
+          "0-15 seconds: Conscious, can act",
+          "15-30 seconds: Dazed, -50% to actions",
+          "30-60 seconds: Unconscious",
+          "60+ seconds: Death"
+        ],
+        "protection": "Spacesuit required"
+      }
+    }
+  },
+  "reputation_system": {
+    "description": "Track character reputation across the Frontier",
+    "categories": {
+      "upf": "Standing with Concordat of Free Worlds",
+      "corporations": {
+        "pgc": "Helix Combine",
+        "streel": "Nexarion Group",
+        "cdc": "Arcadia Development Consortium"
+      },
+      "underworld": "Standing with criminal elements",
+      "frontier": "General reputation among colonists"
+    },
+    "effects": {
+      "positive": "Better prices, information, assistance",
+      "negative": "Higher prices, harassment, enemies"
+    }
+  },
+  "ai_reference": {
+    "optional_rules": {
+      "psionics": "Use Mentalist profession, track Power Points",
+      "mutations": "Roll on mutation tables for exposure",
+      "cybernetics": "Track Cyber Points, watch for cyberpsychosis",
+      "reputation": "Track by faction, affect interactions"
+    },
+    "variant_combat": {
+      "action_points": "Track AP per turn, spend on actions",
+      "hit_locations": "Roll d10 for location, apply modifiers",
+      "criticals": "01-05 triggers special effect"
+    }
+  }
+}

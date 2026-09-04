@@ -1,0 +1,233 @@
+{
+  "ruleset": {
+    "id": "knight_hawks_expanded",
+    "name": "Astra Rising: Knights Rising Extended",
+    "version": "1.0",
+    "type": "expansion",
+    "description": "Advanced starship rules, economic ventures, and the Second Neg War campaign",
+    "dependencies": [
+      "alpha_dawn_basic",
+      "knight_hawks"
+    ],
+    "supplements": [],
+    "adds_to_core": [
+      "Advanced ship construction",
+      "Economic ventures",
+      "Company charters",
+      "Trade routes",
+      "Mining operations"
+    ]
+  },
+  "advanced_ship_construction": {
+    "expanded_hull_sizes": {
+      "description": "Additional ship types beyond basic rules",
+      "minelayer": {
+        "hull_size": 7,
+        "adf": 2,
+        "mr": 2,
+        "hull_points": 35,
+        "dcr": 41,
+        "crew": "40-50",
+        "special": "Deploys minefields"
+      },
+      "assault_transport": {
+        "hull_size": "8-10",
+        "adf": 2,
+        "mr": 2,
+        "hull_points": "40-50",
+        "dcr": "44-50",
+        "crew": "100+",
+        "special": "Carries troops, vehicles"
+      },
+      "spaceliner": {
+        "hull_size": "6-15",
+        "adf": "1-2",
+        "mr": "1-2",
+        "hull_points": "30-75",
+        "dcr": "38-65",
+        "crew": "Varies",
+        "special": "Passenger transport, luxury accommodations"
+      },
+      "freighter": {
+        "hull_size": "5-20",
+        "adf": "1-2",
+        "mr": "1-2",
+        "hull_points": "25-100",
+        "dcr": "35-80",
+        "crew": "Varies",
+        "special": "Massive cargo capacity"
+      }
+    },
+    "advanced_systems": {
+      "special_equipment": {
+        "tractor_beam": {
+          "cost": "50000 Cr",
+          "mhs": 3,
+          "effect": "Pulls ships together or holds them in place"
+        },
+        "escape_shuttles": {
+          "cost": "20000 Cr each",
+          "mhs": 2,
+          "effect": "Emergency evacuation craft"
+        },
+        "laboratory": {
+          "cost": "100000 Cr",
+          "mhs": 5,
+          "effect": "Scientific research capability"
+        },
+        "medical_bay": {
+          "cost": "50000 Cr",
+          "mhs": 3,
+          "effect": "Advanced medical treatment"
+        },
+        "passenger_accommodations": {
+          "cost": "10000 Cr per cabin",
+          "mhs": 1,
+          "effect": "Comfortable passenger transport"
+        }
+      }
+    }
+  },
+  "economic_ventures": {
+    "description": "Running businesses in the Frontier",
+    "passenger_lines": {
+      "description": "Transport passengers between systems",
+      "requirements": "Spaceliner or modified ship",
+      "income": "100-500 Cr per passenger per light-year",
+      "expenses": "Fuel, crew, maintenance, docking fees"
+    },
+    "freight_hauling": {
+      "description": "Transport cargo between systems",
+      "requirements": "Freighter or ship with cargo capacity",
+      "income": "50-200 Cr per ton per light-year",
+      "expenses": "Fuel, crew, maintenance, insurance"
+    },
+    "mining": {
+      "description": "Extract resources from asteroids or planets",
+      "requirements": "Mining equipment, transport",
+      "income": "Variable by resource",
+      "expenses": "Equipment, permits, labor, refining"
+    },
+    "charters": {
+      "description": "Obtain corporate or government charters",
+      "requirements": "Good reputation, proper ship",
+      "benefits": "Guaranteed income, protection, legitimacy",
+      "corporations": [
+        "Helix Combine",
+        "Nexarion Group",
+        "Arcadia Development Consortium"
+      ]
+    }
+  },
+  "company_charters": {
+    "description": "Detailed charter system for business operations",
+    "types": {
+      "exploration_charter": {
+        "provider": "Arcadia Development Consortium",
+        "benefits": "Funding for exploration, claim rights to discoveries",
+        "requirements": "Detailed reports, ADC gets first option on claims",
+        "duration": "1-5 years"
+      },
+      "trade_charter": {
+        "provider": "Helix Combine",
+        "benefits": "Access to Helix Combine trade networks, discounted goods",
+        "requirements": "Exclusive trade through Helix Combine channels",
+        "duration": "Annual renewal"
+      },
+      "military_contract": {
+        "provider": "CFW or Galactic Task Force",
+        "benefits": "Military equipment, legal protection",
+        "requirements": "On-call for emergencies, follow CFW orders",
+        "duration": "Mission-based"
+      },
+      "free_merchant": {
+        "provider": "Rimward Free Merchants",
+        "benefits": "Freedom of operation, loose regulations",
+        "requirements": "Pay RFM fees, follow minimal guidelines",
+        "duration": "Annual"
+      }
+    },
+    "loans": {
+      "description": "Financing for ships and operations",
+      "interest_rate": "4% per 40 days (~23% annual)",
+      "terms": "Variable, secured by ship or property",
+      "default": "Ship repossession, legal action"
+    }
+  },
+  "trade_routes": {
+    "description": "Profitable shipping lanes",
+    "factors": {
+      "distance": "Longer routes pay more but take more time",
+      "danger": "Pirate activity, Neg presence affect profitability",
+      "demand": "Certain goods more valuable in certain systems",
+      "competition": "Other traders may undercut prices"
+    },
+    "profitable_goods": {
+      "high_tech": "Computers, robots, medical equipment",
+      "luxuries": "Entertainment, fine goods, exotic foods",
+      "raw_materials": "Ore, minerals, chemicals",
+      "food": "Staple crops, processed foods"
+    }
+  },
+  "the_second_sathar_war": {
+    "description": "Campaign background for the coming conflict",
+    "situation": {
+      "current": "Tense peace since First Neg War",
+      "intelligence": "Neg building forces, preparing offensive",
+      "timeline": "War expected within years"
+    },
+    "player_roles": {
+      "upf_military": "Spacefleet officers, pilots, marines",
+      "mercenaries": "Galactic Task Force, independent contractors",
+      "spies": "Intelligence agents behind enemy lines",
+      "civilians": "Caught in the crossfire, survival"
+    },
+    "military_operations": {
+      "patrol": "System security, pirate suppression",
+      "convoy_escort": "Protect merchant shipping",
+      "strike": "Attack Neg positions",
+      "reconnaissance": "Gather intelligence",
+      "evacuation": "Rescue civilians from combat zones"
+    },
+    "sathar_threats": {
+      "ships": "Neg vessels self-destruct rather than surrender",
+      "agents": "Operatives of all races working for Neg",
+      "bioweapons": "Genetic warfare, toxins",
+      "psychological": "Terror tactics, demoralization"
+    }
+  },
+  "advanced_combat_options": {
+    "boarding_actions": {
+      "description": "Ship-to-ship infantry combat",
+      "requirements": "Ships must be adjacent",
+      "resolution": "Use ground combat rules"
+    },
+    "fighter_squadrons": {
+      "description": "Mass fighter combat",
+      "squadron_size": "3-6 fighters",
+      "resolution": "Simplified combat for multiple ships"
+    },
+    "mine_warfare": {
+      "description": "Mine laying and clearing",
+      "laying": "Minelayers deploy mines in hexes",
+      "clearing": "Specialized ships can sweep mines"
+    },
+    "planetary_bombardment": {
+      "description": "Ship weapons targeting planetary surface",
+      "effects": "Devastating to installations and population",
+      "restrictions": "War crime under CFW law (usually)"
+    }
+  },
+  "ai_reference": {
+    "economic_calculations": {
+      "profit": "Income - Expenses",
+      "loan_payments": "Principal + (Principal x 0.04 per 40 days)",
+      "charter_benefits": "Reduced costs + guaranteed income"
+    },
+    "war_campaign": {
+      "sathar_behavior": "Aggressive, no surrender, use agents",
+      "upf_response": "Defensive initially, then counter-offensive",
+      "civilian_impact": "Disruption, danger, opportunity for heroes"
+    }
+  }
+}

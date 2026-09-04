@@ -1,0 +1,443 @@
+{
+  "ruleset": {
+    "id": "alpha_dawn_expanded",
+    "name": "Astra Rising Core Extended Rules",
+    "version": "1.0",
+    "type": "expansion",
+    "description": "Expanded character creation, additional skills, detailed equipment, and advanced combat options",
+    "dependencies": [
+      "alpha_dawn_basic"
+    ],
+    "supplements": [
+      "zebulons_guide",
+      "knight_hawks"
+    ],
+    "adds_to_core": [
+      "More skills",
+      "Detailed equipment lists",
+      "Advanced combat options",
+      "Character specializations"
+    ]
+  },
+  "character_creation_expanded": {
+    "starting_money": {
+      "basic": "250 + d100 Cr",
+      "expanded": "500 + d100 Cr for characters starting above level 1"
+    },
+    "expanded_skills": {
+      "military": {
+        "new_skills": [
+          {
+            "name": "Rocket Weapons",
+            "description": "Use of rocket launchers and missile systems",
+            "base": "1/2 DEX",
+            "per_level": "+10%"
+          },
+          {
+            "name": "Thrown Weapons",
+            "description": "Grenades, knives, spears",
+            "base": "1/2 DEX",
+            "per_level": "+10%"
+          }
+        ]
+      },
+      "technological": {
+        "new_skills": [
+          {
+            "name": "Engineering",
+            "description": "Design and construction of complex systems",
+            "base": "1/2 LOG",
+            "per_level": "+10%"
+          },
+          {
+            "name": "Machinery",
+            "description": "Operating heavy equipment, vehicles",
+            "base": "1/2 LOG",
+            "per_level": "+10%"
+          }
+        ]
+      },
+      "biosocial": {
+        "new_skills": [
+          {
+            "name": "Botany",
+            "description": "Plant identification, cultivation, toxins",
+            "base": "1/2 INT",
+            "per_level": "+10%"
+          },
+          {
+            "name": "Zoology",
+            "description": "Animal behavior, training, biology",
+            "base": "1/2 INT",
+            "per_level": "+10%"
+          },
+          {
+            "name": "Chemistry",
+            "description": "Chemical analysis, synthesis",
+            "base": "1/2 LOG",
+            "per_level": "+10%"
+          }
+        ]
+      }
+    }
+  },
+  "equipment": {
+    "weapons": {
+      "beam_weapons": {
+        "laser_pistol": {
+          "damage": "1d10 per SEU",
+          "ammo": "20 SEU powerclip",
+          "range": "5/20/60/125/250m",
+          "cost": "600 Cr",
+          "mass": "1kg"
+        },
+        "laser_rifle": {
+          "damage": "1d10 per SEU",
+          "ammo": "40 SEU powerpack",
+          "range": "10/40/100/300/600m",
+          "cost": "800 Cr",
+          "mass": "4kg"
+        },
+        "heavy_laser": {
+          "damage": "2d10 per SEU",
+          "ammo": "100 SEU powerpack",
+          "range": "20/80/200/600/1200m",
+          "cost": "3000 Cr",
+          "mass": "15kg",
+          "mounted": true
+        }
+      },
+      "projectile_weapons": {
+        "auto_pistol": {
+          "damage": "1d10 per bullet, 5d10 burst",
+          "ammo": "20 rounds",
+          "rate": "Single or 10-shot burst",
+          "range": "5/20/60/125/250m",
+          "cost": "300 Cr",
+          "mass": "1.5kg"
+        },
+        "auto_rifle": {
+          "damage": "1d10 per bullet, 5d10 burst",
+          "ammo": "20 rounds",
+          "rate": "Single or 10-shot burst",
+          "range": "10/40/100/300/600m",
+          "cost": "500 Cr",
+          "mass": "5kg"
+        },
+        "jyro_pistol": {
+          "damage": "2d10",
+          "ammo": "10 rounds",
+          "range": "No PB/30/80/200/400m",
+          "cost": "500 Cr",
+          "mass": "2kg"
+        },
+        "jyro_rifle": {
+          "damage": "3d10",
+          "ammo": "10 rounds",
+          "range": "No PB/50/150/400/800m",
+          "cost": "800 Cr",
+          "mass": "6kg"
+        },
+        "machine_gun": {
+          "damage": "1d10 per bullet, 10d10 burst",
+          "ammo": "100 rounds (belt)",
+          "rate": "20-shot burst only",
+          "range": "20/80/200/600/1200m",
+          "cost": "2000 Cr",
+          "mass": "20kg",
+          "mounted": true
+        }
+      },
+      "melee_weapons": {
+        "vibe_knife": {
+          "damage": "1d10 + 2",
+          "cost": "50 Cr",
+          "mass": "0.5kg"
+        },
+        "vibrosword": {
+          "damage": "1d10 + 5",
+          "cost": "200 Cr",
+          "mass": "2kg"
+        },
+        "sonic_knife": {
+          "damage": "1d10 + 6",
+          "cost": "100 Cr",
+          "mass": "0.5kg",
+          "special": "Vibrating blade"
+        },
+        "sonic_sword": {
+          "damage": "2d10 + 5",
+          "cost": "400 Cr",
+          "mass": "2kg"
+        },
+        "shock_gloves": {
+          "damage": "1d10 + 5 (stun damage)",
+          "cost": "150 Cr",
+          "mass": "1kg"
+        }
+      },
+      "grenades": {
+        "doze": {
+          "effect": "Sleep 1d10 min, RS check to resist",
+          "radius": "3m",
+          "cost": "50 Cr",
+          "mass": "0.5kg"
+        },
+        "frag": {
+          "effect": "4d10 damage, half on RS check",
+          "radius": "5m",
+          "cost": "75 Cr",
+          "mass": "0.5kg"
+        },
+        "poison": {
+          "effect": "STA 30 or unconscious",
+          "radius": "3m",
+          "cost": "100 Cr",
+          "mass": "0.5kg"
+        },
+        "smoke": {
+          "effect": "Obscures vision",
+          "radius": "10m",
+          "duration": "1d10 turns",
+          "cost": "25 Cr",
+          "mass": "0.5kg"
+        },
+        "tanglers": {
+          "effect": "Immobilize, STR 40 to break free",
+          "radius": "3m",
+          "duration": "1d10 turns",
+          "cost": "100 Cr",
+          "mass": "0.5kg"
+        }
+      }
+    },
+    "armor": {
+      "skeinsuit": {
+        "protection": "Absorbs 1/2 damage from kinetic attacks",
+        "cost": "600 Cr",
+        "mass": "2kg",
+        "coverage": "Full body"
+      },
+      "security_skeinsuit": {
+        "protection": "Absorbs 1/2 damage from all attacks",
+        "cost": "1200 Cr",
+        "mass": "3kg",
+        "coverage": "Full body"
+      },
+      "defensive_suit": {
+        "protection": "Absorbs 1/4 damage from all attacks",
+        "cost": "800 Cr",
+        "mass": "4kg",
+        "coverage": "Full body"
+      },
+      "flect_suit": {
+        "protection": "Reflects laser attacks (50% chance)",
+        "cost": "1000 Cr",
+        "mass": "3kg",
+        "coverage": "Full body"
+      }
+    },
+    "gear": {
+      "power_sources": {
+        "seu_clip": {
+          "capacity": "20 SEU",
+          "cost": "20 Cr",
+          "mass": "0.5kg"
+        },
+        "seu_powerpack": {
+          "capacity": "40 SEU",
+          "cost": "40 Cr",
+          "mass": "2kg"
+        },
+        "seu_powerbackpack": {
+          "capacity": "100 SEU",
+          "cost": "100 Cr",
+          "mass": "10kg"
+        }
+      },
+      "communications": {
+        "chronocom": {
+          "function": "Time, radio, computer interface",
+          "range": "5km",
+          "cost": "100 Cr",
+          "mass": "0.2kg"
+        },
+        "subspace_radio": {
+          "function": "Faster-than-light communication",
+          "range": "Interstellar",
+          "cost": "5000 Cr",
+          "mass": "20kg"
+        }
+      },
+      "survival": {
+        "toxy_rad_gauge": {
+          "function": "Detects toxins and radiation",
+          "cost": "50 Cr",
+          "mass": "0.5kg"
+        },
+        "gas_mask": {
+          "function": "Filters toxic atmosphere",
+          "cost": "30 Cr",
+          "mass": "1kg"
+        },
+        "spacesuit": {
+          "function": "Vacuum protection, 20 hours life support",
+          "cost": "1000 Cr",
+          "mass": "10kg"
+        }
+      },
+      "medical": {
+        "first_aid_pack": {
+          "contents": "Bandages, antiseptic, basic drugs",
+          "cost": "50 Cr",
+          "mass": "1kg"
+        },
+        "medkit": {
+          "contents": "Advanced medical supplies",
+          "cost": "200 Cr",
+          "mass": "2kg"
+        },
+        "stimdose": {
+          "effect": "+10 STA for 3 hours",
+          "after_effect": "Must rest 24 hours",
+          "cost": "25 Cr",
+          "mass": "0.1kg"
+        },
+        "staydose": {
+          "effect": "Prevents death at negative STA for 24 hours",
+          "cost": "100 Cr",
+          "mass": "0.1kg"
+        }
+      }
+    }
+  },
+  "combat_expanded": {
+    "advanced_modifiers": {
+      "range_modifiers": {
+        "point_blank": "+20%",
+        "short": "0%",
+        "medium": "-10%",
+        "long": "-20%",
+        "extreme": "-30%"
+      },
+      "target_status": {
+        "prone": "-10%",
+        "moving": "-10%",
+        "partial_cover": "-20%",
+        "full_cover": "No line of sight"
+      },
+      "attacker_status": {
+        "moving": "-10%",
+        "prone": "-10%",
+        "wounded": "-10%",
+        "surprised": "No action first turn"
+      }
+    },
+    "burst_fire": {
+      "description": "Automatic weapons can fire bursts",
+      "10_shot_burst": "Uses 10 ammo, +2d10 damage",
+      "20_shot_burst": "Uses 20 ammo, +4d10 damage (machine guns only)"
+    },
+    "special_attacks": {
+      "aimed_shot": {
+        "description": "Take extra time for better accuracy",
+        "effect": "+10% to hit, but lose initiative"
+      },
+      "quick_draw": {
+        "description": "Draw and fire in same turn",
+        "requirement": "RS 50+",
+        "penalty": "-10% to hit"
+      }
+    }
+  },
+  "vehicles": {
+    "ground_vehicles": {
+      "explorer": {
+        "description": "All-terrain exploration vehicle",
+        "capacity": "8 passengers",
+        "speed": "120 kph",
+        "cost": "15000 Cr"
+      },
+      "skimmer": {
+        "description": "Hover vehicle for urban use",
+        "capacity": "4 passengers",
+        "speed": "200 kph",
+        "cost": "8000 Cr"
+      },
+      "hovercycle": {
+        "description": "Personal hover transport",
+        "capacity": "1-2 passengers",
+        "speed": "250 kph",
+        "cost": "3000 Cr"
+      }
+    },
+    "vehicle_combat": {
+      "to_hit": "Vehicle-mounted weapons use Gunnery skill",
+      "moving_target": "-10% to hit per 100 kph of target speed",
+      "moving_attacker": "-10% to hit per 100 kph of attacker speed"
+    }
+  },
+  "robots": {
+    "robot_levels": {
+      "level_1": "Simple machines, single function",
+      "level_2": "Multiple functions, limited decision-making",
+      "level_3": "Complex functions, moderate autonomy",
+      "level_4": "Advanced reasoning, high autonomy",
+      "level_5": "Near-human intelligence, full autonomy",
+      "level_6": "Artificial intelligence, self-aware"
+    },
+    "common_robots": {
+      "service_robot": {
+        "level": 2,
+        "functions": [
+          "Cleaning",
+          "Serving",
+          "Basic maintenance"
+        ],
+        "cost": "2000 Cr"
+      },
+      "industrial_robot": {
+        "level": 3,
+        "functions": [
+          "Manufacturing",
+          "Heavy labor",
+          "Construction"
+        ],
+        "cost": "5000 Cr"
+      },
+      "security_robot": {
+        "level": 4,
+        "functions": [
+          "Patrol",
+          "Threat assessment",
+          "Combat"
+        ],
+        "sta": 100,
+        "attack": 50,
+        "cost": "10000 Cr"
+      },
+      "heavy_duty_robot": {
+        "level": 3,
+        "functions": [
+          "Heavy lifting",
+          "Demolition",
+          "Mining"
+        ],
+        "sta": 200,
+        "strength": 100,
+        "cost": "8000 Cr"
+      }
+    }
+  },
+  "ai_reference": {
+    "equipment_lookup": {
+      "weapon_stats": "Damage, ammo, range, cost, mass",
+      "armor_protection": "Damage reduction percentage",
+      "gear_function": "What it does, cost, mass"
+    },
+    "combat_calculations": {
+      "burst_damage": "Base damage + (2d10 per 10 shots)",
+      "armor_reduction": "Apply percentage before other modifiers"
+    }
+  }
+}

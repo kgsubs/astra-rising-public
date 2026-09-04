@@ -1,0 +1,455 @@
+{
+  "ruleset": {
+    "id": "alpha_dawn_basic",
+    "name": "Astra Rising Core Rules",
+    "version": "1.0",
+    "type": "core",
+    "description": "Foundational rules for character creation, combat, and gameplay in the Astra Rising RPG",
+    "dependencies": [],
+    "supplements": [
+      "alpha_dawn_expanded",
+      "zebulons_guide",
+      "knight_hawks"
+    ]
+  },
+  "character_creation": {
+    "ability_scores": {
+      "description": "Eight ability scores grouped in pairs, rolled on d100",
+      "generation_method": "Roll d100 for each pair base score",
+      "pairs": [
+        {
+          "name": "STR/STA",
+          "full_names": [
+            "Strength",
+            "Stamina"
+          ],
+          "description": "Physical power and endurance",
+          "typical_range": "30-70"
+        },
+        {
+          "name": "DEX/RS",
+          "full_names": [
+            "Dexterity",
+            "Reaction Speed"
+          ],
+          "description": "Agility and reflexes",
+          "typical_range": "30-70"
+        },
+        {
+          "name": "INT/LOG",
+          "full_names": [
+            "Intuition",
+            "Logic"
+          ],
+          "description": "Perception and reasoning",
+          "typical_range": "30-70"
+        },
+        {
+          "name": "PER/LDR",
+          "full_names": [
+            "Personality",
+            "Leadership"
+          ],
+          "description": "Charisma and command ability",
+          "typical_range": "30-70"
+        }
+      ],
+      "maximum": 100,
+      "minimum": 1
+    },
+    "races": {
+      "description": "Four playable races in the basic rules",
+      "available": [
+        "human",
+        "dralasite",
+        "vrusk",
+        "yazirian"
+      ],
+      "human": {
+        "description": "Most adaptable and versatile race",
+        "ability_modifiers": "+5 to any one ability score",
+        "special_abilities": [
+          "Versatility - can excel in any field"
+        ],
+        "movement": "10 meters/turn",
+        "size": "Medium"
+      },
+      "dralasite": {
+        "description": "Amoeboid shape-changers with elastic bodies",
+        "ability_modifiers": {
+          "STR": "+5",
+          "STA": "+5",
+          "DEX": "-5",
+          "RS": "-5"
+        },
+        "special_abilities": [
+          {
+            "name": "Elasticity",
+            "description": "Can stretch limbs up to 3x normal length, squeeze through small openings"
+          },
+          {
+            "name": "Lie Detection",
+            "description": "5% base chance to detect lies through chemical senses"
+          },
+          {
+            "name": "Shape Alteration",
+            "description": "Can form limbs as needed, become flat (10cm thick), form protective coating"
+          }
+        ],
+        "movement": "10 meters/turn (can roll at walking speed)",
+        "size": "Medium (variable)"
+      },
+      "vrusk": {
+        "description": "Insectoid beings with eight limbs and corporate mindset",
+        "ability_modifiers": {
+          "DEX": "+5",
+          "RS": "+5",
+          "INT": "+5",
+          "LOG": "+5",
+          "STR": "-5",
+          "STA": "-5"
+        },
+        "special_abilities": [
+          {
+            "name": "Ambidexterity",
+            "description": "Can use all limbs equally well, no penalty for two-weapon fighting"
+          },
+          {
+            "name": "Comprehension",
+            "description": "15% base chance to understand any language or communication"
+          },
+          {
+            "name": "Corporate Mindset",
+            "description": "Natural aptitude for business and organization"
+          }
+        ],
+        "movement": "15 meters/turn",
+        "size": "Medium"
+      },
+      "yazirian": {
+        "description": "Ape-like humanoids with gliding membranes and warrior culture",
+        "ability_modifiers": {
+          "DEX": "+5",
+          "RS": "+5",
+          "INT": "+5",
+          "LOG": "+5",
+          "STR": "-10",
+          "STA": "-10"
+        },
+        "special_abilities": [
+          {
+            "name": "Gliding",
+            "description": "Can glide 1 meter forward for every 1 meter descended"
+          },
+          {
+            "name": "Night Vision",
+            "description": "Can see in dim light, but -15% in bright light"
+          },
+          {
+            "name": "Battle Rage",
+            "description": "5% chance to enter battle frenzy (+20% to hit, fight to unconsciousness)"
+          }
+        ],
+        "movement": "10 meters/turn",
+        "size": "Medium"
+      }
+    },
+    "primary_skill_areas": {
+      "description": "Three broad categories of skills",
+      "military": {
+        "description": "Combat and physical skills",
+        "skills": [
+          "Beam Weapons",
+          "Projectile Weapons",
+          "Melee Weapons",
+          "Martial Arts",
+          "Grenades",
+          "Demolitions"
+        ]
+      },
+      "technological": {
+        "description": "Technical and mechanical skills",
+        "skills": [
+          "Computers",
+          "Robotics",
+          "Technician",
+          "Engineering"
+        ]
+      },
+      "biosocial": {
+        "description": "Social and biological sciences",
+        "skills": [
+          "Environmental",
+          "Medical",
+          "Psychosocial"
+        ]
+      }
+    },
+    "starting_equipment": {
+      "credits": "250 + d100",
+      "standard_pack": {
+        "cost": "150 Cr",
+        "contents": [
+          "chronocom",
+          "coveralls",
+          "first_aid_pack",
+          "flashlight",
+          "pocket_tool",
+          "toxy-rad_gauge"
+        ]
+      }
+    }
+  },
+  "skills": {
+    "description": "Skills are rated 1-6 levels",
+    "skill_costs": {
+      "military": {
+        "level_1": "3 XP",
+        "level_2": "6 XP",
+        "level_3": "9 XP",
+        "level_4": "12 XP",
+        "level_5": "15 XP",
+        "level_6": "18 XP"
+      },
+      "technological": {
+        "level_1": "4 XP",
+        "level_2": "8 XP",
+        "level_3": "12 XP",
+        "level_4": "16 XP",
+        "level_5": "20 XP",
+        "level_6": "24 XP"
+      },
+      "biosocial": {
+        "level_1": "5 XP",
+        "level_2": "10 XP",
+        "level_3": "15 XP",
+        "level_4": "20 XP",
+        "level_5": "25 XP",
+        "level_6": "30 XP"
+      }
+    },
+    "core_skills": {
+      "beam_weapons": {
+        "psa": "Military",
+        "description": "Use of laser and energy weapons",
+        "base_chance": "1/2 DEX",
+        "per_level": "+10%"
+      },
+      "projectile_weapons": {
+        "psa": "Military",
+        "description": "Use of bullet and jyro weapons",
+        "base_chance": "1/2 DEX",
+        "per_level": "+10%"
+      },
+      "melee_weapons": {
+        "psa": "Military",
+        "description": "Use of swords, axes, clubs",
+        "base_chance": "1/2 STR or DEX",
+        "per_level": "+10%"
+      },
+      "martial_arts": {
+        "psa": "Military",
+        "description": "Unarmed combat techniques",
+        "base_chance": "1/2 STR or DEX",
+        "per_level": "+10%",
+        "special": "Each level adds +5 to punching damage"
+      },
+      "grenades": {
+        "psa": "Military",
+        "description": "Throwing and using grenades",
+        "base_chance": "1/2 DEX",
+        "per_level": "+10%"
+      },
+      "computers": {
+        "psa": "Technological",
+        "description": "Programming, hacking, data retrieval",
+        "base_chance": "1/2 LOG",
+        "per_level": "+10%"
+      },
+      "robotics": {
+        "psa": "Technological",
+        "description": "Building, repairing, programming robots",
+        "base_chance": "1/2 LOG",
+        "per_level": "+10%"
+      },
+      "technician": {
+        "psa": "Technological",
+        "description": "Operating, repairing machinery",
+        "base_chance": "1/2 LOG",
+        "per_level": "+10%",
+        "subskills": [
+          "Operate Machinery",
+          "Repair Machinery",
+          "Detect Alarms",
+          "Defeat Alarms",
+          "Open Locks"
+        ]
+      },
+      "environmental": {
+        "psa": "Biosocial",
+        "description": "Survival, tracking, nature lore",
+        "base_chance": "1/2 INT",
+        "per_level": "+10%"
+      },
+      "medical": {
+        "psa": "Biosocial",
+        "description": "Healing, diagnosis, treatment",
+        "base_chance": "1/2 INT",
+        "per_level": "+10%",
+        "subskills": [
+          "Diagnosis",
+          "Treatment: Wounds",
+          "Treatment: Disease",
+          "Treatment: Poison",
+          "Treatment: Radiation"
+        ]
+      },
+      "psychosocial": {
+        "psa": "Biosocial",
+        "description": "Persuasion, psychology, social manipulation",
+        "base_chance": "1/2 PER",
+        "per_level": "+10%"
+      }
+    }
+  },
+  "combat": {
+    "description": "Ground combat resolution system",
+    "initiative": {
+      "method": "1d10 + Initiative Modifier (IM)",
+      "im_calculation": "RS / 10 (round up)",
+      "order": "Highest to lowest"
+    },
+    "combat_sequence": [
+      "Check for surprise (Intuition check)",
+      "Roll for initiative",
+      "Declare actions (Side B first)",
+      "Side B moves (Side A gets opportunity fire)",
+      "Side A moves (Side B gets opportunity fire)",
+      "Resolve wrestling",
+      "Resolve ranged and melee combat"
+    ],
+    "to_hit": {
+      "base_chance": "1/2 relevant ability score",
+      "modifiers": {
+        "point_blank": "+20%",
+        "short_range": "0%",
+        "medium_range": "-10%",
+        "long_range": "-20%",
+        "extreme_range": "-30%",
+        "target_moving": "-10%",
+        "target_prone": "-10%",
+        "attacker_moving": "-10%",
+        "attacker_prone": "-10%"
+      }
+    },
+    "ranged_weapons": {
+      "laser_pistol": {
+        "damage": "1d10 per SEU",
+        "ammo": "20 SEU powerclip",
+        "range": "PB 5m / Short 20m / Med 60m / Long 125m / Ext 250m",
+        "cost": "600 Cr"
+      },
+      "laser_rifle": {
+        "damage": "1d10 per SEU",
+        "ammo": "40 SEU powerpack",
+        "range": "PB 10m / Short 40m / Med 100m / Long 300m / Ext 600m",
+        "cost": "800 Cr"
+      },
+      "jyro_pistol": {
+        "damage": "2d10",
+        "ammo": "10 rounds",
+        "range": "No PB / Short 30m / Med 80m / Long 200m / Ext 400m",
+        "cost": "500 Cr",
+        "special": "No point blank (needs acceleration)"
+      },
+      "needler_pistol": {
+        "damage": "1d10",
+        "ammo": "10 darts",
+        "range": "PB 5m / Short 20m / Med 60m / Long 125m / Ext 250m",
+        "cost": "400 Cr"
+      }
+    },
+    "melee_weapons": {
+      "punch": {
+        "damage": "STR / 10 (round down)",
+        "martial_arts_bonus": "+5 per level"
+      },
+      "vibe_knife": {
+        "damage": "1d10 + 2",
+        "cost": "50 Cr"
+      },
+      "sword": {
+        "damage": "1d10 + 4",
+        "cost": "100 Cr"
+      }
+    },
+    "damage_and_healing": {
+      "hit_points": "STA score",
+      "wounded": "0 STA = unconscious",
+      "dying": "-30 STA = death",
+      "stimdose": "+10 STA for 3 hours, then must rest 24 hours",
+      "natural_healing": "1 STA per day of rest",
+      "medical_treatment": "Medical skill + equipment"
+    },
+    "grenades": {
+      "doze": {
+        "effect": "Sleep for 1d10 minutes, RS check to resist",
+        "radius": "3m",
+        "cost": "50 Cr"
+      },
+      "frag": {
+        "effect": "4d10 damage, 1/2 on RS check",
+        "radius": "5m",
+        "cost": "75 Cr"
+      },
+      "smoke": {
+        "effect": "Obscures vision",
+        "radius": "10m",
+        "duration": "1d10 turns",
+        "cost": "25 Cr"
+      }
+    }
+  },
+  "movement": {
+    "ground": {
+      "walking": "10m per turn (humans, dralasites, yazirians)",
+      "vrusk": "15m per turn",
+      "running": "2x walking speed"
+    },
+    "turn_length": "6 seconds"
+  },
+  "experience": {
+    "awards": {
+      "survival": "Just surviving a session",
+      "ability_checks": "Making ability checks",
+      "skill_checks": "Making skill checks (success or failure)",
+      "discovery": "Learning something new",
+      "roleplaying": "Good roleplaying",
+      "innovation": "Creative solutions",
+      "victory": "Surviving combat",
+      "mission_success": "Completing objectives"
+    },
+    "usage": "Spend XP to improve skills or acquire spaceship ranks (Knights Rising)"
+  },
+  "dice_system": {
+    "primary": "d100 (percentile) for skill/ability checks",
+    "secondary": "d10 for damage, initiative, random tables",
+    "success": "Roll equal to or less than target number",
+    "automatic_success": "01-05 (optional rule)",
+    "automatic_failure": "96-00 (optional rule)"
+  },
+  "ai_reference": {
+    "quick_checks": {
+      "ability_check": "Roll d100 vs ability score",
+      "skill_check": "Roll d100 vs (base + 10% per skill level + ability modifier)",
+      "initiative": "1d10 + (RS/10, round up)",
+      "to_hit_ranged": "1/2 DEX + modifiers + (10% per skill level)",
+      "to_hit_melee": "1/2 STR or DEX + modifiers + (10% per skill level)"
+    },
+    "damage_calculation": {
+      "laser": "1d10 per SEU expended",
+      "jyro": "2d10 fixed",
+      "melee": "Weapon damage + STR modifier"
+    }
+  }
+}

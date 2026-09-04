@@ -1,0 +1,3699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Astra Rising AI DM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/lucide-react@0.383.0/dist/umd/lucide-react.js"></script>
+</head>
+<body class="bg-gray-900 min-h-screen">
+  <div id="root"></div>
+  <script type="text/babel">
+
+    // SECTION 1 -- UMD DESTRUCTURING
+    const { useState, useEffect, useCallback, useRef, useMemo } = React;
+    const { AlertCircle, ChevronRight, Loader, BookOpen, Shield, Zap, User, Menu, X, Check, RefreshCw, Globe, Briefcase, Star, Eye, Grid } = LucideReact;
+
+    // SECTION 2 -- CONSTANTS
+
+    const INITIAL_STATE = {
+      character: null,
+      campaign: null,
+      session: { number: 1, scene_count: 0, turn_count: 0 },
+      scene: {
+        header: '',
+        summary: '',
+        in_combat: false,
+        combat_state: null,
+        recent_summaries: [],
+        history_compressed: false,
+        compressed_summary: null,
+        scene_type_history: []
+      },
+      meta: {
+        initialized: false,
+        loading: false,
+        error: null,
+        last_saved: null,
+        snapshots: [],
+        dev_mode: false
+      }
+    };
+
+    const COLORS = {
+      bg_primary: 'bg-gray-900',
+      bg_secondary: 'bg-gray-800',
+      bg_card: 'bg-gray-800',
+      accent_primary: 'text-yellow-400',
+      accent_info: 'text-blue-400',
+      accent_danger: 'text-red-400',
+      text_primary: 'text-gray-100',
+      text_secondary: 'text-gray-400',
+      border: 'border-gray-700',
+      cta_btn: 'bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-bold',
+      danger_btn: 'bg-red-600 text-white hover:bg-red-500 font-bold'
+    };
+
+    const LAYOUT = {
+      sidebar: 'w-64 bg-gray-800 min-h-screen flex flex-col',
+      main: 'flex-1 bg-gray-900 min-h-screen flex flex-col',
+      full_screen: 'min-h-screen bg-gray-900 flex flex-col items-center justify-center'
+    };
+
+    // SECTION 3 -- ASSERTION PANEL
+
+    function AssertionPanel({ assertions }) {
+      return (
+        <div className="fixed bottom-4 right-4 z-50 bg-gray-900 bg-opacity-90 border border-gray-700 rounded-lg p-3 max-h-64 overflow-y-auto w-72 shadow-xl">
+          <div className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-2 border-b border-gray-700 pb-1">
+            DEV ASSERTIONS
+          </div>
+          {assertions.map((assertion, idx) => (
+            <div key={idx} className="flex items-center gap-2 py-0.5">
+              <span
+                className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${assertion.pass ? 'bg-green-400' : 'bg-red-500'}`}
+              />
+              <span className={`text-xs ${assertion.pass ? 'text-green-300' : 'text-red-400'}`}>
+                {assertion.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // SECTION 3h -- ADVENTURE LIBRARY
+
+    const ADVENTURE_LIBRARY = [
+      {
+        id: 'crash_on_Cethara',
+        title: 'Crash on Cethara',
+        tagline: 'Stranded on a hostile alien world, survival is just the beginning.',
+        genre: 'Survival / First Contact',
+        difficulty: 'Beginner',
+        act_summary: {
+          act1: 'Survive the crash site and make first contact with Cethara natives.',
+          act2: 'Navigate tribal politics while uncovering a The Vaash scouting operation.',
+          act3: 'Destroy the The Vaash beacon before reinforcements arrive.'
+        },
+        setting: 'Planet Cethara, Korvath system',
+        tone: ['Survival', 'Discovery', 'Desperate'],
+        recommended_characters: 'any',
+        cover_icon: 'Globe'
+      },
+      {
+        id: 'ghost_station',
+        title: 'Ghost Station',
+        tagline: 'The crew went silent. The station did not.',
+        genre: 'Cosmic Horror',
+        difficulty: 'Intermediate',
+        act_summary: {
+          act1: 'Board the silent research station and discover what happened to the crew.',
+          act2: 'Something is still aboard -- and it is hunting you.',
+          act3: 'Survive long enough to broadcast a warning and escape.'
+        },
+        setting: 'Abandoned orbital research station',
+        tone: ['Dread', 'Mystery', 'Claustrophobic'],
+        recommended_characters: 'any',
+        cover_icon: 'AlertCircle'
+      },
+      {
+        id: 'the_Nexus_job',
+        title: 'The Nexus Job',
+        tagline: 'Three megacorps. One data package. Zero margin for error.',
+        genre: 'Corporate Espionage',
+        difficulty: 'Intermediate',
+        act_summary: {
+          act1: 'Accept a data extraction contract from a mysterious broker on Tessavar.',
+          act2: 'Navigate rival corporate security and a double-cross mid-heist.',
+          act3: 'Escape the megacity with the package and your lives.'
+        },
+        setting: 'Tessavar, megacity arcologies',
+        tone: ['Tense', 'Political', 'High-Stakes'],
+        recommended_characters: 'any',
+        cover_icon: 'Briefcase'
+      },
+      {
+        id: 'the_golden_mandible',
+        title: 'The Golden Mandible',
+        tagline: 'Steal a priceless Krix artifact from the galaxy\'s worst security team.',
+        genre: 'Comedy Heist',
+        difficulty: 'Beginner-Friendly',
+        act_summary: {
+          act1: 'Learn that a legendary Krix relic is on display at Waystation Pell\'s most underfunded museum.',
+          act2: 'Execute a heist that goes wrong in increasingly comedic ways.',
+          act3: 'Escape with the artifact and somehow everyone\'s friendship intact.'
+        },
+        setting: 'Waystation Pell, Procyus Prime',
+        tone: ['Comedic', 'Chaotic', 'Heist'],
+        recommended_characters: 'any',
+        cover_icon: 'Star'
+      },
+      {
+        id: 'the_erebus_protocol',
+        title: 'The Erebus Protocol',
+        tagline: 'The conspiracy goes deeper than the Frontier itself.',
+        genre: 'Conspiracy Thriller',
+        difficulty: 'Advanced',
+        act_summary: {
+          act1: 'A dead CFW agent\'s final message leads to a black-site installation.',
+          act2: 'Unravel a Apex Law cover-up that implicates the Assembly of Worlds.',
+          act3: 'Choose -- expose the truth and shatter the Frontier\'s illusion of safety, or bury it forever.'
+        },
+        setting: 'Deep space, multiple systems',
+        tone: ['Paranoid', 'Cerebral', 'Lethal'],
+        recommended_characters: ['kael_voss', 'skrix', 'rayla'],
+        cover_icon: 'Eye'
+      },
+      {
+        id: 'sfad5_bugs_in_the_system',
+        title: 'Bugs in the System',
+        tagline: 'Two weeks of silence. Two hundred people. Something hungry.',
+        genre: 'Sci-Fi Horror',
+        difficulty: 'Advanced',
+        act_summary: {
+          act1: 'Dock at Waystation Murn — silent, wrong, covered in organic resin.',
+          act2: 'Discover the hive has taken over the processing plant. Survivors barricade in quarters.',
+          act3: 'Confront the sentient Queen: destroy, ally, or quarantine — all choices cost something.'
+        },
+        setting: 'Mhemne Mining Station, asteroid belt',
+        tone: ['Horror', 'Isolation', 'Moral Ambiguity'],
+        recommended_characters: ['kael_voss', 'skrix', 'bolg'],
+        cover_icon: 'AlertCircle'
+      },
+      {
+        id: 'sf4_mission_to_Glacivaar',
+        title: 'Mission to Glacivaar',
+        tagline: 'Two megacorps, one frozen hellscape, and a secret worth killing for.',
+        genre: 'Corporate Noir',
+        difficulty: 'Intermediate',
+        act_summary: {
+          act1: 'ADC hires you to document Nexarion Group\'s illegal mining on Glacivaar. Simple observation.',
+          act2: 'Nexarion Group is digging for an ancient ship buried in the ice. Someone is watching.',
+          act3: 'Corporate war erupts. You hold the secret. Choose a side — or claim it yourself.'
+        },
+        setting: 'Glacivaar, frozen frontier world',
+        tone: ['Cold', 'Calculating', 'Corporate'],
+        recommended_characters: ['kael_voss', 'skrix', 'rayla'],
+        cover_icon: 'Briefcase'
+      },
+      {
+        id: 'sf3_sundown_on_Vashara',
+        title: 'Sundown on Vashara',
+        tagline: 'The primitive natives built something they couldn\'t have built. The The Vaash know why.',
+        genre: 'Ancient Mystery',
+        difficulty: 'Intermediate',
+        act_summary: {
+          act1: 'Land in Vashara\'s warm canyons. Meet Max Malligigg. The Solari pyramid shouldn\'t exist.',
+          act2: 'Inside the pyramid: an ancient hovertank. The Vaash agents are minutes from reactivating it.',
+          act3: 'Raid the hidden The Vaash bunker. Uncover an invasion timeline. The war is coming.'
+        },
+        setting: 'Vashara, canyon world',
+        tone: ['Mystery', 'Ancient Power', 'The Vaash Threat'],
+        recommended_characters: ['kael_voss', 'bolg', 'rayla'],
+        cover_icon: 'Globe'
+      },
+      {
+        id: 'sfkh1_Kelvarn_run',
+        title: 'Kelvarn Run',
+        tagline: 'Everyone wants what\'s in your cargo hold. Nobody\'s offering a fair price.',
+        genre: 'Space Western Noir',
+        difficulty: 'Intermediate',
+        act_summary: {
+          act1: 'Stranded in the Kelvarn system with mysterious cargo, a broken ship, and creditors at the door.',
+          act2: 'The cargo is stolen CFW encryption codes. The Vaash agents, corporate spies, and CFW recovery teams close in.',
+          act3: 'An auction in the lawless Outer Reach — sell, surrender, expose, or destroy.'
+        },
+        setting: 'Kelvarn system, Inner and Outer Reach',
+        tone: ['Paranoid', 'Gritty', 'Morally Gray'],
+        recommended_characters: ['kael_voss', 'skrix', 'rayla'],
+        cover_icon: 'Star'
+      },
+      {
+        id: 'sf1_Cethara_planet_of_mystery',
+        title: 'Cethara, Planet of Mystery',
+        tagline: 'The ancient god is dying. What it knows could save — or damn — the Frontier.',
+        genre: 'Exploration & Discovery',
+        difficulty: 'Intermediate',
+        act_summary: {
+          act1: 'Earn the trust of the Kruvaan tree-dwellers to find lost explorers in Ashtekkai territory.',
+          act2: 'The Ashtekkai worship a false god — an Aelunn AI maintaining the last of an ancient race.',
+          act3: 'The Aelunn secret is out: they created the native races, and the The Vaash are returning.'
+        },
+        setting: 'Cethara, Korvath system',
+        tone: ['Exploratory', 'Revelatory', 'Epic'],
+        recommended_characters: ['bolg', 'skrix', 'rayla'],
+        cover_icon: 'Globe'
+      }
+    ];
+
+    // SECTION 3h2 -- ADVENTURE MODULES
+    const ADVENTURE_MODULES = {
+      crash_on_Cethara: {
+        synopsis: "You are a passenger whose shuttle has crashed on Cethara. Escape the wreck, survive the alien desert, make first contact with the Ul'Mek, and retrieve a stolen tribal artifact to earn safe passage.",
+        ai_instructions: {
+          tone: "Immersive narrator, second person present tense",
+          pacing: "1-2 paragraphs per response, then prompt for action",
+          themes: ["Survival", "First contact", "Alien world wonder", "Earning trust"]
+        },
+        scenes: [
+          {
+            id: "scene_1_wake_up",
+            title: "The Wreck",
+            type: "introduction",
+            description: "You awaken to chaos. The shuttle is on its side. Emergency lighting casts everything in red. Smoke burns your eyes. Three other survivors are stirring: a human medic named Dr. Vance, a Krix engineer named Kliktik, and a Moluun merchant named Gloob. The shuttle's hull is breached. Fire spreads from the engine compartment.",
+            objective: "Escape the burning wreck and assess the situation.",
+            npcs_present: [
+              { name: "Dr. Helena Vance", role: "Medic", attitude: "Helpful, slightly panicked" },
+              { name: "Kliktik", role: "Engineer", attitude: "Practical, business-like" },
+              { name: "Gloob", role: "Merchant", attitude: "Nervous, wants to negotiate even now" }
+            ],
+            exits: [{ to: "scene_2_desert", description: "Stumble out into harsh purple daylight" }]
+          },
+          {
+            id: "scene_2_desert",
+            title: "The Purple Desert",
+            type: "exploration",
+            description: "You stand in an alien desert. The sand is purple. Two suns beat down mercilessly. The shuttle smolders behind you. To the north: rocky hills and what looks like ruins. To the east: a canyon. To the south: open desert. Strange cries echo from the rocks.",
+            objective: "Find shelter, water, and signs of civilization.",
+            npcs_present: [],
+            exits: [
+              { to: "scene_3_canyon", description: "Canyon with cave to the east" },
+              { to: "scene_4_ruins", description: "Rocky hills with ruins to the north" },
+              { to: "scene_5_ulmor", description: "Open desert south — follow Strider herd or travel south 4+ hours" }
+            ]
+          },
+          {
+            id: "scene_3_canyon",
+            title: "The Water Cave",
+            type: "shelter",
+            description: "A narrow canyon opens into a small cave. Water seeps from the rock wall into a pool. It's cool here. But you're not alone. In the shadows, something moves.",
+            objective: null,
+            npcs_present: [],
+            exits: [
+              { to: "scene_2_desert", description: "Back to desert" },
+              { to: "scene_5_ulmor", description: "Follow canyon south into Ul'Mek territory" }
+            ]
+          },
+          {
+            id: "scene_4_ruins",
+            title: "Ancient Ruins",
+            type: "exploration",
+            description: "Crumbling stone walls covered in strange glyphs. This was a city once. Now it's home to scavengers. You find a cache of supplies left by previous explorers — or previous crash victims.",
+            objective: null,
+            npcs_present: [],
+            exits: [
+              { to: "scene_2_desert", description: "Return to desert" },
+              { to: "scene_5_ulmor", description: "Tracks lead south to inhabited area" }
+            ]
+          },
+          {
+            id: "scene_5_ulmor",
+            title: "First Contact",
+            type: "social",
+            description: "You crest a dune and see them: octopus-like beings riding large six-legged beasts (striders). They wear leather harnesses and carry spears and strange projectile weapons. One raises a hand in greeting — or warning. This is the Ul'Mek tribe.",
+            objective: null,
+            npcs_present: [
+              { name: "Chieftain Ul-Kar", role: "Tribal Leader", attitude: "Cautious but curious" },
+              { name: "Shaman Ul-Mai", role: "Spiritual Leader", attitude: "Suspicious, watches for signs" }
+            ],
+            exits: [
+              { to: "scene_6_caves", description: "Accept quest — Ul-Mai marks cave entrance on your map" },
+              { to: "scene_2_desert", description: "Refuse or leave — they point toward the distant mountains" }
+            ]
+          },
+          {
+            id: "scene_6_caves",
+            title: "The Kruvaan Caves",
+            type: "dungeon",
+            description: "A maze of tunnels carved into red rock. The Kruvaan are small, ape-like creatures who live in the dark. They stole the Spear of Strider, but they fear something deeper in the caves — something that drove them to the upper levels.",
+            objective: null,
+            npcs_present: [
+              { name: "Kur-Ruk", role: "War Chief", attitude: "Aggressive but cowardly if outmatched" }
+            ],
+            exits: [{ to: "scene_7_return", description: "Return to Ul'Mek with the Spear" }]
+          },
+          {
+            id: "scene_7_return",
+            title: "Victory and Departure",
+            type: "resolution",
+            description: "You return the Spear of Strider to Chieftain Ul-Kar. The tribe celebrates with a feast. You have made allies on this strange world. Ul-Mai guides you to the starport — three days. A ADC patrol ship rescues you. As you leave orbit, The Vaash vessels enter the system.",
+            objective: null,
+            npcs_present: [],
+            exits: []
+          }
+        ],
+        npcs_reference: {
+          ul_mor: { role: "Tribal allies, strider riders", motivation: "Protect tribe and sacred artifacts" },
+          Kruvaan: { role: "Cave-dwelling thieves", motivation: "Territorial, superstitious, cowardly if losing" },
+          razorback: { role: "Desert apex predator", motivation: "Ambush prey from sand" }
+        }
+      },
+      ghost_station: {
+        synopsis: "A 20-year-old distress signal leads to an abandoned station. Something killed the crew and it may still be there. An unknowable alien artifact drives observers mad with visions of their own deaths.",
+        ai_instructions: {
+          tone: "Cosmic horror. Slow dread. Unknown unknowns. Never fully explain the artifact.",
+          pacing: "Start slow, build unease. First hour: mystery. Second hour: dread. Third hour: revelation and escape.",
+          themes: ["Cosmic horror", "Unknowable alien intelligence", "Survival over victory", "The past consuming the present"]
+        },
+        scenes: [
+          {
+            id: "scene_1_docking",
+            title: "The Airlock",
+            type: "introduction",
+            description: "Your ship's sensors confirm: Station Lethis is dead. No power, no life signs, minimal heat. The station spins slowly, artificial gravity failing. Through the viewport, you see the docking bay — dark, littered with debris. The distress signal repeats every 30 seconds, automated. Someone set it running... and never turned it off.",
+            objective: "Board the station, locate the signal source, determine what happened.",
+            npcs_present: [
+              { name: "Jax", role: "Engineer (crew)", attitude: "Nervous, superstitious" },
+              { name: "Syl", role: "Security (crew)", attitude: "Professional, battle-hardened" }
+            ],
+            exits: [
+              { to: "scene_2_command", description: "Head to command center (elevator shaft, 3 levels up)" },
+              { to: "scene_3_quarters", description: "Investigate crew quarters (heat signature location)" },
+              { to: "scene_4_lab", description: "Research lab (sealed, emergency power active)" }
+            ]
+          },
+          {
+            id: "scene_2_command",
+            title: "The Bridge",
+            type: "investigation",
+            description: "The command center is a frozen tomb. Consoles dead. Captain's chair faces the viewport, overlooking the asteroid field. In it: a skeleton in a pressure suit, hands still gripping the armrests. The captain never left. On the main screen, a single word repeats in all caps: 'SORRY.'",
+            objective: null,
+            npcs_present: [],
+            exits: [
+              { to: "scene_3_quarters", description: "Crew quarters" },
+              { to: "scene_4_lab", description: "Research lab (sealed door, requires override)" },
+              { to: "scene_5_mining", description: "Mining bay (where artifact was found)" }
+            ]
+          },
+          {
+            id: "scene_3_quarters",
+            title: "Crew Quarters",
+            type: "horror",
+            description: "Personal quarters are frozen crypts. Family photos on walls. Half-eaten meals, now ice. And the heat signature you detected — it's coming from Cabin 4. The door is warm to the touch. Someone... something... is inside.",
+            objective: null,
+            npcs_present: [
+              { name: "Dr. Elena Voss", role: "Surviving station chief", attitude: "Catatonic, muttering visions" }
+            ],
+            exits: [{ to: "scene_4_lab", description: "The lab. Where the artifact waits." }]
+          },
+          {
+            id: "scene_4_lab",
+            title: "The Containment Lab",
+            type: "climax",
+            description: "The lab door is sealed from the outside — someone trapped whatever was inside. Emergency power flickers here. In the center of the room, under a cracked containment dome: the artifact. It looks like... nothing. A void. A space where something should be but isn't. And it's looking back.",
+            objective: null,
+            npcs_present: [],
+            exits: [{ to: "scene_5_escape", description: "Make decision about artifact" }]
+          },
+          {
+            id: "scene_5_escape",
+            title: "The Departure",
+            type: "resolution",
+            description: "You leave Station Lethis behind. The station continues its slow spin, the artifact contained — or released — depending on your choice. Dr. Voss's final words echo: 'It shows you things. Things that haven't happened yet.' You check your chronocom. 18 years until the date in your vision.",
+            objective: null,
+            npcs_present: [],
+            exits: []
+          }
+        ],
+        npcs_reference: {
+          dr_elena_voss: { role: "Station Chief Scientist, surviving", motivation: "Warn others, find peace before she dies" },
+          jax: { role: "Player's engineer", motivation: "Survive and get home; easily rattled" },
+          syl: { role: "Player's security", motivation: "Protect the crew by any means necessary" },
+          the_artifact: { role: "Unknowable alien entity/construct", motivation: "Unknown — possibly feeds on observation" }
+        }
+      },
+      the_Nexus_job: {
+        synopsis: "Corporate espionage on Nexus. Infiltrate a Helix Combine data facility, steal quantum drive schematics, and survive the extraction — including a mysterious third party waiting on the roof.",
+        ai_instructions: {
+          tone: "Cyberpunk noir meets corporate thriller. Tense, atmospheric, paranoia-inducing.",
+          pacing: "Build tension. Public areas = safer but slower. Secure areas = dangerous but direct.",
+          themes: ["Corporate paranoia", "Moral flexibility", "Time pressure", "Loyalty for sale"]
+        },
+        scenes: [
+          {
+            id: "scene_1_briefing",
+            title: "The Meet",
+            type: "introduction",
+            description: "The hotel room is small, damp, and smells of recycled air. Your chronocom buzzes: a message from Agent Vex. 'Package delivered to locker 47B at Starport Transit. Do not open until you reach the facility. Payment on delivery of data chip. Do not contact me again until job is complete.' Attached: floor plans, security rotations, and a Helix Combine contractor ID with your face on it.",
+            objective: "Review intel, prepare, reach the Helix Combine Arcology.",
+            npcs_present: [],
+            exits: [{ to: "scene_2_approach", description: "Head to Helix Combine Arcology district" }]
+          },
+          {
+            id: "scene_2_approach",
+            title: "The Corporate Zone",
+            type: "exploration",
+            description: "The Helix Combine Arcology rises 200 stories into Nexus's smog-choked sky. Its base is a maze of plazas, shops, and security checkpoints. Your fake ID should get you through the public levels. Below that requires... creativity. The building never sleeps.",
+            objective: null,
+            npcs_present: [],
+            exits: [{ to: "scene_3_infiltration", description: "Reach sublevel 12" }]
+          },
+          {
+            id: "scene_3_infiltration",
+            title: "Sublevel 12",
+            type: "stealth",
+            description: "The research level is quiet after hours. White corridors, humming servers, red emergency lighting. You can hear your own heartbeat. The data vault is 50 meters ahead — biometric scanner, two guards, and a motion-sensitive floor. The schematic is in Vault 7.",
+            objective: null,
+            npcs_present: [
+              { name: "Helix Combine Security Guards (x2)", role: "Vault guards", attitude: "Alert, armed, chatting" }
+            ],
+            exits: [{ to: "scene_4_extraction", description: "Retrieve data chip" }]
+          },
+          {
+            id: "scene_4_extraction",
+            title: "The Getaway",
+            type: "action",
+            description: "You have the chip. Now you need to reach the roof for extraction. But security knows something's wrong. Alarms blare. Red lights flash. The building goes into lockdown. Your chronocom shows 8 minutes until the drone leaves — with or without you.",
+            objective: null,
+            npcs_present: [
+              { name: "The Broker", role: "Unknown third-party operative", attitude: "Confident, offers double pay, dangerous if refused" }
+            ],
+            exits: [{ to: "scene_5_aftermath", description: "Reach drone with chip" }]
+          },
+          {
+            id: "scene_5_aftermath",
+            title: "Payment and Consequences",
+            type: "resolution",
+            description: "The drone drops you at a Nexarion Group safehouse in the industrial district. Agent Vex is there, mandibles clicking with satisfaction — or calculation. 'The data is authentic. Payment transferred.' Your account shows 5,000 Credits. But you notice Vex recording the transaction.",
+            objective: null,
+            npcs_present: [
+              { name: "Agent Vex", role: "Nexarion Group handler", attitude: "Professional, calculating, recording everything" }
+            ],
+            exits: []
+          }
+        ],
+        npcs_reference: {
+          agent_vex: { role: "Nexarion Group Corporate Intelligence handler", motivation: "Complete the job; protect Nexarion Group assets above all" },
+          the_broker: { role: "Unknown rival operative", motivation: "Acquire the drive schematic for unknown principal" },
+          Helix Combine_security: { role: "Corporate guards", motivation: "Protect facility, follow protocols" }
+        }
+      },
+      the_golden_mandible: {
+        synopsis: "A comedy heist. Break into a casino to steal a golden statue from the crime lord who framed your mentor. Your crew is eccentric. The security is elaborate. The target is a decoy. The real score is still out there.",
+        ai_instructions: {
+          tone: "Witty, fast-paced, self-aware. Like a good heist movie with sci-fi flavor.",
+          pacing: "Quick scenes, rapid banter, constant momentum. Slow down for character moments.",
+          themes: ["Comedy chaos", "Found family", "Justice over profit", "Plans going wrong in the best ways"]
+        },
+        scenes: [
+          {
+            id: "scene_1_the_meet",
+            title: "A Crew of Questionable Competence",
+            type: "introduction",
+            description: "Your hideout is a converted storage unit behind a Nebula Chili Parlor. The smell of synthetic peppers permeates everything. You've put out word: you need a crew. The applicants are... special. But desperate times, desperate measures. The Golden Mandible isn't going to steal itself. Probably.",
+            objective: "Assemble a crew for the Golden Mandible heist.",
+            npcs_present: [
+              { name: "Glix", role: "Shape-shifting infiltration (Moluun)", attitude: "Nervous, becomes furniture under stress" },
+              { name: "Zap", role: "Tech wizard (Skrath)", attitude: "Chronic pessimist, narcoleptic" },
+              { name: "Moxie", role: "Social engineering (Human)", attitude: "Cannot stop talking, befriends everyone" },
+              { name: "Krik", role: "Muscle (Krix)", attitude: "Pacifist philosopher, quotes ethics mid-heist" }
+            ],
+            exits: [{ to: "scene_2_the_invitation", description: "Assemble crew, plan the approach" }]
+          },
+          {
+            id: "scene_2_the_invitation",
+            title: "Getting on the List",
+            type: "social/heist",
+            description: "The Grand Nebula Casino doesn't let just anyone into Baron Vrix's private tournament. Entry fee: 100,000 credits. Or an invitation from a current member. Or a really good disguise and a lot of confidence. You have 47 credits and a smile that has gotten you out of worse.",
+            objective: null,
+            npcs_present: [],
+            exits: [{ to: "scene_3_the_tournament", description: "Gain casino access" }]
+          },
+          {
+            id: "scene_3_the_tournament",
+            title: "All Eyes on the Game",
+            type: "social/comedy",
+            description: "Tournament night. The Grand Nebula is packed with Frontier elite. Baron Vrix holds court in the museum, watching the game on holo-screens, the Golden Mandible gleaming behind him. 200 witnesses. 12 guards. 1 very paranoid crime lord. And you, somewhere in the crowd.",
+            objective: null,
+            npcs_present: [
+              { name: "Baron Vrix", role: "Crime lord, target, egomaniac", attitude: "Paranoid, vain, heavily guarded" }
+            ],
+            exits: [{ to: "scene_4_the_vault", description: "Obtain vault access" }]
+          },
+          {
+            id: "scene_4_the_vault",
+            title: "Snuggles and Other Problems",
+            type: "stealth/comedy",
+            description: "You have the key. The floor is (temporarily) clear. The vault awaits. Between you and 2 million credits: a laser grid, pressure-sensitive floor, biometric scanner, and Snuggles — the attack robot that looks like a teddy bear and kills like a battleship. Also, you have 30 seconds before the key's separation alarm triggers.",
+            objective: null,
+            npcs_present: [
+              { name: "Snuggles", role: "Attack robot / vault guardian", attitude: "Humming contentedly, will kill without hesitation" }
+            ],
+            exits: [{ to: "scene_5_the_escape", description: "Secure the Mandible" }]
+          },
+          {
+            id: "scene_5_the_escape",
+            title: "The Getaway (and the Twist)",
+            type: "action/comedy",
+            description: "You have the Golden Mandible. Alarms are blaring. Baron Vrix is screaming something about 'the Ghost' and 'unlimited bounty.' Snuggles has woken up and seems personally offended. Twist: the Mandible is a decoy. A message arrives — your mentor is alive. The real one is on Nexus.",
+            objective: null,
+            npcs_present: [],
+            exits: [{ to: "scene_6_aftermath", description: "Escape with (fake) Mandible" }]
+          },
+          {
+            id: "scene_6_aftermath",
+            title: "The Real Score",
+            type: "resolution",
+            description: "You're back in the Soller Chili storage unit. The fake Mandible sits in the corner, judging you with its gemstone eyes. Your crew bickers. But you have a new lead: your mentor is alive, the real Mandible is in play, and Baron Vrix has put a 100,000 credit bounty on your head.",
+            objective: null,
+            npcs_present: [],
+            exits: []
+          }
+        ],
+        npcs_reference: {
+          baron_vrix: { role: "Crime lord antagonist", motivation: "Protect his collection; ego above all else" },
+          glix: { role: "Infiltration specialist", motivation: "Help the crew; terrified of failing" },
+          zap: { role: "Tech wizard", motivation: "Prove his pessimism wrong (secretly)" },
+          moxie: { role: "Social chaos engine", motivation: "Befriend everyone, solve everything with words" },
+          krik: { role: "Reluctant muscle", motivation: "Help friends while wrestling his philosophical objections to theft" }
+        }
+      },
+      the_erebus_protocol: {
+        synopsis: "You wake up with amnesia in a CFW black site. Your hands know how to kill. A countdown says 47 hours until 'Protocol Erebus' activates. You are Subject 7-Alpha — an assassin who started remembering. Stop the activation or become what they made you.",
+        ai_instructions: {
+          tone: "Paranoid thriller. Trust no one. Every ally is a potential threat. Every threat might be an ally.",
+          pacing: "Fast action scenes interspersed with quiet investigation. Never let player feel safe.",
+          themes: ["Identity and memory", "Moral ambiguity", "Institutional corruption", "What makes us human"]
+        },
+        scenes: [
+          {
+            id: "scene_1_awakening",
+            title: "The White Room",
+            type: "introduction",
+            description: "White ceiling. Antiseptic smell. The beep of a heart monitor — yours. You sit up. Medical bay. Private room. On the floor: a human doctor in a lab coat, face down, blood pooling. Dead. Your hands are shaking. Not from fear. From adrenaline. Your body knows something your mind doesn't. The door is locked from outside. Alarms scream through the facility.",
+            objective: "Escape the medical bay and find an exit.",
+            npcs_present: [],
+            exits: [{ to: "scene_2_escape", description: "Into the facility. Find an exit. Find answers." }]
+          },
+          {
+            id: "scene_2_escape",
+            title: "The Run",
+            type: "action",
+            description: "The facility is a maze of white corridors and red emergency lights. You pass other rooms — some empty, some with sedated subjects. You're not the only one they worked on. Behind you, security boots. Ahead, an elevator and a stairwell. Level B2: crates labeled 'Erebus Assets — Inactive.' Level B3: retinal scanner. Your eye opens it. You were here before.",
+            objective: null,
+            npcs_present: [],
+            exits: [{ to: "scene_3_surface", description: "Reach ground level or hangar bay" }]
+          },
+          {
+            id: "scene_3_surface",
+            title: "The City",
+            type: "investigation",
+            description: "You're on Procyus Prime. CFW capital. The most surveilled city in the Frontier. Every camera is a threat. Every Apex Law officer a potential executioner. Your chronocom buzzes: 'Starlight Lounge. Level 42. Come alone. I knew Dr. Thorne. I know what you are.' Name: Vance.",
+            objective: null,
+            npcs_present: [
+              { name: "Vance", role: "Ex-Apex Law informant", attitude: "Old, scarred, knows everything about Erebus" },
+              { name: "Apex Law Officer Chen", role: "Honest cop", attitude: "Suspicious but may be an ally — or bait" }
+            ],
+            exits: [{ to: "scene_4_chase", description: "Meeting with Vance completes or is interrupted" }]
+          },
+          {
+            id: "scene_4_chase",
+            title: "The Pursuit",
+            type: "action",
+            description: "They found you. Not Apex Law — worse. Erebus cleanup team. Professionals like you. Three of them. Weapons free. No stun setting this time. Vance pushes you toward the back exit: 'Run! I'll hold them!' He buys you 60 seconds.",
+            objective: null,
+            npcs_present: [],
+            exits: [{ to: "scene_5_Nexus", description: "Escape Procyus Prime alive" }]
+          },
+          {
+            id: "scene_5_Nexus",
+            title: "The Allies",
+            type: "social/investigation",
+            description: "Nexus. Corporate capital. You need to find Subject 5-Gamma — codenamed Kira, working Nexarion Group tower night security. Another weapon like you. But is she still programmed? Or free like you're trying to be?",
+            objective: null,
+            npcs_present: [
+              { name: "Kira (Subject 5-Gamma)", role: "Erebus asset, potential ally", attitude: "Paranoid, armed, testing you before lowering her weapon" }
+            ],
+            exits: [
+              { to: "scene_6_vault", description: "Kira alliance formed — find Dr. Thorne's research" },
+              { to: "scene_7_station_alone", description: "Kira refuses or player goes solo" }
+            ]
+          },
+          {
+            id: "scene_6_vault",
+            title: "The Data Heist",
+            type: "stealth/action",
+            description: "Dr. Thorne's research is in a Helix Combine corporate data vault on Nexus. Kira has credentials. You have the skills. The vault is underground, biometric-locked, guarded by automated systems and human security. Your retinal scan opens the inner door — you were here before. Inside: Dr. Thorne's deconditioning protocol. And your real name.",
+            objective: null,
+            npcs_present: [],
+            exits: [{ to: "scene_7_station", description: "Data retrieved" }]
+          },
+          {
+            id: "scene_7_station",
+            title: "The Black Site",
+            type: "climax",
+            description: "The Erebus control station orbits a dead moon. No official registry. 2 hours until activation. Inside: Director Crane — the architect of Erebus — and 12 subjects in cryo ready to deploy. Major Kaelen Voss (Subject 9-Beta) blocks your path — programmed to obey, but conflicted. You must choose: destroy the signal, free the subjects, kill Crane, or take control.",
+            objective: null,
+            npcs_present: [
+              { name: "Director Crane", role: "Architect of Erebus", attitude: "Believes utterly in his mission; not a monster, a true believer" },
+              { name: "Major Kaelen Voss", role: "Subject 9-Beta, tragic antagonist", attitude: "Loyal programming vs. returning humanity" }
+            ],
+            exits: [{ to: "scene_8_aftermath", description: "Choice made. Countdown stopped — or not." }]
+          },
+          {
+            id: "scene_8_aftermath",
+            title: "Who You Are",
+            type: "resolution",
+            description: "The station burns behind you. Or stands silent. Or serves your will. You made your choice. The countdown stopped. Or it didn't. Either way, you're not Subject 7-Alpha anymore. You're [NAME]. You're alive. And you remember.",
+            objective: null,
+            npcs_present: [],
+            exits: []
+          }
+        ],
+        npcs_reference: {
+          vance: { role: "Ex-Apex Law, conspiracy informant", motivation: "Expose Erebus; sacrifices himself to do it" },
+          kira: { role: "Fellow Erebus survivor, potential ally", motivation: "Survive and break free of programming" },
+          director_crane: { role: "Erebus architect, villain", motivation: "Believes black ops keep the Frontier safe; ends justify means" },
+          major_voss: { role: "Programmed antagonist", motivation: "Conflicted between loyalty and recovered humanity" }
+        }
+      },
+      sfad5_bugs_in_the_system: {
+        synopsis: "Mhemne Mining Station went silent two weeks ago. 200 people. No distress call. RFM is being evasive. Something bio-engineered is nesting inside and you're walking into its hive.",
+        ai_instructions: {
+          tone: "Sci-fi horror. Alien meets The Thing. Isolation, paranoia, body horror.",
+          pacing: "Slow dread building to confrontation. The hive should feel inevitable, ancient, wrong.",
+          themes: ["Body horror", "Isolation", "What makes us human", "Moral compromise"]
+        },
+        scenes: [
+          {
+            id: "scene_1_approach",
+            title: "The Silent Station",
+            type: "introduction",
+            description: "Waystation Murn drifts in the asteroid belt — an ugly collection of modules and processing equipment. No running lights. No response to hails. Your ship's sensors show life support active but minimal power to other systems. The docking bay is open. Waiting. Inviting. Or luring.",
+            objective: "Board the station and assess what happened.",
+            npcs_present: [],
+            exits: [{ to: "scene_2_administration", description: "Enter the station, search for survivors" }]
+          },
+          {
+            id: "scene_2_administration",
+            title: "Ghost Town",
+            type: "exploration/horror",
+            description: "The administration deck should be bustling. Instead: chaos. Furniture overturned. Documents scattered. And everywhere, a strange resinous substance coating walls, floors, equipment — thick, sticky, organic, almost architectural. The communications array is destroyed. Deliberately. Someone — or something — didn't want messages getting out.",
+            objective: null,
+            npcs_present: [],
+            exits: [
+              { to: "scene_3_processing_plant", description: "Investigate mining operations" },
+              { to: "scene_4_living_quarters", description: "Search for survivors in crew areas" }
+            ]
+          },
+          {
+            id: "scene_3_processing_plant",
+            title: "The Hive",
+            type: "horror/combat",
+            description: "The processing plant was where ore became profit. Now it's something else entirely. The resin is thickest here — forming chambers, tunnels, architecture that serves no human purpose. And in the center: eggs. Pods. Something growing. Something that used to be human. The miners didn't just disappear. They were repurposed.",
+            objective: null,
+            npcs_present: [],
+            exits: [
+              { to: "scene_4_living_quarters", description: "Search for survivors" },
+              { to: "scene_5_the_queen", description: "Confront the hive's heart" }
+            ]
+          },
+          {
+            id: "scene_4_living_quarters",
+            title: "The Survivors",
+            type: "social/horror",
+            description: "Not everyone is dead. Not everyone is transformed. A handful of survivors have barricaded themselves in crew quarters — living on emergency rations, armed with mining tools, slowly going mad. They've seen what happened. They know what's out there. And they're not sure if you're rescue... or more bugs.",
+            objective: null,
+            npcs_present: [
+              { name: "Dr. Ylena Voss", role: "Station medic", attitude: "Exhausted, traumatized, still functional" },
+              { name: "Foreman Krik", role: "Mining supervisor", attitude: "Armed, paranoid, grieving — his fault they're here" },
+              { name: "Technician Zap", role: "Communications tech", attitude: "Feverish, possibly infected, moral dilemma" }
+            ],
+            exits: [
+              { to: "scene_5_the_queen", description: "The Queen must be dealt with" },
+              { to: "scene_6_escape", description: "Leave while you can" }
+            ]
+          },
+          {
+            id: "scene_5_the_queen",
+            title: "The Heart of the Hive",
+            type: "climax",
+            description: "The Queen's chamber is the station's former ore processing center — now a cathedral of organic horror. The Queen herself is massive, intelligent, and aware. She doesn't want to fight. She wants to talk. She wants to explain. She wants to offer a deal. And what she offers... changes everything.",
+            objective: null,
+            npcs_present: [
+              { name: "The Queen", role: "Hive matriarch, fully sentient", attitude: "Calm, intelligent, offering alliance — and genuinely means it" }
+            ],
+            exits: [{ to: "scene_6_aftermath", description: "The Queen is dealt with. Time to leave." }]
+          },
+          {
+            id: "scene_6_aftermath",
+            title: "The Report",
+            type: "resolution",
+            description: "You leave Waystation Murn behind — whether as a grave, a quarantine zone, or the beginning of something new. RFM wants your report. The survivors need medical care. What you saw changes how you see the Frontier. There are monsters out there. And some of them can talk.",
+            objective: null,
+            npcs_present: [],
+            exits: []
+          }
+        ],
+        npcs_reference: {
+          dr_ylena_voss: { role: "Station medic survivor", motivation: "Escape, understand the insects, warn others" },
+          foreman_krik: { role: "Mining supervisor survivor", motivation: "Atone for bringing the infection aboard" },
+          the_queen: { role: "Hive matriarch", motivation: "Survival, expansion, a chance at legitimacy" }
+        }
+      },
+      sf4_mission_to_Glacivaar: {
+        synopsis: "ADC hires you to document Nexarion Group's illegal mining on Glacivaar. Simple observation. But Nexarion Group found an ancient ship under the ice and they'll kill to keep it secret. Two megacorps and one frozen hellscape.",
+        ai_instructions: {
+          tone: "Corporate noir. Cold, calculating, everyone has an angle.",
+          pacing: "Cold isolation building to corporate confrontation. The ancient ship is the wildcard.",
+          themes: ["Corporate greed", "Ancient secrets", "Moral compromise", "Survival"]
+        },
+        scenes: [
+          {
+            id: "scene_1_ADC_briefing",
+            title: "The Briefing",
+            type: "introduction",
+            description: "ADC headquarters on Nexus. Executive Marla Chen explains the situation: Nexarion Group has established an illegal mining colony on Glacivaar, a planet ADC surveyed and claimed under Frontier law. Your job is simple — land, observe, document, return. Don't engage Nexarion Group personnel. Don't start an incident. Just get proof. Chen is nervous. Too nervous for a simple documentation mission.",
+            objective: "Travel to Glacivaar and document Nexarion Group's illegal operation.",
+            npcs_present: [
+              { name: "Marla Chen", role: "ADC Executive", attitude: "Professional, stressed, hiding something important" }
+            ],
+            exits: [{ to: "scene_2_Glacivaar_landing", description: "Travel to Glacivaar" }]
+          },
+          {
+            id: "scene_2_Glacivaar_landing",
+            title: "The Frozen World",
+            type: "exploration",
+            description: "Glacivaar is worse than described. The cold bites through your gear. The wind howls constantly. Your sensors pick up Nexarion Group's operation 50 kilometers north — a thermal bloom in the frozen wasteland. But there's something else. A signal. Old. Weak. Coming from the ice itself.",
+            objective: null,
+            npcs_present: [],
+            exits: [
+              { to: "scene_3_Nexarion Group_colony", description: "Approach Nexarion Group operation" },
+              { to: "scene_4_ice_caves", description: "Investigate the mysterious signal beneath the ice" }
+            ]
+          },
+          {
+            id: "scene_3_Nexarion Group_colony",
+            title: "Nexarion Group's Secret",
+            type: "infiltration",
+            description: "The Nexarion Group colony is massive — far larger than a simple mining operation. Military vehicles. Armed guards. And in the center, a massive drilling rig boring into the ice. They're not just mining minerals. They're digging for something specific. Something hidden.",
+            objective: null,
+            npcs_present: [
+              { name: "Director Krix", role: "Nexarion Group operation commander", attitude: "Ruthless, efficient, will order killings" }
+            ],
+            exits: [
+              { to: "scene_4_ice_caves", description: "Escape to ice caves, investigate signal" },
+              { to: "scene_5_confrontation", description: "Confront Nexarion Group directly" }
+            ]
+          },
+          {
+            id: "scene_4_ice_caves",
+            title: "Beneath the Ice",
+            type: "exploration/dungeon",
+            description: "The signal leads to a vast ice cave system — natural formations mixed with something else. Artificial structures. Ancient technology. And at the center: a ship. Not Nexarion Group's target — something else. Something that crashed here millennia ago. Non-Frontier design. Power systems dormant but functional. Technology beyond current Frontier science.",
+            objective: null,
+            npcs_present: [],
+            exits: [{ to: "scene_5_confrontation", description: "Nexarion Group has followed you. Confrontation is inevitable." }]
+          },
+          {
+            id: "scene_5_confrontation",
+            title: "Corporate War",
+            type: "climax",
+            description: "Nexarion Group knows you know. ADC is coming — Chen sent a ship after all, but is it rescue or cleanup? You're caught between two megacorps, an ancient ship, and the frozen hell of Glacivaar. The only way out is through.",
+            objective: null,
+            npcs_present: [
+              { name: "Director Krix", role: "Nexarion Group commander", attitude: "Eliminate witnesses, claim the discovery" },
+              { name: "Captain Voss", role: "ADC Security Commander", attitude: "Conflicted — wants legal resolution but uncomfortable with corporate games" }
+            ],
+            exits: [{ to: "scene_6_aftermath", description: "The confrontation ends. The consequences begin." }]
+          },
+          {
+            id: "scene_6_aftermath",
+            title: "The Fallout",
+            type: "resolution",
+            description: "Glacivaar recedes in your viewport, but the consequences follow you. Corporations don't forget. And you've touched something ancient that will draw attention you may not want.",
+            objective: null,
+            npcs_present: [],
+            exits: []
+          }
+        ],
+        npcs_reference: {
+          marla_chen: { role: "ADC Executive", motivation: "Protect ADC interests; knows more than she's saying" },
+          director_krix: { role: "Nexarion Group operation commander", motivation: "Claim the ancient discovery; eliminate witnesses" },
+          captain_voss: { role: "ADC Security Commander", motivation: "Legal resolution, protect ADC, do the right thing" }
+        }
+      },
+      sf3_sundown_on_Vashara: {
+        synopsis: "A primitive tribe's pyramid shouldn't exist — and it doesn't. Inside: an ancient hovertank. The Vaash agents are minutes from reactivating it. In the hidden bunker below, an invasion timeline proves war is coming.",
+        ai_instructions: {
+          tone: "Mystery and ancient technology. The pyramid should feel wrong, ancient, powerful.",
+          pacing: "Slow investigation building to action. The tank reveal should be dramatic.",
+          themes: ["Ancient weapons", "Primitive worship", "The Vaash infiltration", "Coming war"]
+        },
+        scenes: [
+          {
+            id: "scene_1_landing_site",
+            title: "The Golden Rift",
+            type: "introduction",
+            description: "Your ship descends through Vashara's thin atmosphere, landing in a massive canyon where the air is warm and breathable. Max Malligigg — a nervous Krix with more ambition than sense — greets you with maps, theories, and the wild gleam of someone who's found something valuable. The pyramid on the edge of the Solari village gleams with an unnatural sheen that stone shouldn't have.",
+            objective: "Investigate the Solari pyramid and discover what Malligigg found.",
+            npcs_present: [
+              { name: "Maximillian Malligigg", role: "Employer, KXS Centispeed Second Officer", attitude: "Excited, greedy, genuinely curious" },
+              { name: "Captain Vrix", role: "Centispeed Captain", attitude: "Skeptical, wants to leave immediately" }
+            ],
+            exits: [{ to: "scene_2_Solari_village", description: "Travel to Solari village" }]
+          },
+          {
+            id: "scene_2_Solari_village",
+            title: "The Village of the Sun",
+            type: "exploration/social",
+            description: "The Solari village shouldn't exist. Nomadic tribes don't build permanent settlements — yet here stands a village of expertly crafted wooden buildings, centered on a massive pyramid that gleams with an unnatural sheen. The Solari themselves are humanoid, primitive in dress and speech, but their metalwork is suspiciously advanced. They don't like strangers asking questions about the pyramid.",
+            objective: null,
+            npcs_present: [
+              { name: "Chief Helios", role: "Village leader", attitude: "Suspicious, protective of pyramid secret" },
+              { name: "Shaman Star-Speaker", role: "Religious leader", attitude: "Fanatical — believes pyramid contains a demon that must not wake" },
+              { name: "Helio-Young", role: "Curious youth", attitude: "Fascinated by off-worlders, willing to talk" }
+            ],
+            exits: [{ to: "scene_3_the_war_tank", description: "Investigate the pyramid's secret" }]
+          },
+          {
+            id: "scene_3_the_war_tank",
+            title: "The Sleeping Weapon",
+            type: "exploration/combat",
+            description: "Inside the pyramid, you find the truth: an ancient hovertank — a weapon of devastating power, dormant for millennia. The Solari worship it as a god. But The Vaash agents have been here. They're trying to reactivate the tank. And if they succeed, they'll have a weapon capable of destroying any CFW force.",
+            objective: null,
+            npcs_present: [
+              { name: "The Vaash Agents (2-4)", role: "Disguised operatives", attitude: "Mission-focused, suicidal if captured" }
+            ],
+            exits: [{ to: "scene_4_The Vaash_base", description: "The Vaash agents came from somewhere — find their base" }]
+          },
+          {
+            id: "scene_4_The Vaash_base",
+            title: "The Hidden Bunker",
+            type: "dungeon/combat",
+            description: "The The Vaash didn't come to Vashara by accident. They have a hidden underground bunker where they've been studying the tank, experimenting on Solari, and preparing for something bigger. The smell of chemicals. Faint screams. And an invasion timeline that reveals this isn't just about one weapon.",
+            objective: null,
+            npcs_present: [
+              { name: "The Vaash Commander", role: "Base commander", attitude: "Fanatical, will self-destruct base if losing" }
+            ],
+            exits: [{ to: "scene_5_aftermath", description: "Base dealt with. Now the bigger picture." }]
+          },
+          {
+            id: "scene_5_aftermath",
+            title: "The Report",
+            type: "resolution",
+            description: "Vashara holds its secrets close, but you've pried them open. The The Vaash have been stopped — for now. The tank is secured, destroyed, or in CFW hands. The Solari must rebuild their culture without their 'god.' And you hold information that could save the Frontier.",
+            objective: null,
+            npcs_present: [],
+            exits: []
+          }
+        ],
+        npcs_reference: {
+          malligigg: { role: "Employer and expedition leader", motivation: "Profit from ancient discovery; recklessly curious" },
+          Solari: { role: "Primitive tribe, pyramid guardians", motivation: "Protect their 'god'; deeply suspicious of outsiders" },
+          The Vaash_agents: { role: "Disguised enemy operatives", motivation: "Reactivate the tank for The Vaash war machine" }
+        }
+      },
+      sfkh1_Kelvarn_run: {
+        synopsis: "Stranded in the Kelvarn system with stolen CFW encryption codes in your hold. The Vaash agents, corporate spies, CFW recovery teams, and revolutionaries all want what you're carrying. The auction ends with a twist.",
+        ai_instructions: {
+          tone: "Space western noir. Everyone has an angle. Trust is expensive.",
+          pacing: "Political intrigue building to confrontation. The codes are the MacGuffin — what matters is who you become.",
+          themes: ["Moral ambiguity", "Survival", "Freedom vs order", "The gray areas of law"]
+        },
+        scenes: [
+          {
+            id: "scene_1_inner_reach",
+            title: "The Inner Reach",
+            type: "introduction",
+            description: "Inner Reach. Orderly. Controlled. Boring — if you're not looking closely. The Kelvarn Council runs a tight ship: permits, inspections, taxes. Your ship is docked at Waystation Kador, needing repairs you can't afford. And everyone knows you're carrying something valuable.",
+            objective: "Find a way to pay for ship repairs while managing who knows about your cargo.",
+            npcs_present: [
+              { name: "Administrator Kole", role: "Station Administrator", attitude: "Officious, corruptible, ambitious" },
+              { name: "Captain Mara Dren", role: "Kelvarn Council Security", attitude: "Suspicious, professional, dangerous" }
+            ],
+            exits: [
+              { to: "scene_2_outer_reach", description: "Make the run to Outer Reach" },
+              { to: "scene_3_council_job", description: "Take the legitimate job from Captain Dren" }
+            ]
+          },
+          {
+            id: "scene_2_outer_reach",
+            title: "The Outer Reach",
+            type: "exploration/social",
+            description: "Outer Reach. No law but what you bring. No order but what you enforce. You've run the blockade and made it to Waystation Thresh. Now you need a buyer. And you need to survive long enough to find one. The cargo is revealed: stolen CFW military encryption codes. Extremely valuable. Everyone on this station either wants them or wants you dead for having them.",
+            objective: null,
+            npcs_present: [
+              { name: "Boss Grimm", role: "Station crime lord", attitude: "Businesslike, friendly, utterly ruthless" },
+              { name: "Zee the Mechanic", role: "Ship repair specialist", attitude: "Sarcastic genius, overworked, soft spot for underdogs" }
+            ],
+            exits: [
+              { to: "scene_4_the_deal", description: "Find a buyer for the codes" },
+              { to: "scene_5_CFW_confrontation", description: "CFW finds you first" }
+            ]
+          },
+          {
+            id: "scene_3_council_job",
+            title: "Working for the Man",
+            type: "investigation",
+            description: "You took the legitimate path — work for Kelvarn Council, earn your keep honestly. Captain Dren has a job: infiltrate smuggling operations on Outer Reach. Gather evidence. Build a case. It's dangerous, underpaid, and puts you in the crosshairs of everyone you've been trying to avoid. But it's legal. Mostly. The complication: the smuggling ring implicates Council members.",
+            objective: null,
+            npcs_present: [
+              { name: "Captain Mara Dren", role: "Council Security, mission handler", attitude: "Wants law and order; uncomfortable with what you'll find" }
+            ],
+            exits: [{ to: "scene_4_the_deal", description: "Your cover is blown. Time to choose sides." }]
+          },
+          {
+            id: "scene_4_the_deal",
+            title: "The Auction",
+            type: "social/climax",
+            description: "Word is out. You have the codes. And everyone wants them. Boss Grimm has arranged an auction — neutral ground, safe conduct, highest bidder wins. The bidders: a disguised The Vaash agent (50,000 Cr or death), a Nexarion Group corporate spy (30,000 Cr), revolutionaries (15,000 Cr), and a CFW recovery team (amnesty plus 10,000). Twist: the codes are fake — a trap to identify buyers.",
+            objective: null,
+            npcs_present: [],
+            exits: [{ to: "scene_6_aftermath", description: "The auction ends. The consequences begin." }]
+          },
+          {
+            id: "scene_5_CFW_confrontation",
+            title: "The Law Catches Up",
+            type: "action/climax",
+            description: "You tried to run. You tried to hide. But CFW Recovery Team Alpha-7 doesn't give up. They've cornered you on Waystation Thresh. Their offer: surrender the codes, face trial, maybe live. Their threat: resist, and they have authorization to use lethal force. Your ship is blocked. Your escape routes cut off.",
+            objective: null,
+            npcs_present: [
+              { name: "Commander Jax", role: "CFW Recovery Team leader", attitude: "By-the-book, authorized lethal force" }
+            ],
+            exits: [{ to: "scene_6_aftermath", description: "Confrontation resolved. Time to deal with consequences." }]
+          },
+          {
+            id: "scene_6_aftermath",
+            title: "The Kelvarn Legacy",
+            type: "resolution",
+            description: "Kelvarn fades behind you, but its mark remains. You've made choices — some profitable, some survivable, some moral. You've made enemies with long memories. And you've learned that in the Frontier, the line between smuggler and citizen, criminal and hero, is thinner than vacuum.",
+            objective: null,
+            npcs_present: [],
+            exits: []
+          }
+        ],
+        npcs_reference: {
+          administrator_kole: { role: "Station Administrator", motivation: "Personal gain; has a price for everything" },
+          captain_dren: { role: "Kelvarn Council Security", motivation: "Law and order, but knows the law isn't always just" },
+          boss_grimm: { role: "Outer Reach crime lord", motivation: "Profit and power; violence is just another tool" },
+          zee: { role: "Ship repair specialist", motivation: "Fix things, get paid, sarcasm as armor" }
+        }
+      },
+      sf1_Cethara_planet_of_mystery: {
+        synopsis: "The Kruvaan hold the key to finding lost explorers taken by the fanatical Ashtekkai. Their 'god' is an Aelunn AI keeping the last of an ancient race alive. The The Vaash created the crisis. And they're coming back.",
+        ai_instructions: {
+          tone: "Exploration and discovery. Ancient mysteries, first contact, moral choices about colonialism.",
+          pacing: "Slow exploration building to revelation. The Aelunn secret should feel earned.",
+          themes: ["Ancient civilizations", "Created life", "Religious fanaticism", "Coming war"]
+        },
+        scenes: [
+          {
+            id: "scene_1_Kruvaan_village",
+            title: "The Tree-Dwellers",
+            type: "exploration/social",
+            description: "The Kruvaan live in the great forest of Cethara, high in the canopy where the Ul'Mek cannot follow. These small, ape-like beings are master craftsmen and traders — but fiercely territorial. To find the lost explorers, you must earn their trust. And their trust comes with a price.",
+            objective: "Earn Kruvaan trust to learn where the lost explorers were taken.",
+            npcs_present: [
+              { name: "Chief Kura-Ban", role: "Tribal leader", attitude: "Suspicious but fair" },
+              { name: "Kura-Dee", role: "Trader and guide", attitude: "Curious, mercantile, willing to deal" }
+            ],
+            exits: [{ to: "scene_2_Ashtekkai_territory", description: "Journey to Ashtekkai lands" }]
+          },
+          {
+            id: "scene_2_Ashtekkai_territory",
+            title: "The Valley of the Gods",
+            type: "exploration/combat",
+            description: "The Ashtekkai are a religious warrior society living in the Valley of the Gods — a region filled with ancient Aelunn ruins. They've become fanatical, worshipping something they call 'the Great One.' Their warriors patrol constantly, and their priests perform dark rituals in the ruins. This is where the lost explorers were last seen. They're being held as sacrifices.",
+            objective: null,
+            npcs_present: [
+              { name: "High Priest Ede-Tek", role: "Religious leader", attitude: "Fanatical, hostile to outsiders, believes the Great One will grant power" }
+            ],
+            exits: [
+              { to: "scene_3_Aelunn_ruins", description: "Explore deeper Aelunn ruins beneath the valley" },
+              { to: "scene_4_the_great_one", description: "Confront the Ashtekkai religion at its source" }
+            ]
+          },
+          {
+            id: "scene_3_Aelunn_ruins",
+            title: "The Ancient City",
+            type: "exploration/dungeon",
+            description: "Beneath the Valley of the Gods lies a vast Aelunn city — preserved for millennia. The Aelunn were highly advanced: bio-engineers, terraformers, masters of genetics. They created many of Cethara's native species. The Gene Library reveals it: the Ul'Mek, Kruvaan, and Ashtekkai are all Aelunn creations. And in the Stasis Vaults — hundreds of Aelunn in suspension. A few still live.",
+            objective: null,
+            npcs_present: [],
+            exits: [{ to: "scene_4_the_great_one", description: "The stasis chamber holds the key" }]
+          },
+          {
+            id: "scene_4_the_great_one",
+            title: "The Sleeping God",
+            type: "climax/revelation",
+            description: "The Great One is revealed: not a god, but the last functioning Aelunn preservation system. An AI maintaining the last living Aelunn in stasis — Ela-Vaen, chief scientist. The Ashtekkai worship her as a deity. But she's dying. The system is failing. And she holds knowledge that could change everything: the The Vaash are returning to finish what they started millennia ago.",
+            objective: null,
+            npcs_present: [
+              { name: "Ela-Vaen", role: "Last living Aelunn scientist", attitude: "Dying but lucid; desperate to share her warning" }
+            ],
+            exits: [{ to: "scene_5_aftermath", description: "The truth is out. Now what?" }]
+          },
+          {
+            id: "scene_5_aftermath",
+            title: "A Planet Changed",
+            type: "resolution",
+            description: "You've uncovered Cethara's secret: an ancient civilization, created races, and a coming threat. The Ashtekkai are in disarray — their god revealed as alien technology. The Kruvaan and Ul'Mek must decide their future. And you hold the key to uniting them all. Or tearing them apart.",
+            objective: null,
+            npcs_present: [],
+            exits: []
+          }
+        ],
+        npcs_reference: {
+          chief_kura_ban: { role: "Kruvaan tribal leader", motivation: "Protect the tribe; will trade trust for proven good faith" },
+          ela_eorn: { role: "Last living Aelunn scientist", motivation: "Warn about the The Vaash; share the truth before she dies" },
+          high_priest_ede_tek: { role: "Ashtekkai religious leader", motivation: "Serve the Great One; destroy threats to the faith" }
+        }
+      }
+    };
+
+    // SECTION 3b -- CHARACTER ROSTER
+
+    const CHARACTER_ROSTER = [
+      {
+        id: 'kael_voss', name: 'Kael Voss', race: 'Human', psa: 'Military', archetype: 'Soldier/Enforcer',
+        stats: { str: 55, sta: 55, dex: 55, rs: 50, int: 40, log: 40, per: 45, ldr: 50 },
+        combat: { im: 5, ps: '+3', dm_modifier: 0 },
+        stamina: { current: 55, max: 55 },
+        skills: [{ name: 'Beam Weapons', level: 2 }, { name: 'Melee Weapons', level: 2 }, { name: 'Demolitions', level: 1 }, { name: 'Thrown Weapons', level: 1 }, { name: 'Gyrojet Weapons', level: 1 }],
+        inventory: ['Rafflur M-3 proton pistol', 'Ke-1000 laser pistol', 'Albedo suit', 'Vibroknife', 'Frag grenade x2'],
+        seu: { total: 30, sources: [{ name: 'M-3 clip', seu: 10 }, { name: 'Ke-1000 clip', seu: 20 }] },
+        ammo: {}, status_effects: [], credits: 500,
+        xp: { total: 0, unspent: 0 }, racial_abilities: [],
+        ui_meta: { description: 'A seasoned Human soldier with heavy weapons expertise and battlefield experience.', difficulty: 'any', color_accent: 'border-blue-500' }
+      },
+      {
+        id: 'skrix', name: 'Skrix', race: 'Krix', psa: 'Technical', archetype: 'Techex',
+        stats: { str: 40, sta: 40, dex: 50, rs: 50, int: 55, log: 55, per: 45, ldr: 45 },
+        combat: { im: 5, ps: '+2', dm_modifier: 0 },
+        stamina: { current: 40, max: 40 },
+        skills: [{ name: 'Technician', level: 3 }, { name: 'Computers', level: 1 }, { name: 'Beam Weapons', level: 1 }],
+        inventory: ['Ke-1000 laser pistol', 'Civilian skeinsuit', 'Techkit', 'Doze grenade x2'],
+        seu: { total: 40, sources: [{ name: 'Ke-1000 clip', seu: 20 }, { name: 'spare', seu: 20 }] },
+        ammo: {}, status_effects: [], credits: 500,
+        xp: { total: 0, unspent: 0 }, racial_abilities: ['Ambidexterity', 'Comprehension 15%'],
+        ui_meta: { description: 'A multi-limbed Krix technician who can interface with nearly any system.', difficulty: 'any', color_accent: 'border-green-500' }
+      },
+      {
+        id: 'bolg', name: 'Bolg', race: 'Moluun', psa: 'Biosocial', archetype: 'Scispec/Medic',
+        stats: { str: 55, sta: 55, dex: 45, rs: 45, int: 45, log: 45, per: 50, ldr: 50 },
+        combat: { im: 5, ps: '+3', dm_modifier: 0 },
+        stamina: { current: 55, max: 55 },
+        skills: [{ name: 'Medical', level: 3 }, { name: 'Environmental', level: 1 }, { name: 'Psycho-Social', level: 1 }],
+        inventory: ['Electrostunner', 'Albedo suit', 'Medkit x2', 'Bioscanner', 'Stimdose x2'],
+        seu: { total: 40, sources: [{ name: 'Electrostunner', seu: 20 }, { name: 'spare', seu: 20 }] },
+        ammo: {}, status_effects: [], credits: 500,
+        xp: { total: 0, unspent: 0 }, racial_abilities: ['Elasticity', 'Lie Detection 5%'],
+        ui_meta: { description: 'A shape-shifting Moluun field medic and xenobiologist.', difficulty: 'any', color_accent: 'border-purple-500' }
+      },
+      {
+        id: 'rayla', name: 'Rayla', race: 'Skrath', psa: 'Military', archetype: 'Scout/Explorer',
+        stats: { str: 30, sta: 30, dex: 55, rs: 55, int: 55, log: 55, per: 45, ldr: 45 },
+        combat: { im: 6, ps: '+2', dm_modifier: 1 },
+        stamina: { current: 30, max: 30 },
+        skills: [{ name: 'Beam Weapons', level: 2 }, { name: 'Survival', level: 2 }, { name: 'Tracking', level: 2 }],
+        inventory: ['Ke-2000 laser rifle', 'Ke-1000 laser pistol', 'Skeinsuit', 'Survival pack', 'Macrobinoculars'],
+        seu: { total: 60, sources: [{ name: 'rifle', seu: 20 }, { name: 'pistol', seu: 20 }, { name: 'spare', seu: 20 }] },
+        ammo: {}, status_effects: [], credits: 500,
+        xp: { total: 0, unspent: 0 }, racial_abilities: ['Night Vision', 'Gliding', 'Battle Rage 5%'],
+        ui_meta: { description: 'A winged Skrath scout with exceptional senses and aggressive instincts. Best for experienced players.', difficulty: 'experienced', color_accent: 'border-red-500' }
+      }
+    ];
+
+    // SECTION 3c -- CHARACTER CARD COMPONENT
+
+    function CharacterCard({ character, selected, onSelect }) {
+      const staPercent = (character.stamina.current / character.stamina.max * 100) + '%';
+      const difficultyAny = character.ui_meta.difficulty === 'any';
+      const borderClass = selected
+        ? 'border-yellow-400 ring-2 ring-yellow-400'
+        : 'border-gray-700';
+
+      return (
+        <div
+          className={`bg-gray-800 rounded-lg border cursor-pointer p-4 ${borderClass}`}
+          onClick={() => onSelect(character.id)}
+        >
+          <div className="flex items-start justify-between mb-1">
+            <span className="font-bold text-gray-100 text-sm leading-tight">{character.name}</span>
+            <span
+              className={`text-xs font-semibold px-1.5 py-0.5 rounded ml-2 flex-shrink-0 ${difficultyAny ? 'bg-green-700 text-white' : 'bg-orange-600 text-white'}`}
+            >
+              {difficultyAny ? 'Any Level' : 'Experienced'}
+            </span>
+          </div>
+          <div className="text-xs text-gray-400 mb-2">{character.race} &mdash; {character.archetype}</div>
+
+          <div className="mb-2">
+            <div className="text-xs text-gray-500 mb-0.5">STA {character.stamina.current}/{character.stamina.max}</div>
+            <div className="w-full bg-gray-700 rounded-full h-1.5">
+              <div
+                className="bg-green-500 h-1.5 rounded-full"
+                style={{ width: staPercent }}
+              />
+            </div>
+          </div>
+
+          <div className="mb-2">
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Skills</div>
+            {character.skills.slice(0, 3).map((skill, i) => (
+              <div key={i} className="text-xs text-gray-300">{skill.name} {skill.level}</div>
+            ))}
+          </div>
+
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Gear</div>
+            {character.inventory.slice(0, 3).map((item, i) => (
+              <div key={i} className="text-xs text-gray-300">{item}</div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 3d -- CHARACTER DETAIL PANEL COMPONENT
+
+    function CharacterDetailPanel({ character }) {
+      if (!character) return null;
+
+      const statRows = [
+        ['STR', character.stats.str], ['STA', character.stats.sta],
+        ['DEX', character.stats.dex], ['RS', character.stats.rs],
+        ['INT', character.stats.int], ['LOG', character.stats.log],
+        ['PER', character.stats.per], ['LDR', character.stats.ldr]
+      ];
+
+      return (
+        <div className="mt-3 bg-gray-800 border border-gray-700 rounded-lg p-4">
+          <div className="font-bold text-gray-100 text-sm mb-3">{character.name} &mdash; Full Profile</div>
+
+          <div className="grid grid-cols-4 gap-2 mb-4">
+            {statRows.map(([label, value]) => (
+              <div key={label} className="text-center">
+                <div className="text-xs text-gray-500 uppercase">{label}</div>
+                <div className="text-gray-100 font-bold text-sm">{value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mb-3">
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Skills</div>
+            <div className="flex flex-wrap gap-1">
+              {character.skills.map((skill, i) => (
+                <span key={i} className="text-xs bg-gray-700 text-gray-200 px-2 py-0.5 rounded">
+                  {skill.name} <span className="text-yellow-400 font-bold">{skill.level}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-3">
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Inventory</div>
+            <ul className="list-disc list-inside">
+              {character.inventory.map((item, i) => (
+                <li key={i} className="text-xs text-gray-300">{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mb-3">
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">SEU Sources</div>
+            <div className="flex flex-wrap gap-1">
+              {character.seu.sources.map((src, i) => (
+                <span key={i} className="text-xs bg-gray-700 text-gray-200 px-2 py-0.5 rounded">
+                  {src.name}: {src.seu} SEU
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {character.racial_abilities.length > 0 && (
+            <div className="mb-3">
+              <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Racial Abilities</div>
+              <div className="flex flex-wrap gap-1">
+                {character.racial_abilities.map((ability, i) => (
+                  <span key={i} className="text-xs bg-gray-700 text-blue-300 px-2 py-0.5 rounded">{ability}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <p className="text-xs italic text-gray-400">{character.ui_meta.description}</p>
+        </div>
+      );
+    }
+
+    // SECTION 3e -- CHARACTER SELECT PANEL COMPONENT
+
+    function CharacterSelectPanel({ selectedCharId, onSelect }) {
+      const selectedChar = CHARACTER_ROSTER.find(c => c.id === selectedCharId);
+      return (
+        <div>
+          <div className="font-bold text-gray-100 mb-3">Select Your Operative</div>
+          <div className="grid grid-cols-2 gap-3">
+            {CHARACTER_ROSTER.map(character => (
+              <CharacterCard
+                key={character.id}
+                character={character}
+                selected={selectedCharId === character.id}
+                onSelect={onSelect}
+              />
+            ))}
+          </div>
+          <CharacterDetailPanel character={selectedChar} />
+        </div>
+      );
+    }
+
+    // SECTION 3i -- ADVENTURE CARD COMPONENT
+
+    function AdventureCard({ adventure, selected, onSelect }) {
+      const difficultyColors = {
+        'Beginner': 'bg-green-700 text-white',
+        'Beginner-Friendly': 'bg-green-700 text-white',
+        'Intermediate': 'bg-yellow-600 text-white',
+        'Advanced': 'bg-red-700 text-white'
+      };
+      const badgeClass = difficultyColors[adventure.difficulty] || 'bg-gray-600 text-white';
+      const borderClass = selected ? 'border-yellow-400' : 'border-gray-700';
+
+      // Map icon name string to component
+      const iconMap = { Globe, Briefcase, Star, Eye, AlertCircle };
+      const IconComponent = iconMap[adventure.cover_icon] || BookOpen;
+
+      return (
+        <div
+          className={`bg-gray-800 rounded-lg border cursor-pointer p-3 mb-2 transition-colors duration-150 ${borderClass}`}
+          onClick={() => onSelect(adventure.id)}
+        >
+          <div className="flex items-start justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <IconComponent size={14} className="text-gray-400 flex-shrink-0" />
+              <span className="font-bold text-gray-100 text-sm">{adventure.title}</span>
+            </div>
+            <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ml-2 flex-shrink-0 ${badgeClass}`}>
+              {adventure.difficulty}
+            </span>
+          </div>
+          <div className="text-xs text-gray-500 mb-1">{adventure.genre}</div>
+          <p className="text-xs text-gray-400 italic mb-2">{adventure.tagline}</p>
+          <div className="flex flex-wrap gap-1">
+            {adventure.tone.map((t, i) => (
+              <span key={i} className="text-xs bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded">{t}</span>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 3j -- ADVENTURE DETAIL PANEL COMPONENT
+
+    function AdventureDetailPanel({ adventure }) {
+      if (!adventure) return null;
+      const recChars = Array.isArray(adventure.recommended_characters)
+        ? adventure.recommended_characters.join(', ')
+        : 'Any operative';
+      return (
+        <div className="mt-2 bg-gray-800 border border-gray-700 rounded-lg p-3">
+          <div className="font-bold text-gray-100 text-sm mb-2">{adventure.title} — Mission Brief</div>
+          <div className="mb-3">
+            <div className="flex items-start gap-2 mb-1">
+              <span className="text-xs font-bold text-yellow-400 w-10 flex-shrink-0">ACT 1</span>
+              <span className="text-xs text-gray-300">{adventure.act_summary.act1}</span>
+            </div>
+            <div className="flex items-start gap-2 mb-1">
+              <span className="text-xs font-bold text-yellow-400 w-10 flex-shrink-0">ACT 2</span>
+              <span className="text-xs text-gray-300">{adventure.act_summary.act2}</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-xs font-bold text-yellow-400 w-10 flex-shrink-0">ACT 3</span>
+              <span className="text-xs text-gray-300">{adventure.act_summary.act3}</span>
+            </div>
+          </div>
+          <div className="text-xs text-gray-500 mb-1"><span className="text-gray-400 font-semibold">Setting:</span> {adventure.setting}</div>
+          <div className="text-xs text-gray-500"><span className="text-gray-400 font-semibold">Recommended:</span> {recChars}</div>
+        </div>
+      );
+    }
+
+    // SECTION 3k -- ADVENTURE SELECT PANEL COMPONENT
+
+    function AdventureSelectPanel({ selectedAdventureId, onSelect }) {
+      const selectedAdventure = ADVENTURE_LIBRARY.find(a => a.id === selectedAdventureId);
+      return (
+        <div>
+          <div className="font-bold text-gray-100 mb-3">Choose Your Mission</div>
+          <div className="overflow-y-auto">
+            {ADVENTURE_LIBRARY.map(adventure => (
+              <AdventureCard
+                key={adventure.id}
+                adventure={adventure}
+                selected={selectedAdventureId === adventure.id}
+                onSelect={onSelect}
+              />
+            ))}
+          </div>
+          <AdventureDetailPanel adventure={selectedAdventure} />
+        </div>
+      );
+    }
+
+    // SECTION 27a -- SAVE DATA VALIDATOR
+    function validateSaveData(data) {
+      const errors = [];
+      if (!data || typeof data !== 'object') {
+        errors.push('Invalid save data format');
+        return { valid: false, errors };
+      }
+      if (!data.character || typeof data.character !== 'object') errors.push('Missing required field: character');
+      else if (!data.character.name || typeof data.character.name !== 'string') errors.push('Character data is incomplete');
+      if (!data.campaign || typeof data.campaign !== 'object') errors.push('Missing required field: campaign');
+      else if (!data.campaign.adventure_id) errors.push('Campaign data is incomplete');
+      if (!data.session || typeof data.session !== 'object') errors.push('Missing required field: session');
+      if (!data.scene || typeof data.scene !== 'object') errors.push('Missing required field: scene');
+      if (!data.meta || typeof data.meta !== 'object') errors.push('Missing required field: meta');
+      else if (data.meta.initialized !== true) errors.push('Save data not fully initialized (meta.initialized is false)');
+      return { valid: errors.length === 0, errors };
+    }
+
+    // SECTION 27b -- PARSE AND LOAD SAVE
+    function parseAndLoadSave(jsonString, setGameState, setPhase) {
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonString);
+      } catch (e) {
+        return { success: false, errors: ['Invalid JSON: ' + e.message] };
+      }
+      const validation = validateSaveData(parsed);
+      if (!validation.valid) {
+        return { success: false, errors: validation.errors };
+      }
+      // API key is NOT in gameState by design -- player must re-enter it
+      // Ensure meta.dev_mode is preserved
+      const safeState = { ...parsed, meta: { ...parsed.meta, dev_mode: true } };
+      setGameState(safeState);
+      setPhase('GAME');
+      return { success: true, errors: [] };
+    }
+
+    // SECTION 27c -- CONTINUE CAMPAIGN PANEL
+    function ContinueCampaignPanel({ onLoad, onCancel }) {
+      const [jsonText, setJsonText] = useState('');
+      const [errors, setErrors] = useState([]);
+      const [loading, setLoading] = useState(false);
+
+      const handleLoad = () => {
+        if (!jsonText.trim()) {
+          setErrors(['Please paste your saved campaign JSON.']);
+          return;
+        }
+        setLoading(true);
+        const result = onLoad(jsonText);
+        setLoading(false);
+        if (!result.success) {
+          setErrors(result.errors);
+        }
+      };
+
+      return (
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+          <div className="font-bold text-gray-100 mb-1 text-sm">Continue Campaign</div>
+          <p className="text-gray-400 text-xs mb-3">
+            Paste your saved campaign JSON below. Your API key is not included in saves — enter it above before loading.
+          </p>
+          <textarea
+            value={jsonText}
+            onChange={e => { setJsonText(e.target.value); setErrors([]); }}
+            placeholder='Paste your exported campaign JSON here...'
+            className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-gray-300 text-xs font-mono h-32 resize-y focus:outline-none focus:border-yellow-500 mb-3"
+          />
+          {errors.length > 0 && (
+            <div className="mb-3">
+              {errors.map((err, i) => (
+                <div key={i} className="flex items-center gap-1 text-xs text-red-400 mb-0.5">
+                  <AlertCircle size={10} />
+                  <span>{err}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <button
+              onClick={handleLoad}
+              disabled={loading}
+              className="flex-1 bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded hover:bg-yellow-300 text-sm disabled:opacity-50"
+            >
+              {loading ? 'Loading...' : 'Load Campaign'}
+            </button>
+            <button
+              onClick={onCancel}
+              className="bg-gray-700 text-gray-300 py-2 px-4 rounded hover:bg-gray-600 text-sm"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 3f -- SETUP SCREEN (hoisted to module scope)
+
+    function SetupScreen({ selectedCharId, onCharSelect, selectedAdventureId, onAdventureSelect, onBeginAdventure, onLoadSave }) {
+      const canBegin = selectedCharId && selectedAdventureId;
+      const [showContinue, setShowContinue] = useState(false);
+      return (
+        <div className="min-h-screen bg-gray-900 flex flex-col px-6 py-6">
+          <div className="text-center mb-6">
+            <h1 className="text-4xl font-extrabold text-yellow-400 tracking-wide mb-2">
+              Astra Rising AI DM
+            </h1>
+            <p className="text-gray-400 text-lg mb-2">
+              Solo AI Dungeon Master for the Astra Rising tabletop RPG
+            </p>
+            <span className="inline-block text-xs font-semibold text-blue-400 border border-blue-700 rounded px-2 py-0.5 uppercase tracking-widest">
+              PRD v2.0
+            </span>
+          </div>
+
+          <div className="flex flex-row gap-6 flex-1 mb-6">
+            <div className="w-1/2">
+              <CharacterSelectPanel selectedCharId={selectedCharId} onSelect={onCharSelect} />
+            </div>
+            <div className="w-1/2 flex items-start">
+              <div className="w-full">
+                <AdventureSelectPanel selectedAdventureId={selectedAdventureId} onSelect={onAdventureSelect} />
+              </div>
+            </div>
+          </div>
+
+          <div className="max-w-lg w-full mx-auto">
+            <button
+              disabled={!canBegin}
+              onClick={canBegin ? onBeginAdventure : undefined}
+              className={`w-full font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400 ${canBegin ? 'bg-yellow-400 text-gray-900 hover:bg-yellow-300 cursor-pointer' : 'bg-gray-700 text-gray-500 cursor-not-allowed opacity-60'}`}
+            >
+              Begin Adventure
+            </button>
+
+            <div className="mt-3 text-center">
+              <button
+                onClick={() => setShowContinue(s => !s)}
+                className="text-xs text-gray-500 hover:text-gray-300 underline"
+              >
+                {showContinue ? 'Cancel' : 'Continue a previous campaign'}
+              </button>
+            </div>
+
+            {showContinue && (
+              <div className="mt-3">
+                <ContinueCampaignPanel
+                  onLoad={onLoadSave}
+                  onCancel={() => setShowContinue(false)}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 18 -- STATE MANAGER
+
+    function clampStamina(current, delta, max) {
+      return Math.max(0, Math.min(max, current + delta));
+    }
+
+    function applySeuDelta(seu, delta, seu_source) {
+      if (!delta || delta === 0) return seu;
+      let remaining = Math.abs(delta);
+      const newSources = seu.sources.map(src => ({ ...src }));
+
+      // Try named source first
+      if (seu_source) {
+        const namedIdx = newSources.findIndex(s => s.name === seu_source);
+        if (namedIdx >= 0) {
+          const deduct = Math.min(remaining, newSources[namedIdx].seu);
+          newSources[namedIdx].seu -= deduct;
+          remaining -= deduct;
+        }
+      }
+
+      // Fall back to other sources in order
+      if (remaining > 0) {
+        for (let i = 0; i < newSources.length; i++) {
+          if (newSources[i].seu > 0) {
+            const deduct = Math.min(remaining, newSources[i].seu);
+            newSources[i].seu = Math.max(0, newSources[i].seu - deduct);
+            remaining -= deduct;
+            if (remaining <= 0) break;
+          }
+        }
+      }
+
+      const newTotal = newSources.reduce((sum, s) => sum + s.seu, 0);
+      return { total: Math.max(0, newTotal), sources: newSources };
+    }
+
+    function applyNpcUpdates(campaign, npc_updates) {
+      if (!npc_updates || npc_updates.length === 0) return campaign;
+      const newNpcs = [...(campaign.npcs || [])];
+      npc_updates.forEach(update => {
+        const idx = newNpcs.findIndex(n => n.name === update.name);
+        if (idx >= 0) {
+          newNpcs[idx] = { ...newNpcs[idx], ...update };
+        } else {
+          newNpcs.push({ name: update.name || 'Unknown', role: update.role || '', goal: update.goal || '', attitude: update.attitude || 'neutral', condition: update.condition || 'healthy' });
+        }
+      });
+      return { ...campaign, npcs: newNpcs };
+    }
+
+    function applyFactionUpdates(campaign, faction_updates) {
+      if (!faction_updates || faction_updates.length === 0) return campaign;
+      const newFactions = [...(campaign.factions || [])];
+      faction_updates.forEach(update => {
+        const idx = newFactions.findIndex(f => f.name === update.name);
+        if (idx >= 0) {
+          const newStanding = (newFactions[idx].standing || 0) + (update.standing_delta || 0);
+          const newNotes = update.note ? [...(newFactions[idx].notes || []), update.note] : (newFactions[idx].notes || []);
+          newFactions[idx] = { ...newFactions[idx], standing: newStanding, notes: newNotes };
+        } else {
+          newFactions.push({ name: update.name, standing: update.standing_delta || 0, notes: update.note ? [update.note] : [] });
+        }
+      });
+      return { ...campaign, factions: newFactions };
+    }
+
+    function applyJournalEntry(campaign, entry) {
+      if (!entry || typeof entry !== 'string' || !entry.trim()) return campaign;
+      const newEntry = { timestamp: Date.now(), entry: entry.trim() };
+      return { ...campaign, journal: [...(campaign.journal || []), newEntry] };
+    }
+
+    function applyStateUpdates(gameState, stateUpdates) {
+      if (!stateUpdates || !gameState.character) return gameState;
+
+      const su = stateUpdates;
+      let char = { ...gameState.character };
+      let campaign = { ...gameState.campaign };
+
+      // 1. Stamina delta
+      if (su.stamina_delta !== undefined && su.stamina_delta !== null && su.stamina_delta !== 0) {
+        char = { ...char, stamina: { ...char.stamina, current: clampStamina(char.stamina.current, su.stamina_delta, char.stamina.max) } };
+      }
+
+      // 2. SEU delta
+      if (su.seu_delta !== undefined && su.seu_delta !== null && su.seu_delta !== 0) {
+        char = { ...char, seu: applySeuDelta(char.seu, su.seu_delta, su.seu_source || null) };
+      }
+
+      // 3. Ammo updates
+      if (su.ammo_updates && typeof su.ammo_updates === 'object') {
+        const newAmmo = { ...char.ammo };
+        Object.entries(su.ammo_updates).forEach(([key, delta]) => {
+          newAmmo[key] = Math.max(0, (newAmmo[key] || 0) + delta);
+        });
+        char = { ...char, ammo: newAmmo };
+      }
+
+      // 4. Status add
+      if (Array.isArray(su.status_add)) {
+        const newStatuses = [...char.status_effects];
+        su.status_add.forEach(s => { if (s && !newStatuses.includes(s)) newStatuses.push(s); });
+        char = { ...char, status_effects: newStatuses };
+      }
+
+      // 5. Status remove
+      if (Array.isArray(su.status_remove)) {
+        char = { ...char, status_effects: char.status_effects.filter(s => !su.status_remove.includes(s)) };
+      }
+
+      // 6. Inventory add
+      if (Array.isArray(su.inventory_add)) {
+        const newInv = [...char.inventory];
+        su.inventory_add.forEach(item => { if (item && typeof item === 'string' && item.trim()) newInv.push(item.trim()); });
+        char = { ...char, inventory: newInv };
+      }
+
+      // 7. Inventory remove
+      if (Array.isArray(su.inventory_remove)) {
+        char = { ...char, inventory: char.inventory.filter(item => !su.inventory_remove.includes(item)) };
+      }
+
+      // 8. XP delta
+      if (su.xp_delta !== undefined && su.xp_delta !== null && su.xp_delta !== 0) {
+        char = { ...char, xp: { total: char.xp.total + su.xp_delta, unspent: char.xp.unspent + su.xp_delta } };
+      }
+
+      // 9. Credits delta
+      if (su.credits_delta !== undefined && su.credits_delta !== null && su.credits_delta !== 0) {
+        char = { ...char, credits: Math.max(0, char.credits + su.credits_delta) };
+      }
+
+      // 10. NPC updates
+      if (su.npc_updates) {
+        campaign = applyNpcUpdates(campaign, su.npc_updates);
+      }
+
+      // 11. Faction updates
+      if (su.faction_updates) {
+        campaign = applyFactionUpdates(campaign, su.faction_updates);
+      }
+
+      // 12. Journal entry
+      if (su.journal_entry) {
+        campaign = applyJournalEntry(campaign, su.journal_entry);
+      }
+
+      // 13. Scene transition
+      if (su.scene_id && typeof su.scene_id === 'string' && su.scene_id.trim()) {
+        campaign = { ...campaign, current_scene_id: su.scene_id.trim() };
+      }
+
+      return { ...gameState, character: char, campaign };
+    }
+
+    // SECTION 19 -- STAMINA BAR COMPONENT
+    function StaminaBar({ current, max }) {
+      const pct = max > 0 ? current / max : 0;
+      const barColor = pct > 0.5 ? 'bg-green-500' : pct > 0.25 ? 'bg-yellow-500' : 'bg-red-500';
+      return (
+        <div className="w-full bg-gray-700 rounded-full h-2">
+          <div
+            className={`${barColor} h-2 rounded-full transition-all duration-300`}
+            style={{ width: `${Math.round(pct * 100)}%` }}
+          />
+        </div>
+      );
+    }
+
+    // SECTION 20 -- SKILL BADGE COMPONENT
+    function SkillBadge({ name, level }) {
+      return (
+        <div className="flex items-center justify-between py-0.5">
+          <span className="text-xs text-gray-300">{name}</span>
+          <span className="text-xs bg-gray-700 text-yellow-400 font-bold px-1.5 py-0.5 rounded ml-2">{level}</span>
+        </div>
+      );
+    }
+
+    // SECTION 21 -- CHARACTER SHEET COMPONENT
+    function CharacterSheet({ character }) {
+      if (!character) {
+        return (
+          <div className="w-64 bg-gray-800 flex-shrink-0 flex flex-col border-r border-gray-700">
+            <div className="p-4 border-b border-gray-700">
+              <p className="text-gray-500 text-xs uppercase tracking-widest font-semibold">Character Sheet</p>
+            </div>
+            <div className="flex-1 flex items-center justify-center p-4">
+              <p className="text-gray-600 text-xs text-center">No character loaded</p>
+            </div>
+          </div>
+        );
+      }
+
+      const staminaPct = character.stamina.max > 0 ? character.stamina.current / character.stamina.max : 0;
+      const staminaLow = staminaPct < 0.25;
+
+      const statRows = [
+        [['STR', character.stats.str], ['STA', character.stats.sta], ['DEX', character.stats.dex], ['RS', character.stats.rs]],
+        [['INT', character.stats.int], ['LOG', character.stats.log], ['PER', character.stats.per], ['LDR', character.stats.ldr]]
+      ];
+
+      return (
+        <div className="w-64 bg-gray-800 flex-shrink-0 flex flex-col border-r border-gray-700 overflow-hidden">
+          {/* Header */}
+          <div className="p-3 border-b border-gray-700 flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-yellow-400 text-sm leading-tight">{character.name}</span>
+              <span className="text-xs bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded font-mono">IM {character.combat.im}</span>
+            </div>
+            <div className="text-xs text-gray-400 mt-0.5">{character.race} -- {character.archetype}</div>
+          </div>
+
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
+
+            {/* Stamina */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Stamina</span>
+                <span className={`text-xs font-bold ${staminaLow ? 'text-red-400' : 'text-gray-100'}`}>
+                  {character.stamina.current} / {character.stamina.max}
+                  {staminaLow && ' !'}
+                </span>
+              </div>
+              <StaminaBar current={character.stamina.current} max={character.stamina.max} />
+            </div>
+
+            {/* Stats */}
+            <div>
+              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Stats</div>
+              {statRows.map((row, ri) => (
+                <div key={ri} className="grid grid-cols-4 gap-1 mb-1">
+                  {row.map(([label, value]) => (
+                    <div key={label} className="text-center bg-gray-900 rounded py-1">
+                      <div className="text-gray-500 text-xs leading-none">{label}</div>
+                      <div className="text-gray-100 text-xs font-bold leading-none mt-0.5">{value}</div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* Skills */}
+            <div>
+              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Skills</div>
+              {character.skills && character.skills.length > 0 ? (
+                character.skills.map((skill, i) => (
+                  <SkillBadge key={i} name={skill.name} level={skill.level} />
+                ))
+              ) : (
+                <p className="text-xs text-gray-600 italic">No skills</p>
+              )}
+            </div>
+
+            {/* Status Effects */}
+            {character.status_effects && character.status_effects.length > 0 && (
+              <div>
+                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Status</div>
+                <div className="flex flex-wrap gap-1">
+                  {character.status_effects.map((effect, i) => {
+                    const isNegative = ['wound', 'stunned', 'poisoned', 'blind', 'unconscious'].some(neg => effect.toLowerCase().includes(neg));
+                    return (
+                      <span key={i} className={`text-xs px-1.5 py-0.5 rounded font-semibold ${isNegative ? 'bg-red-900 text-red-300' : 'bg-yellow-900 text-yellow-300'}`}>
+                        {effect}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* SEU */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">SEU</span>
+                <span className="text-xs text-gray-100 font-bold">{character.seu.total} total</span>
+              </div>
+              {character.seu.sources.map((src, i) => (
+                <div key={i} className="flex justify-between text-xs text-gray-400 py-0.5">
+                  <span>{src.name}</span>
+                  <span className="text-gray-300">{src.seu}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Inventory */}
+            <div>
+              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Inventory</div>
+              {character.inventory && character.inventory.length > 0 ? (
+                <ul className="list-disc list-inside">
+                  {character.inventory.map((item, i) => (
+                    <li key={i} className="text-xs text-gray-300 leading-relaxed">{item}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-gray-600 italic">No items</p>
+              )}
+            </div>
+
+            {/* Credits / XP footer */}
+            <div className="border-t border-gray-700 pt-2 mt-auto">
+              <div className="flex justify-between text-xs text-gray-400">
+                <span>Credits</span>
+                <span className="text-gray-100 font-bold">{character.credits} Cr</span>
+              </div>
+              <div className="flex justify-between text-xs text-gray-400 mt-0.5">
+                <span>XP</span>
+                <span className="text-gray-100">{character.xp.total} ({character.xp.unspent} unspent)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 22 -- COMBAT ENGINE
+
+    // Combat constants
+    const COMBAT_PHASES = {
+      INITIATIVE: 'initiative',
+      PLAYER_TURN: 'player_turn',
+      ENEMY_TURN: 'enemy_turn',
+      END: 'end'
+    };
+
+    const OPTIONAL_RULES_DEFAULT = {
+      burst_fire: false,
+      called_shots: false,
+      cover_concealment: false,
+      suppression_fire: false
+    };
+
+    // Range modifiers (Astra Rising Core)
+    const RANGE_MODIFIERS = {
+      POINT_BLANK: 20,
+      SHORT: 10,
+      MEDIUM: 0,
+      LONG: -10,
+      EXTREME: -20
+    };
+
+    // Core dice function
+    function rollD100() {
+      return Math.floor(Math.random() * 100) + 1;
+    }
+
+    // Astra Rising Core attack resolution
+    // skillLevel: the character's skill level (e.g. Beam Weapons 2)
+    // modifiers: array of integers (range modifiers, cover, etc.)
+    // Returns { roll, target, success, margin }
+    function resolveAttack(skillLevel, modifiers) {
+      const baseTarget = skillLevel * 10;
+      const totalMod = Array.isArray(modifiers) ? modifiers.reduce((a, b) => a + b, 0) : 0;
+      const target = baseTarget + totalMod;
+      const roll = rollD100();
+      return {
+        roll,
+        target,
+        success: roll <= target,
+        margin: target - roll
+      };
+    }
+
+    // Astra Rising Core initiative: lower value = acts first
+    // Formula: (10 - IM) + d10 roll, lower is faster
+    function rollInitiative(im, rs) {
+      const d10 = Math.floor(Math.random() * 10) + 1;
+      return (10 - im) + d10;
+    }
+
+    // Apply a DMResponse combat_state_update to the scene
+    function applyCombatStateUpdate(scene, combatStateUpdate) {
+      if (!combatStateUpdate) return scene;
+
+      // Combat ends if combatants is null or empty array
+      const combatants = combatStateUpdate.combatants;
+      const combatEnded = !combatants || (Array.isArray(combatants) && combatants.length === 0);
+
+      if (combatEnded) {
+        return { ...scene, in_combat: false, combat_state: null };
+      }
+
+      return {
+        ...scene,
+        in_combat: true,
+        combat_state: {
+          round: combatStateUpdate.round || 1,
+          phase: combatStateUpdate.phase || COMBAT_PHASES.INITIATIVE,
+          initiative_order: combatStateUpdate.initiative_order || [],
+          combatants: combatants,
+          active_optional_rules: combatStateUpdate.active_optional_rules || { ...OPTIONAL_RULES_DEFAULT }
+        }
+      };
+    }
+
+    // SECTION 13 -- useDMTurn HOOK
+    function useDMTurn({ gameState, setGameState, sessionToken, onError, onOocNote }) {
+      const [loading, setLoading] = useState(false);
+      const [currentChoices, setCurrentChoices] = useState([]);
+      const [messages, setMessages] = useState([]); // conversation history for API
+      const [latestDiceRolls, setLatestDiceRolls] = useState([]);
+      const [latestTooltipTerms, setLatestTooltipTerms] = useState([]);
+
+      const submitTurn = useCallback(async (playerText) => {
+        if (loading || !playerText.trim()) return;
+        setLoading(true);
+
+        // Add player message to display history
+        const playerMsg = { id: Date.now() + '_p', role: 'player', content: playerText, timestamp: Date.now() };
+        setMessages(prev => [...prev, playerMsg]);
+
+        // Build API message history (role: user/assistant pairs)
+        const apiMessages = messages.reduce((acc, msg) => {
+          if (msg.role === 'player') acc.push({ role: 'user', content: msg.content });
+          if (msg.role === 'dm') acc.push({ role: 'assistant', content: msg._raw || msg.content });
+          return acc;
+        }, []);
+        apiMessages.push({ role: 'user', content: playerText });
+
+        const systemPrompt = buildSystemPrompt(gameState);
+        const result = await callDM(sessionToken, apiMessages, systemPrompt, onError);
+
+        if (!result) {
+          setLoading(false);
+          return;
+        }
+
+        const validation = validateDMResponse(result);
+        if (!validation.valid) {
+          onError({ code: 'VALIDATION_ERROR', message: 'DM response invalid: ' + validation.errors.join(', '), recoverable: true, retry_action: null });
+          setLoading(false);
+          return;
+        }
+
+        setLatestDiceRolls(result.dice_rolls || []);
+
+        if (result.tooltip_terms && result.tooltip_terms.length > 0) {
+          setLatestTooltipTerms(result.tooltip_terms);
+        }
+
+        if (result.ooc_note && onOocNote) onOocNote(result.ooc_note);
+
+        // Add DM message to display history
+        const dmMsg = {
+          id: Date.now() + '_dm',
+          role: 'dm',
+          content: result.narrative,
+          _raw: JSON.stringify(result),
+          timestamp: Date.now()
+        };
+        setMessages(prev => [...prev, dmMsg]);
+        setCurrentChoices(result.choices || []);
+
+        // Apply state updates, scene changes, and turn count atomically
+        setGameState(prev => {
+          const withUpdates = applyStateUpdates(prev, result.state_updates);
+          let withScene = { ...withUpdates, session: { ...withUpdates.session, turn_count: withUpdates.session.turn_count + 1 } };
+          if (result.scene_change) {
+            withScene = {
+              ...withScene,
+              scene: {
+                ...withScene.scene,
+                header: result.scene_header || withScene.scene.header,
+                summary: result.scene_summary || withScene.scene.summary,
+                recent_summaries: result.scene_summary
+                  ? [...withScene.scene.recent_summaries, result.scene_summary]
+                  : withScene.scene.recent_summaries
+              },
+              session: { ...withScene.session, scene_count: withScene.session.scene_count + 1 }
+            };
+          } else if (result.scene_summary) {
+            withScene = { ...withScene, scene: { ...withScene.scene, summary: result.scene_summary } };
+          }
+          // Apply combat state update if present
+          if (result.combat_state_update !== undefined) {
+            const updatedScene = applyCombatStateUpdate(withScene.scene, result.combat_state_update);
+            withScene = { ...withScene, scene: updatedScene };
+          }
+          return withScene;
+        });
+
+        setLoading(false);
+      }, [loading, messages, gameState, sessionToken, onError]);
+
+      const addDMMessage = useCallback((content, raw) => {
+        const dmMsg = { id: Date.now() + '_dm', role: 'dm', content, _raw: raw || content, timestamp: Date.now() };
+        setMessages(prev => [...prev, dmMsg]);
+      }, []);
+
+      return { submitTurn, loading, currentChoices, messages, addDMMessage, setCurrentChoices, latestDiceRolls, latestTooltipTerms };
+    }
+
+    // SECTION 28a -- TOOLTIP GLOSSARY
+    const TOOLTIP_GLOSSARY = {
+      'stamina': 'A character\'s total hit points. Reaching 0 means unconscious; reaching negative max means dead.',
+      'seu': 'Standardized Energy Unit -- fuel for energy weapons and powered equipment.',
+      'im': 'Initiative Modifier -- determines turn order in combat. Lower value means acting sooner.',
+      'rs': 'Reaction Speed -- governs defensive rolls and initiative tiebreakers.',
+      'percentile roll': 'Roll 1d100. Success if roll is equal to or under the target number.',
+      'albedo suit': 'Reflective personal armor that reduces laser weapon damage by 50 points.',
+      'skeinsuit': 'Flexible body armor providing general damage reduction against most attacks.',
+      'CFW': 'Concordat of Free Worlds -- the governing body of all Frontier star systems.',
+      'Apex Law': 'CFW\'s elite interstellar law enforcement agency, operating covertly across the Frontier.',
+      'The Vaash': 'Serpentine alien race of unknown origin; primary antagonist faction of the Frontier.',
+      'Krix': 'Multi-limbed insectoid race known for business acumen and ambidexterity.',
+      'Moluun': 'Amorphous blob-like race with natural lie detection and limited shape-shifting.',
+      'Skrath': 'Winged ape-like race with night vision, gliding ability, and hereditary battle rage.',
+      'human': 'Adaptable baseline race with no special abilities but excellent stat flexibility.',
+      'medkit': 'Standard medical kit. Required for Medical skill checks to restore stamina.',
+      'techkit': 'Standard technician kit. Required for most Technician and robot-repair skill checks.',
+      'stunned': 'Character cannot act for 1d10 turns due to shock or concussive damage.',
+      'suppressed': 'Character must make RS roll or take cover rather than attack this turn.',
+      'proficiency level': 'Skill rank from 1 to 6. Each level adds 10% to the base stat chance.',
+      'ke-1000': 'Ke-1000 laser pistol. Reliable medium-range energy weapon consuming SEU per shot.',
+      'ke-2000': 'Ke-2000 laser rifle. Long-range precision energy weapon, higher SEU consumption.',
+      'gyrojet': 'Rocket-propelled projectile weapon. Uses conventional ammunition, not SEU.',
+      'electrostunner': 'Non-lethal energy weapon that inflicts stunned status on successful hits.',
+      'doze grenade': 'Area-effect grenade releasing sedative gas. RS roll or fall unconscious.',
+      'frag grenade': 'Fragmentation grenade. Area damage, no save.',
+      'mega-corps': 'Vast interstellar corporations that rival the CFW in economic and military power.',
+      'frontier': 'The collective name for the seventeen inhabited star systems of known space.',
+      'Cethara': 'Hostile frontier planet in the Korvath system, home to multiple native species.',
+      'Procyus Prime': 'Heavily populated Core world and seat of CFW political power.',
+      'Tessavar': 'Densely urbanized corporate world known for megacity arcologies and political intrigue.'
+    };
+
+    // SECTION 28b -- TOOLTIP COMPONENT
+    function Tooltip({ term, definition, children }) {
+      const [visible, setVisible] = useState(false);
+      return (
+        <span
+          className="relative inline"
+          onMouseEnter={() => setVisible(true)}
+          onMouseLeave={() => setVisible(false)}
+        >
+          <span className="underline decoration-dotted decoration-yellow-500 cursor-help text-yellow-200">
+            {children}
+          </span>
+          {visible && (
+            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-50 pointer-events-none">
+              <span className="block bg-gray-900 border border-gray-600 text-gray-100 text-xs rounded px-2 py-1.5 max-w-64 shadow-lg whitespace-normal leading-relaxed">
+                <span className="block font-bold text-yellow-400 mb-0.5">{term}</span>
+                {definition}
+              </span>
+            </span>
+          )}
+        </span>
+      );
+    }
+
+    // SECTION 28c -- WRAP TEXT WITH TOOLTIPS
+    function wrapTextWithTooltips(text, registry) {
+      if (!text || !registry || Object.keys(registry).length === 0) {
+        return [<span key="raw">{text}</span>];
+      }
+
+      // Sort terms by length descending to match longer terms first
+      const terms = Object.keys(registry).sort((a, b) => b.length - a.length);
+      const usedTerms = new Set(); // first occurrence only per call
+
+      // Build a regex that matches any term (case-insensitive)
+      const escapedTerms = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      if (escapedTerms.length === 0) return [<span key="raw">{text}</span>];
+      const pattern = new RegExp(`(${escapedTerms.join('|')})`, 'gi');
+
+      const parts = text.split(pattern);
+      const elements = [];
+
+      parts.forEach((part, i) => {
+        if (!part) return;
+        const lowerPart = part.toLowerCase();
+        const def = registry[lowerPart];
+        if (def && !usedTerms.has(lowerPart)) {
+          usedTerms.add(lowerPart);
+          elements.push(
+            <Tooltip key={i} term={part} definition={def}>
+              {part}
+            </Tooltip>
+          );
+        } else {
+          elements.push(<span key={i}>{part}</span>);
+        }
+      });
+
+      return elements;
+    }
+
+    // SECTION 14 -- MESSAGE HISTORY COMPONENT
+    function MessageHistory({ messages, tooltipRegistry }) {
+      const bottomRef = useRef(null);
+
+      useEffect(() => {
+        if (bottomRef.current) {
+          bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, [messages]);
+
+      if (messages.length === 0) {
+        return (
+          <div className="flex-1 overflow-y-auto p-4 flex items-center justify-center">
+            <p className="text-gray-600 text-sm italic">Your adventure awaits...</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="flex-1 overflow-y-auto p-4">
+          {messages.map(msg => (
+            <div key={msg.id} className={`mb-4 ${msg.role === 'player' ? 'flex justify-end' : 'flex justify-start'}`}>
+              {msg.role === 'dm' && (
+                <div className="max-w-2xl">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-bold text-yellow-400 uppercase tracking-widest">DM</span>
+                  </div>
+                  <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+                    {msg.content.split('\n').filter(l => l.trim()).map((line, i) => (
+                      <p key={i} className="text-gray-100 text-sm leading-relaxed mb-2 last:mb-0">
+                        {tooltipRegistry ? wrapTextWithTooltips(line, tooltipRegistry) : line}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {msg.role === 'player' && (
+                <div className="max-w-md">
+                  <div className="bg-blue-900 border border-blue-700 rounded-lg px-4 py-2">
+                    <p className="text-blue-100 text-sm">{msg.content}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+          <div ref={bottomRef} />
+        </div>
+      );
+    }
+
+    // SECTION 15 -- CHOICE MENU COMPONENT
+    function ChoiceMenu({ choices, onChoiceSelect, disabled }) {
+      if (!choices || choices.length === 0) return null;
+
+      return (
+        <div className="px-4 pb-3">
+          <div className="text-xs text-gray-500 uppercase tracking-widest mb-2 font-semibold">Choose your action</div>
+          <div className="flex flex-col gap-2">
+            {choices.map(choice => (
+              <button
+                key={choice.id}
+                disabled={disabled}
+                onClick={() => !disabled && onChoiceSelect(choice)}
+                className={`text-left px-4 py-2 rounded border text-sm w-full ${
+                  disabled
+                    ? 'bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed'
+                    : 'bg-gray-800 border-gray-600 text-gray-200 hover:border-yellow-400 hover:text-gray-100 cursor-pointer'
+                }`}
+              >
+                <ChevronRight size={12} className="inline mr-2 text-yellow-400" />
+                {choice.text}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 16 -- PLAYER INPUT COMPONENT
+    function PlayerInput({ onSubmit, disabled, showHint, externalFill, onExternalFillConsumed }) {
+      const [inputVal, setInputVal] = useState('');
+
+      useEffect(() => {
+        if (externalFill) {
+          setInputVal(externalFill);
+          if (onExternalFillConsumed) onExternalFillConsumed();
+        }
+      }, [externalFill]);
+
+      const placeholder = showHint
+        ? 'Type your action or click a choice above. Example: I examine the area carefully.'
+        : 'What do you do?';
+
+      const handleSubmit = () => {
+        if (!inputVal.trim() || disabled) return;
+        onSubmit(inputVal.trim());
+        setInputVal('');
+      };
+
+      const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          handleSubmit();
+        }
+      };
+
+      return (
+        <div className="px-4 py-3 bg-gray-800 border-t border-gray-700 flex gap-2">
+          <input
+            type="text"
+            value={inputVal}
+            onChange={e => setInputVal(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={disabled}
+            placeholder={placeholder}
+            className="flex-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-gray-100 text-sm placeholder-gray-500 focus:outline-none focus:border-yellow-500 disabled:opacity-50"
+          />
+          <button
+            onClick={handleSubmit}
+            disabled={disabled || !inputVal.trim()}
+            className="bg-yellow-400 text-gray-900 font-bold px-4 py-2 rounded hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 cursor-pointer flex items-center gap-1.5"
+            aria-label={disabled ? 'Loading...' : 'Send'}
+          >
+            {disabled && <Loader size={12} className="animate-spin flex-shrink-0" />}
+            Send
+          </button>
+        </div>
+      );
+    }
+
+    // SECTION 23a -- DICE ROLL DISPLAY
+    function DiceRollDisplay({ diceRolls }) {
+      if (!diceRolls || diceRolls.length === 0) return null;
+      return (
+        <div className="flex flex-row gap-2 overflow-x-auto py-2">
+          {diceRolls.map((roll, i) => (
+            <div key={i} className="bg-gray-700 rounded p-2 flex-shrink-0 min-w-20 text-center">
+              <div className="text-xs text-gray-400 mb-1 leading-tight">{roll.description}</div>
+              <div className={`text-2xl font-bold ${roll.success ? 'text-green-400' : 'text-red-400'}`}>{roll.roll}</div>
+              <div className="text-xs text-gray-500">vs {roll.target}</div>
+              <div className={`text-xs font-semibold mt-0.5 ${roll.success ? 'text-green-400' : 'text-red-400'}`}>
+                {roll.success ? 'HIT' : 'MISS'}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // SECTION 23b -- INITIATIVE TRACKER
+    function InitiativeTracker({ initiativeOrder, round }) {
+      if (!initiativeOrder || initiativeOrder.length === 0) return null;
+      return (
+        <div>
+          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">
+            Initiative — Round {round || 1}
+          </div>
+          <div className="flex flex-col gap-1">
+            {initiativeOrder.map((combatant, i) => {
+              const isFirst = i === initiativeOrder.findIndex(c => !c.has_acted);
+              return (
+                <div
+                  key={combatant.id || i}
+                  className={`flex items-center gap-2 px-2 py-1 rounded text-xs ${
+                    isFirst ? 'bg-yellow-900 border border-yellow-600 text-yellow-100' : 'bg-gray-700 text-gray-300'
+                  } ${combatant.has_acted ? 'opacity-50' : ''}`}
+                >
+                  {combatant.is_player ? <User size={10} className="text-blue-400 flex-shrink-0" /> : <Shield size={10} className="text-red-400 flex-shrink-0" />}
+                  <span className="flex-1">{combatant.name}</span>
+                  <span className="text-gray-400">{combatant.initiative_roll}</span>
+                  {combatant.has_acted && <Check size={10} className="text-gray-500" />}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 23c -- OPTIONAL RULES PANEL
+    function OptionalRulesPanel({ activeOptionalRules }) {
+      if (!activeOptionalRules) return null;
+      const rules = [
+        { key: 'burst_fire', label: 'Burst Fire' },
+        { key: 'called_shots', label: 'Called Shots' },
+        { key: 'cover_concealment', label: 'Cover & Concealment' },
+        { key: 'suppression_fire', label: 'Suppression Fire' }
+      ];
+      const activeRules = rules.filter(r => activeOptionalRules[r.key]);
+      if (activeRules.length === 0) return null;
+      return (
+        <div>
+          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Active Rules</div>
+          <div className="flex flex-wrap gap-1">
+            {activeRules.map(r => (
+              <span key={r.key} className="text-xs bg-blue-900 text-blue-300 px-2 py-0.5 rounded font-semibold">{r.label}</span>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 23d -- COMBAT PANEL
+    function CombatPanel({ combatState, diceRolls }) {
+      const [collapsed, setCollapsed] = useState(false);
+      if (!combatState) return null;
+      return (
+        <div className="mx-4 mb-2 bg-gray-800 border border-red-900 rounded-lg overflow-hidden">
+          <div
+            className="flex items-center justify-between px-3 py-2 bg-red-900 cursor-pointer"
+            onClick={() => setCollapsed(c => !c)}
+          >
+            <div className="flex items-center gap-2">
+              <Zap size={12} className="text-yellow-400" />
+              <span className="text-xs font-bold text-yellow-400 uppercase tracking-widest">Combat Active</span>
+              <span className="text-xs text-red-300">— Round {combatState.round || 1}</span>
+            </div>
+            <span className="text-xs text-red-300">{collapsed ? 'Show' : 'Hide'}</span>
+          </div>
+          {!collapsed && (
+            <div className="p-3 flex flex-col gap-3">
+              {diceRolls && diceRolls.length > 0 && (
+                <div>
+                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Dice Rolls</div>
+                  <DiceRollDisplay diceRolls={diceRolls} />
+                </div>
+              )}
+              <InitiativeTracker initiativeOrder={combatState.initiative_order} round={combatState.round} />
+              <OptionalRulesPanel activeOptionalRules={combatState.active_optional_rules} />
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // SECTION 24a -- SNAPSHOT FUNCTIONS
+    function createSnapshot(gameState) {
+      return {
+        id: Date.now().toString(),
+        timestamp: Date.now(),
+        turn_count: gameState.session.turn_count,
+        scene_count: gameState.session.scene_count,
+        state_snapshot: JSON.parse(JSON.stringify(gameState))
+      };
+    }
+
+    function restoreSnapshot(snapshot) {
+      return snapshot.state_snapshot;
+    }
+
+    // SECTION 24b -- OOC NOTE COMPONENT
+    function OocNote({ oocNote }) {
+      const [dismissed, setDismissed] = useState(false);
+
+      useEffect(() => {
+        setDismissed(false); // reset dismiss on new ooc note
+      }, [oocNote]);
+
+      if (!oocNote || dismissed) return null;
+
+      return (
+        <div className="mx-4 mb-2 bg-yellow-900 border border-yellow-600 rounded-lg px-3 py-2 flex items-start justify-between gap-2">
+          <div className="flex items-start gap-2 flex-1">
+            <AlertCircle size={14} className="text-yellow-400 flex-shrink-0 mt-0.5" />
+            <p className="text-yellow-100 text-xs leading-relaxed">{oocNote}</p>
+          </div>
+          <button onClick={() => setDismissed(true)} className="text-yellow-400 hover:text-yellow-200 flex-shrink-0">
+            <X size={12} />
+          </button>
+        </div>
+      );
+    }
+
+    // SECTION 24c -- TOAST NOTIFICATION
+    function Toast({ message, onDismiss }) {
+      useEffect(() => {
+        if (!message) return;
+        const t = setTimeout(onDismiss, 3000);
+        return () => clearTimeout(t);
+      }, [message]);
+      if (!message) return null;
+      return (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-green-800 border border-green-600 text-green-100 text-xs font-semibold px-4 py-2 rounded-full shadow-lg z-50">
+          {message}
+        </div>
+      );
+    }
+
+    // SECTION 25a -- JOURNAL ENTRY COMPONENT
+    function JournalEntry({ entry }) {
+      const time = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return (
+        <div className="border-l-2 border-yellow-400 pl-3 py-1 mb-2">
+          <div className="text-xs text-gray-500 mb-0.5">[{time}]</div>
+          <p className="text-xs text-gray-300 leading-relaxed">{entry.entry}</p>
+        </div>
+      );
+    }
+
+    // SECTION 25b -- JOURNAL PANEL COMPONENT
+    function JournalPanel({ journal, campaign, onClose }) {
+      return (
+        <div className="fixed right-0 top-0 h-full w-80 bg-gray-900 border-l border-gray-700 z-40 flex flex-col shadow-2xl">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <BookOpen size={14} className="text-yellow-400" />
+              <span className="text-sm font-bold text-gray-100">Mission Journal</span>
+            </div>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-200">
+              <X size={16} />
+            </button>
+          </div>
+
+          {campaign && (
+            <div className="px-4 py-3 border-b border-gray-700 flex-shrink-0">
+              <div className="text-xs font-bold text-yellow-400 mb-2 uppercase tracking-wide">{campaign.adventure_title}</div>
+              {campaign.spine && (
+                <div className="flex flex-col gap-1.5">
+                  {[
+                    { label: 'ACT 1', text: campaign.spine.act1_goal },
+                    { label: 'ACT 2', text: campaign.spine.act2_complication },
+                    { label: 'ACT 3', text: campaign.spine.act3_convergence }
+                  ].map(act => (
+                    <div key={act.label} className="flex items-start gap-2">
+                      <span className="text-xs font-bold text-yellow-400 w-10 flex-shrink-0">{act.label}</span>
+                      <span className="text-xs text-gray-400 leading-relaxed">{act.text}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex-1 overflow-y-auto px-4 py-3">
+            {(!journal || journal.length === 0) ? (
+              <p className="text-gray-600 text-xs italic">No journal entries yet. The DM will record key events here.</p>
+            ) : (
+              [...journal].reverse().map((entry, i) => (
+                <JournalEntry key={i} entry={entry} />
+              ))
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 25c -- SUMMARY CARD COMPONENT
+    function SummaryCard({ gameState, onNewAdventure, onClose }) {
+      const [showExport, setShowExport] = useState(false);
+      const [confirmNew, setConfirmNew] = useState(false);
+      const char = gameState.character;
+      const camp = gameState.campaign;
+      const session = gameState.session;
+
+      const exportJson = JSON.stringify(gameState, null, 2);
+
+      const handleSaveAndExport = () => {
+        setShowExport(true);
+      };
+
+      return (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
+          <div className="bg-gray-900 border border-gray-700 rounded-xl max-w-2xl w-full max-h-screen overflow-y-auto p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-extrabold text-yellow-400">Session Summary</h2>
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-200"><X size={18} /></button>
+            </div>
+
+            {camp && <div className="text-gray-400 text-sm mb-4 italic">{camp.adventure_title}</div>}
+
+            {/* Stats bar */}
+            <div className="grid grid-cols-4 gap-3 mb-4">
+              {[
+                { label: 'Turns', value: session.turn_count },
+                { label: 'Scenes', value: session.scene_count },
+                { label: 'XP', value: char ? char.xp.total : 0 },
+                { label: 'Credits', value: char ? char.credits + ' Cr' : '0' }
+              ].map(stat => (
+                <div key={stat.label} className="bg-gray-800 rounded-lg p-3 text-center">
+                  <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">{stat.label}</div>
+                  <div className="text-gray-100 font-bold text-lg">{stat.value}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Campaign spine */}
+            {camp && camp.spine && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Campaign Spine</div>
+                {[
+                  { label: 'ACT 1', text: camp.spine.act1_goal },
+                  { label: 'ACT 2', text: camp.spine.act2_complication },
+                  { label: 'ACT 3', text: camp.spine.act3_convergence }
+                ].map(act => (
+                  <div key={act.label} className="flex items-start gap-2 mb-1">
+                    <span className="text-xs font-bold text-yellow-400 w-10 flex-shrink-0">{act.label}</span>
+                    <span className="text-xs text-gray-400">{act.text}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Journal highlights */}
+            {camp && camp.journal && camp.journal.length > 0 && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Journal Highlights</div>
+                {[...camp.journal].slice(-5).reverse().map((entry, i) => (
+                  <JournalEntry key={i} entry={entry} />
+                ))}
+              </div>
+            )}
+
+            {/* Character status */}
+            {char && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Character Status</div>
+                <div className="bg-gray-800 rounded-lg p-3 text-xs text-gray-300 flex flex-wrap gap-3">
+                  <span>STA: {char.stamina.current}/{char.stamina.max}</span>
+                  <span>SEU: {char.seu.total}</span>
+                  {char.status_effects.length > 0 && <span>Status: {char.status_effects.join(', ')}</span>}
+                </div>
+              </div>
+            )}
+
+            {/* Export area */}
+            {showExport && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Copy to resume later:</div>
+                <textarea
+                  readOnly
+                  value={exportJson}
+                  className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-2 text-xs text-gray-300 font-mono h-24 resize-none"
+                  onClick={e => e.target.select()}
+                />
+              </div>
+            )}
+
+            {/* Confirm new adventure dialog */}
+            {confirmNew && (
+              <div className="bg-red-900 border border-red-700 rounded-lg p-4 mb-4">
+                <p className="text-red-200 text-sm mb-3">Start a new adventure? All progress will be lost unless you saved a checkpoint.</p>
+                <div className="flex gap-2">
+                  <button onClick={onNewAdventure} className="bg-red-600 text-white font-bold py-1.5 px-4 rounded hover:bg-red-500 text-sm">Confirm</button>
+                  <button onClick={() => setConfirmNew(false)} className="bg-gray-700 text-gray-300 py-1.5 px-4 rounded hover:bg-gray-600 text-sm">Cancel</button>
+                </div>
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={handleSaveAndExport}
+                className="flex-1 bg-gray-700 text-gray-200 font-bold py-2 rounded hover:bg-gray-600 text-sm"
+              >
+                Save & Continue Later
+              </button>
+              <button
+                onClick={() => setConfirmNew(true)}
+                className="flex-1 bg-gray-600 text-white font-bold py-2 rounded hover:bg-gray-500 text-sm"
+              >
+                New Adventure
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 25d -- END SESSION BUTTON COMPONENT
+    function EndSessionButton({ onClick }) {
+      return (
+        <button
+          onClick={onClick}
+          className="flex items-center gap-1 text-xs px-2 py-1 rounded border border-gray-600 text-gray-400 hover:border-red-500 hover:text-red-400 cursor-pointer"
+        >
+          <span>End Session</span>
+        </button>
+      );
+    }
+
+    // SECTION 26c -- SUMMARIZE BUTTON COMPONENT
+    function SummarizeButton({ gameState, setGameState, sessionToken, onToast, onError }) {
+      const [compressing, setCompressing] = useState(false);
+      const visible = gameState.session.scene_count >= 15;
+
+      if (!visible) return null;
+
+      const handleCompress = async () => {
+        setCompressing(true);
+        const result = await compressCampaignHistory(
+          gameState,
+          sessionToken,
+          onError,
+          (compressedText) => {
+            setGameState(prev => ({
+              ...prev,
+              scene: { ...prev.scene, history_compressed: true, compressed_summary: compressedText }
+            }));
+            if (onToast) onToast('Campaign history compressed. Context optimized.');
+          }
+        );
+        setCompressing(false);
+      };
+
+      return (
+        <button
+          onClick={handleCompress}
+          disabled={compressing || gameState.scene.history_compressed}
+          className={`flex items-center gap-1 text-xs px-2 py-1 rounded border ${
+            gameState.scene.history_compressed
+              ? 'border-green-700 text-green-500 cursor-not-allowed'
+              : compressing
+              ? 'border-gray-600 text-gray-500 cursor-wait'
+              : 'border-gray-600 text-gray-300 hover:border-green-500 hover:text-green-300 cursor-pointer'
+          }`}
+        >
+          {compressing ? <Loader size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+          <span>{gameState.scene.history_compressed ? 'History Compressed' : compressing ? 'Compressing...' : 'Summarize Campaign'}</span>
+        </button>
+      );
+    }
+
+    // SECTION 24d -- META CONTROLS BAR
+    function MetaControlsBar({ gameState, setGameState, onAskDm, onRestoreSnapshot, onOpenJournal, onEndSession, sessionToken, onToast }) {
+      const [showSnapshots, setShowSnapshots] = useState(false);
+      const [confirmRestore, setConfirmRestore] = useState(null);
+      const inCombat = gameState.scene.in_combat;
+      const snapshots = gameState.meta.snapshots || [];
+
+      const formatTime = (ts) => {
+        const d = new Date(ts);
+        return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+      };
+
+      const handleSaveSnapshot = () => {
+        const snap = createSnapshot(gameState);
+        setGameState(prev => ({
+          ...prev,
+          meta: {
+            ...prev.meta,
+            snapshots: [...prev.meta.snapshots, snap].slice(-5)
+          }
+        }));
+        onRestoreSnapshot('SAVED'); // signal toast
+      };
+
+      const handleConfirmRestore = () => {
+        if (!confirmRestore) return;
+        const restored = restoreSnapshot(confirmRestore);
+        setGameState(restored);
+        setConfirmRestore(null);
+        setShowSnapshots(false);
+      };
+
+      return (
+        <div className="relative flex items-center gap-2 px-3 py-1.5 bg-gray-800 border-b border-gray-700 flex-shrink-0">
+          {/* Save Checkpoint */}
+          <button
+            disabled={inCombat}
+            onClick={handleSaveSnapshot}
+            title={inCombat ? 'Cannot save during combat' : 'Save a checkpoint'}
+            className={`flex items-center gap-1 text-xs px-2 py-1 rounded border ${
+              inCombat
+                ? 'border-gray-700 text-gray-600 cursor-not-allowed'
+                : 'border-gray-600 text-gray-300 hover:border-yellow-500 hover:text-yellow-300 cursor-pointer'
+            }`}
+          >
+            <RefreshCw size={10} />
+            <span>Save Checkpoint</span>
+          </button>
+
+          {/* Snapshots dropdown */}
+          {snapshots.length > 0 && (
+            <div className="relative">
+              <button
+                onClick={() => setShowSnapshots(s => !s)}
+                className="flex items-center gap-1 text-xs px-2 py-1 rounded border border-gray-600 text-gray-300 hover:border-blue-500 hover:text-blue-300 cursor-pointer"
+              >
+                <span>Checkpoints ({snapshots.length})</span>
+              </button>
+              {showSnapshots && (
+                <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-600 rounded shadow-lg z-40 min-w-48">
+                  {[...snapshots].reverse().map(snap => (
+                    <button
+                      key={snap.id}
+                      onClick={() => setConfirmRestore(snap)}
+                      className="w-full text-left px-3 py-2 text-xs text-gray-300 hover:bg-gray-700 border-b border-gray-700 last:border-0"
+                    >
+                      Turn {snap.turn_count} — Scene {snap.scene_count} ({formatTime(snap.timestamp)})
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Summarize Campaign */}
+          <SummarizeButton
+            gameState={gameState}
+            setGameState={setGameState}
+            sessionToken={sessionToken}
+            onToast={onToast}
+            onError={() => {}}
+          />
+
+          {/* Ask DM */}
+          <button
+            onClick={onAskDm}
+            className="flex items-center gap-1 text-xs px-2 py-1 rounded border border-gray-600 text-gray-300 hover:border-yellow-500 hover:text-yellow-300 cursor-pointer ml-auto"
+          >
+            <BookOpen size={10} />
+            <span>Ask DM</span>
+          </button>
+
+          {/* Journal */}
+          <button
+            onClick={onOpenJournal}
+            className="flex items-center gap-1 text-xs px-2 py-1 rounded border border-gray-600 text-gray-300 hover:border-blue-500 hover:text-blue-300 cursor-pointer"
+          >
+            <BookOpen size={10} />
+            <span>Journal</span>
+          </button>
+          <EndSessionButton onClick={onEndSession} />
+
+          {/* Confirm restore modal */}
+          {confirmRestore && (
+            <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+              <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 max-w-sm w-full mx-4">
+                <h3 className="text-gray-100 font-bold mb-2">Restore Checkpoint?</h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Restore to Turn {confirmRestore.turn_count}, Scene {confirmRestore.scene_count}? This will undo all progress since this checkpoint.
+                </p>
+                <div className="flex gap-2">
+                  <button onClick={handleConfirmRestore} className="flex-1 bg-yellow-400 text-gray-900 font-bold py-2 rounded hover:bg-yellow-300 text-sm">Restore</button>
+                  <button onClick={() => setConfirmRestore(null)} className="flex-1 bg-gray-700 text-gray-300 py-2 rounded hover:bg-gray-600 text-sm">Cancel</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // SECTION 29a -- MAP DATA
+    const MAP_DATA = {
+      crash_on_Cethara: "CRASH SITE\n[Wreckage] [Supply Cache] [Radio Tower]\nSurrounding Jungle --> The Vaash Camp (3km NE)",
+      ghost_station: "GHOST STATION OMEGA\n[Docking Bay] -- [Corridor A] -- [Lab Section]\n                              |\n                         [Command Deck]",
+      the_Nexus_job: "TESSAVAR MEGACITY LEVEL 47\n[Elevator Shaft] [Server Room] [Guard Post]\n     |                |              |\n[Street Level] ......[Extraction Point]",
+      the_golden_mandible: "WAYSTATION PELL MUNICIPAL MUSEUM\n[Lobby] [Gift Shop] [Security Office]\n   |         |            |\n[Exhibit Hall -- THE GOLDEN MANDIBLE]",
+      the_erebus_protocol: "INSTALLATION EREBUS\n[Airlock] [Decontamination] [Core Access]\n[CLASSIFIED LEVEL] -- [Director Suite]"
+    };
+
+    // SECTION 29b -- MAP TOGGLE COMPONENT
+    function MapToggle({ adventureId }) {
+      const [showMap, setShowMap] = useState(false);
+      const mapText = MAP_DATA[adventureId] || 'No map available for this location.';
+
+      return (
+        <div className="relative">
+          <button
+            onClick={() => setShowMap(s => !s)}
+            title="Toggle location map"
+            className={`flex items-center gap-1 px-2 py-1 rounded text-xs border ${
+              showMap ? 'border-yellow-500 text-yellow-400 bg-yellow-900 bg-opacity-30' : 'border-gray-600 text-gray-400 hover:border-gray-400 hover:text-gray-200'
+            }`}
+          >
+            <Grid size={12} />
+            <span>Map</span>
+          </button>
+          {showMap && (
+            <div className="absolute top-full right-0 mt-1 z-40 bg-gray-900 border border-gray-600 rounded-lg p-3 shadow-xl min-w-64 max-w-sm">
+              <div className="text-xs font-bold text-yellow-400 mb-2 uppercase tracking-wide">Location Map</div>
+              <pre className="text-xs text-gray-300 font-mono whitespace-pre leading-relaxed overflow-x-auto">{mapText}</pre>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // SECTION 29c -- SCENE HEADER COMPONENT
+    function SceneHeader({ scene, campaign }) {
+      const headerText = scene.header && scene.header.trim() ? scene.header : 'Unknown Location';
+      const adventureId = campaign ? campaign.adventure_id : null;
+
+      return (
+        <div className="h-12 bg-gray-800 border-b border-gray-700 flex items-center px-4 gap-3 flex-shrink-0">
+          {scene.in_combat
+            ? <Shield size={14} className="text-red-400 flex-shrink-0" />
+            : <BookOpen size={14} className="text-blue-400 flex-shrink-0" />
+          }
+          <span
+            className="flex-1 text-gray-200 text-sm font-semibold truncate"
+            title={headerText}
+          >
+            {headerText}
+          </span>
+          {adventureId && <MapToggle adventureId={adventureId} />}
+        </div>
+      );
+    }
+
+    // SECTION 29d -- CONTEXT BAR COMPONENT
+    function ContextBar({ campaign, session }) {
+      const sceneCount = session ? session.scene_count : 0;
+      const turnCount = session ? session.turn_count : 0;
+
+      const actLabel = sceneCount <= 5 ? 'Act 1' : sceneCount <= 12 ? 'Act 2' : 'Act 3';
+      const actGoal = campaign && campaign.spine
+        ? (sceneCount <= 5
+            ? campaign.spine.act1_goal
+            : sceneCount <= 12
+            ? campaign.spine.act2_complication
+            : campaign.spine.act3_convergence)
+        : '';
+      const actGoalShort = actGoal && actGoal.length > 40 ? actGoal.slice(0, 40) + '...' : actGoal;
+      const adventureTitle = campaign ? campaign.adventure_title : '';
+
+      return (
+        <div className="h-8 bg-gray-800 border-b border-gray-700 flex items-center px-4 gap-3 flex-shrink-0 overflow-hidden">
+          {adventureTitle && (
+            <span className="text-xs text-gray-500 truncate max-w-32" title={adventureTitle}>{adventureTitle}</span>
+          )}
+          <span className="text-xs text-yellow-600 font-semibold flex-shrink-0">{actLabel}</span>
+          {actGoalShort && (
+            <span className="text-xs text-gray-500 truncate flex-1 hidden sm:block" title={actGoal}>{actGoalShort}</span>
+          )}
+          <span className="text-xs bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded flex-shrink-0">Sc. {sceneCount}</span>
+          <span className="text-xs bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded flex-shrink-0">Trn. {turnCount}</span>
+        </div>
+      );
+    }
+
+    // SECTION 17 -- GAME SCREEN (replaces placeholder from PACKET_1_2)
+    function GameScreen({ gameState, setGameState, sessionToken, firstHookOpening, onNewAdventure }) {
+      const [gameError, setGameError] = useState(null);
+      const [oocNote, setOocNote] = useState(null);
+      const [toast, setToast] = useState(null);
+      const [fillText, setFillText] = useState('');
+      const [showJournal, setShowJournal] = useState(false);
+      const [showSummary, setShowSummary] = useState(false);
+      const [tooltipRegistry, setTooltipRegistry] = useState({ ...TOOLTIP_GLOSSARY });
+
+      const { submitTurn, loading, currentChoices, messages, addDMMessage, setCurrentChoices, latestDiceRolls, latestTooltipTerms } = useDMTurn({
+        gameState,
+        setGameState,
+        sessionToken,
+        onError: setGameError,
+        onOocNote: setOocNote
+      });
+
+      const showHint = gameState.session.turn_count === 0;
+
+      const handleChoice = useCallback((choice) => {
+        submitTurn(choice.text);
+      }, [submitTurn]);
+
+      useEffect(() => {
+        if (firstHookOpening) {
+          submitTurn('BEGIN: ' + firstHookOpening);
+        }
+      }, []); // eslint-disable-line -- fire only on mount
+
+      useEffect(() => {
+        if (latestTooltipTerms && latestTooltipTerms.length > 0) {
+          setTooltipRegistry(prev => {
+            const updated = { ...prev };
+            latestTooltipTerms.forEach(({ term, definition }) => {
+              if (term && definition) updated[term.toLowerCase()] = definition;
+            });
+            return updated;
+          });
+        }
+      }, [latestTooltipTerms]);
+
+      return (
+        <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
+          <CharacterSheet character={gameState.character} />
+
+          {/* Right main area */}
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* Scene Header */}
+            <SceneHeader scene={gameState.scene} campaign={gameState.campaign} />
+            {/* Context Bar */}
+            <ContextBar campaign={gameState.campaign} session={gameState.session} />
+
+            {/* Meta controls bar */}
+            <MetaControlsBar
+              gameState={gameState}
+              setGameState={setGameState}
+              onAskDm={() => setFillText('OOC: I have a question for the DM -- ')}
+              onRestoreSnapshot={(signal) => { if (signal === 'SAVED') setToast('Checkpoint saved!'); }}
+              onOpenJournal={() => setShowJournal(true)}
+              onEndSession={() => setShowSummary(true)}
+              sessionToken={sessionToken}
+              onToast={setToast}
+            />
+
+            {/* Error banner */}
+            {gameError && (
+              <div className="bg-red-900 border-b border-red-700 px-4 py-2 flex items-center justify-between gap-3 flex-shrink-0">
+                <div className="flex items-start gap-2 flex-1 min-w-0">
+                  <AlertCircle size={14} className="text-red-400 flex-shrink-0 mt-0.5" />
+                  {gameError.code && (
+                    <span className="text-xs font-bold text-red-400 bg-red-800 px-1.5 py-0.5 rounded font-mono flex-shrink-0">{gameError.code}</span>
+                  )}
+                  <span className="text-red-200 text-xs leading-relaxed truncate">{gameError.message}</span>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {gameError.recoverable && gameError.retry_action && (
+                    <button
+                      onClick={() => { setGameError(null); gameError.retry_action(); }}
+                      className="text-xs bg-yellow-400 text-gray-900 font-bold px-2 py-1 rounded hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 cursor-pointer"
+                    >
+                      Retry
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setGameError(null)}
+                    className="text-red-400 hover:text-red-200 focus:outline-none cursor-pointer"
+                    aria-label="Dismiss error"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Message history */}
+            <MessageHistory messages={messages} tooltipRegistry={tooltipRegistry} />
+
+            {/* Combat panel -- only renders when in_combat */}
+            {gameState.scene.in_combat && (
+              <CombatPanel
+                combatState={gameState.scene.combat_state}
+                diceRolls={latestDiceRolls}
+              />
+            )}
+
+            {/* OOC note */}
+            <OocNote oocNote={oocNote} />
+
+            {/* Choice menu */}
+            <ChoiceMenu choices={currentChoices} onChoiceSelect={handleChoice} disabled={loading} />
+
+            {/* Player input */}
+            <PlayerInput
+              onSubmit={submitTurn}
+              disabled={loading}
+              showHint={showHint}
+              externalFill={fillText}
+              onExternalFillConsumed={() => setFillText('')}
+            />
+          </div>
+
+          {/* Toast notification */}
+          <Toast message={toast} onDismiss={() => setToast(null)} />
+
+          {/* Journal panel overlay */}
+          {showJournal && (
+            <JournalPanel
+              journal={gameState.campaign ? gameState.campaign.journal : []}
+              campaign={gameState.campaign}
+              onClose={() => setShowJournal(false)}
+            />
+          )}
+
+          {/* Summary card modal */}
+          {showSummary && (
+            <SummaryCard
+              gameState={gameState}
+              onNewAdventure={() => { onNewAdventure(); setShowSummary(false); }}
+              onClose={() => setShowSummary(false)}
+            />
+          )}
+        </div>
+      );
+    }
+
+    // SECTION 5 -- API CONSTANTS
+    const API_CONSTANTS = {
+      MODEL: 'claude-sonnet-4-6',
+      MAX_TOKENS: 4096,
+      API_VERSION: '2023-06-01'
+    };
+
+    // SECTION 6 -- BUILD SYSTEM PROMPT
+    function buildSystemPrompt(gameState) {
+      // Delegate to compressed version when history is compressed
+      if (gameState.scene && gameState.scene.history_compressed && gameState.scene.compressed_summary) {
+        return buildCompressedSystemPrompt(gameState);
+      }
+
+      // Layer 1: Rules Foundation (static)
+      const layer1 = `ASTRA RISING RPG RULES (ASTRA RISING CORE):
+- Percentile system: roll d100 equal to or under the target stat to succeed
+- Core stats: STR (Strength), STA (Stamina/HP), DEX (Dexterity), RS (Reaction Speed), INT (Intuition), LOG (Logic), PER (Personality), LDR (Leadership)
+- Combat Initiative: roll d10, add IM (Initiative Modifier); higher goes first
+- Stamina damage: reduces STA; at 0 STA character falls unconscious; death at -STA(max)
+- Skills: each level adds +10% to base stat checks for that skill
+- SEU (Standardized Energy Units): power for energy weapons; tracked per source
+- Optional combat rules available: burst fire, called shots, cover/concealment, suppression fire
+- Racial abilities apply passively unless combat-specific`;
+
+      // Layer 2: DM Persona (static)
+      const layer2 = `DM PERSONA:
+You are a cinematic, genre-blending AI Dungeon Master for Astra Rising.
+Narrative style: 2nd person present tense ("You step into the airlock...").
+Tone: serious but pulpy, with moments of dark humor. Match the adventure's genre.
+Always describe sensory details: sights, sounds, smells of the frontier.
+Never railroad. Present meaningful choices. Consequences are real.
+Keep narrative responses under 300 words unless a major scene transition demands more.
+Always end with 2-4 player choices (the choices array).`;
+
+      // Layer 3: Campaign State (dynamic, compressed)
+      const char = gameState.character;
+      const camp = gameState.campaign;
+      const scene = gameState.scene;
+
+      let layer3 = 'CURRENT CAMPAIGN STATE:\n';
+
+      if (char) {
+        const skillList = char.skills.map(s => `${s.name}(${s.level})`).join(', ');
+        const statStr = `${char.stats.str}/${char.stats.sta}/${char.stats.dex}/${char.stats.rs}/${char.stats.int}/${char.stats.log}/${char.stats.per}/${char.stats.ldr}`;
+        layer3 += `CHAR: ${char.name} | ${char.race} | ${char.archetype}\n`;
+        layer3 += `STATS(str/sta/dex/rs/int/log/per/ldr): ${statStr}\n`;
+        layer3 += `STA: ${char.stamina.current}/${char.stamina.max}\n`;
+        layer3 += `SKILLS: ${skillList}\n`;
+        layer3 += `INV: ${char.inventory.join(', ')}\n`;
+        layer3 += `SEU: ${char.seu.total} total\n`;
+        layer3 += `XP: ${char.xp.total} total / ${char.xp.unspent} unspent\n`;
+        if (char.status_effects && char.status_effects.length > 0) {
+          layer3 += `STATUS: ${char.status_effects.join(', ')}\n`;
+        }
+      } else {
+        layer3 += 'CHAR: none selected\n';
+      }
+
+      if (camp) {
+        layer3 += `CAMPAIGN: ${camp.adventure_title} | device: ${camp.story_device}\n`;
+        if (camp.npcs && camp.npcs.length > 0) {
+          layer3 += `NPCS: ${camp.npcs.map(n => `${n.name}(${n.role})`).join(', ')}\n`;
+        }
+        if (camp.factions && camp.factions.length > 0) {
+          layer3 += `FACTIONS: ${camp.factions.map(f => f.name).join(', ')}\n`;
+        }
+        if (camp.journal && camp.journal.length > 0) {
+          layer3 += `JOURNAL_LAST: ${camp.journal[camp.journal.length - 1]}\n`;
+        }
+        if (camp.adventure_id) {
+          const mod = ADVENTURE_MODULES[camp.adventure_id];
+          if (mod) {
+            layer3 += `ADVENTURE_TONE: ${mod.ai_instructions.tone}\n`;
+            layer3 += `THEMES: ${mod.ai_instructions.themes.join(', ')}\n`;
+            layer3 += `PACING: ${mod.ai_instructions.pacing}\n`;
+            const modScene = mod.scenes.find(s => s.id === camp.current_scene_id);
+            if (modScene) {
+              layer3 += `CURRENT_SCENE: ${modScene.title} [${modScene.type}]\n`;
+              layer3 += `SCENE_DESC: ${modScene.description}\n`;
+              if (modScene.objective) layer3 += `SCENE_OBJ: ${modScene.objective}\n`;
+              if (modScene.npcs_present && modScene.npcs_present.length > 0) {
+                layer3 += `SCENE_NPCS: ${modScene.npcs_present.map(n => `${n.name}(${n.role}, ${n.attitude})`).join('; ')}\n`;
+              }
+              if (modScene.exits && modScene.exits.length > 0) {
+                layer3 += `EXITS: ${modScene.exits.map(e => `${e.to}: ${e.description}`).join(' | ')}\n`;
+              }
+            }
+          }
+        }
+      }
+
+      if (scene.in_combat && scene.combat_state) {
+        layer3 += `COMBAT: round ${scene.combat_state.round}, phase ${scene.combat_state.phase}\n`;
+      }
+
+      // JSON response schema reference
+      const responseSchema = `
+RESPONSE FORMAT (respond ONLY with valid JSON, no markdown, no prose outside JSON):
+
+For gameplay turns (DMResponse):
+{
+  "narrative": "string (DM prose, 2nd person, under 300 words)",
+  "dice_rolls": [{"description":"string","target":0,"roll":0,"success":true}],
+  "state_updates": {
+    "stamina_delta": 0,
+    "seu_delta": 0,
+    "seu_source": null,
+    "ammo_updates": {},
+    "status_add": [],
+    "status_remove": [],
+    "inventory_add": [],
+    "inventory_remove": [],
+    "xp_delta": 0,
+    "credits_delta": 0,
+    "npc_updates": [],
+    "faction_updates": [],
+    "journal_entry": null,
+    "scene_id": null
+  },
+  "choices": [{"id":"string","text":"string","action_type":"string"}],
+  "scene_change": false,
+  "scene_header": null,
+  "scene_summary": null,
+  "combat_state_update": null,
+  "ooc_note": null,
+  "tooltip_terms": []
+}
+
+For session zero init call (SessionZeroResponse):
+{
+  "story_device": "string (the unifying dramatic device for this run)",
+  "story_device_seed": "string (a single evocative seed phrase)",
+  "hooks": [
+    {"title":"string","opening":"string"},
+    {"title":"string","opening":"string"},
+    {"title":"string","opening":"string"}
+  ],
+  "campaign_spine": {
+    "act1_goal": "string",
+    "act2_complication": "string",
+    "act3_convergence": "string"
+  },
+  "key_npcs": [{"name":"string","role":"string","goal":"string","attitude":"string"}]
+}`;
+
+      return `${layer1}\n\n${layer2}\n\n${layer3}\n${responseSchema}`;
+    }
+
+    // SECTION 26a -- COMPRESSED SYSTEM PROMPT BUILDER
+    function buildCompressedSystemPrompt(gameState) {
+      // Layer 1: Rules Foundation (same as buildSystemPrompt Layer 1)
+      const layer1 = `ASTRA RISING RPG RULES (ASTRA RISING CORE):
+- Percentile system: roll d100 equal to or under the target stat to succeed
+- Core stats: STR, STA, DEX, RS, INT, LOG, PER, LDR
+- Combat Initiative: roll d10, add IM; higher goes first
+- Stamina damage: reduces STA; at 0 STA character falls unconscious
+- Skills: each level adds +10% to base stat checks
+- SEU: power for energy weapons
+- Optional combat rules: burst fire, called shots, cover/concealment, suppression fire`;
+
+      // Layer 2: DM Persona (same as buildSystemPrompt Layer 2)
+      const layer2 = `DM PERSONA:
+You are a cinematic, genre-blending AI Dungeon Master for Astra Rising.
+Narrative style: 2nd person present tense. Tone: serious but pulpy.
+Keep narrative responses under 300 words. Always end with 2-4 player choices.`;
+
+      // Layer 3: Compressed state
+      const char = gameState.character;
+      const scene = gameState.scene;
+
+      let layer3 = 'CAMPAIGN STATE (COMPRESSED):\n';
+      layer3 += `COMPRESSED_HISTORY: ${scene.compressed_summary || 'No compression available.'}\n`;
+
+      if (char) {
+        const statusStr = char.status_effects && char.status_effects.length > 0 ? char.status_effects.join(', ') : 'none';
+        layer3 += `CURRENT_STATE: CHAR=${char.name} STA=${char.stamina.current}/${char.stamina.max} STATUS=${statusStr} SCENE=${scene.header || 'unknown'} COMBAT=${scene.in_combat}\n`;
+      }
+
+      const camp = gameState.campaign;
+      if (camp && camp.adventure_id) {
+        const mod = ADVENTURE_MODULES[camp.adventure_id];
+        if (mod) {
+          layer3 += `ADVENTURE_TONE: ${mod.ai_instructions.tone}\n`;
+          layer3 += `THEMES: ${mod.ai_instructions.themes.join(', ')}\n`;
+          const modScene = mod.scenes.find(s => s.id === camp.current_scene_id);
+          if (modScene) {
+            layer3 += `CURRENT_SCENE: ${modScene.title} [${modScene.type}]\n`;
+            layer3 += `SCENE_DESC: ${modScene.description}\n`;
+            if (modScene.objective) layer3 += `SCENE_OBJ: ${modScene.objective}\n`;
+            if (modScene.npcs_present && modScene.npcs_present.length > 0) {
+              layer3 += `SCENE_NPCS: ${modScene.npcs_present.map(n => `${n.name}(${n.role}, ${n.attitude})`).join('; ')}\n`;
+            }
+            if (modScene.exits && modScene.exits.length > 0) {
+              layer3 += `EXITS: ${modScene.exits.map(e => `${e.to}: ${e.description}`).join(' | ')}\n`;
+            }
+          }
+        }
+      }
+
+      // Append same JSON response schema
+      const responseSchema = `
+RESPONSE FORMAT (respond ONLY with valid JSON, no markdown):
+{"narrative":"string","dice_rolls":[],"state_updates":{"stamina_delta":0,"seu_delta":0,"seu_source":null,"ammo_updates":{},"status_add":[],"status_remove":[],"inventory_add":[],"inventory_remove":[],"xp_delta":0,"credits_delta":0,"npc_updates":[],"faction_updates":[],"journal_entry":null,"scene_id":null},"choices":[{"id":"string","text":"string","action_type":"string"}],"scene_change":false,"scene_header":null,"scene_summary":null,"combat_state_update":null,"ooc_note":null,"tooltip_terms":[]}`;
+
+      return `${layer1}\n\n${layer2}\n\n${layer3}\n${responseSchema}`;
+    }
+
+    // SECTION 26b -- COMPRESS CAMPAIGN HISTORY
+    async function compressCampaignHistory(gameState, sessionToken, onError, onSuccess) {
+      const camp = gameState.campaign;
+      const char = gameState.character;
+      const scene = gameState.scene;
+
+      // Build the data to compress
+      const dataToCompress = {
+        adventure: camp ? { title: camp.adventure_title, story_device: camp.story_device, spine: camp.spine } : null,
+        character: char ? { name: char.name, race: char.race, archetype: char.archetype, stamina: char.stamina, status_effects: char.status_effects, skills: char.skills, credits: char.credits, xp: char.xp } : null,
+        npcs: camp ? camp.npcs : [],
+        factions: camp ? camp.factions : [],
+        journal: camp ? camp.journal : [],
+        recent_summaries: scene.recent_summaries || [],
+        session: gameState.session
+      };
+
+      const compressionPrompt = `Summarize the following Astra Rising campaign history in 300-500 tokens, preserving: active NPCs and their attitudes, faction standings, current campaign spine status, most important events, current character equipment and health status. Campaign data:\n\n${JSON.stringify(dataToCompress, null, 2)}`;
+
+      const compressionSystemMsg = 'You are a campaign historian. Your task is to compress campaign history into a concise summary preserving all game-mechanically relevant information. Do not use JSON. Write flowing prose. Maximum 500 tokens.';
+
+      // Direct fetch for compression (plain text response, not DMResponse JSON)
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Session-Token': sessionToken,
+            'anthropic-version': API_CONSTANTS.API_VERSION
+          },
+          body: JSON.stringify({
+            model: API_CONSTANTS.MODEL,
+            max_tokens: 600,
+            system: compressionSystemMsg,
+            messages: [{ role: 'user', content: compressionPrompt }]
+          })
+        });
+
+        if (!response.ok) {
+          onError({ code: `HTTP_${response.status}`, message: `Compression failed: ${response.statusText}`, recoverable: true, retry_action: null });
+          return null;
+        }
+
+        const data = await response.json();
+        const compressedText = data.content && data.content[0] && data.content[0].text;
+        if (!compressedText) {
+          onError({ code: 'JSON_PARSE_ERROR', message: 'Empty compression response', recoverable: true, retry_action: null });
+          return null;
+        }
+
+        if (onSuccess) onSuccess(compressedText);
+        return compressedText;
+      } catch (err) {
+        onError({ code: 'NETWORK_ERROR', message: 'Network error during compression', recoverable: true, retry_action: null });
+        return null;
+      }
+    }
+
+    // SECTION 7 -- RESPONSE VALIDATORS
+    function validateDMResponse(obj) {
+      const errors = [];
+      if (!obj || typeof obj !== 'object') { errors.push('Response is not an object'); return { valid: false, errors }; }
+      if (typeof obj.narrative !== 'string' || obj.narrative.length === 0) errors.push('narrative missing or empty');
+      if (!Array.isArray(obj.choices)) errors.push('choices is not an array');
+      if (!obj.state_updates || typeof obj.state_updates !== 'object') errors.push('state_updates missing');
+      return { valid: errors.length === 0, errors };
+    }
+
+    function validateSessionZeroResponse(obj) {
+      const errors = [];
+      if (!obj || typeof obj !== 'object') { errors.push('Response is not an object'); return { valid: false, errors }; }
+      if (typeof obj.story_device !== 'string' || obj.story_device.length === 0) errors.push('story_device missing');
+      if (!Array.isArray(obj.hooks) || obj.hooks.length !== 3) errors.push('hooks must be array of length 3');
+      if (!obj.campaign_spine || typeof obj.campaign_spine !== 'object') errors.push('campaign_spine missing');
+      else {
+        if (!obj.campaign_spine.act1_goal) errors.push('campaign_spine.act1_goal missing');
+        if (!obj.campaign_spine.act2_complication) errors.push('campaign_spine.act2_complication missing');
+        if (!obj.campaign_spine.act3_convergence) errors.push('campaign_spine.act3_convergence missing');
+      }
+      if (!Array.isArray(obj.key_npcs)) errors.push('key_npcs is not an array');
+      return { valid: errors.length === 0, errors };
+    }
+
+    // SECTION 8 -- callDM FUNCTION
+    async function callDM(sessionToken, messages, systemPrompt, onError) {
+      const makeRequest = async () => {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Session-Token': sessionToken,
+            'anthropic-version': API_CONSTANTS.API_VERSION
+          },
+          body: JSON.stringify({
+            model: API_CONSTANTS.MODEL,
+            max_tokens: API_CONSTANTS.MAX_TOKENS,
+            system: systemPrompt,
+            messages
+          })
+        });
+
+        if (!response.ok) {
+          const codeMap = { 401: 'HTTP_401', 429: 'HTTP_429', 500: 'HTTP_500' };
+          const code = codeMap[response.status] || `HTTP_${response.status}`;
+          const err = {
+            code,
+            message: `API error ${response.status}: ${response.statusText}`,
+            recoverable: response.status !== 401,
+            retry_action: response.status !== 401 ? (() => callDM(sessionToken, messages, systemPrompt, onError)) : null
+          };
+          onError(err);
+          return null;
+        }
+
+        const data = await response.json();
+        const text = data.content && data.content[0] && data.content[0].text;
+        if (!text) {
+          onError({ code: 'JSON_PARSE_ERROR', message: 'Empty response from API', recoverable: true, retry_action: () => callDM(sessionToken, messages, systemPrompt, onError) });
+          return null;
+        }
+
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          onError({ code: 'JSON_PARSE_ERROR', message: 'Could not parse DM response as JSON', recoverable: true, retry_action: () => callDM(sessionToken, messages, systemPrompt, onError) });
+          return null;
+        }
+      };
+
+      try {
+        return await makeRequest();
+      } catch (networkErr) {
+        // Silent retry once on network error
+        try {
+          return await makeRequest();
+        } catch (retryErr) {
+          onError({ code: 'NETWORK_ERROR', message: 'Network error: could not reach Anthropic API', recoverable: true, retry_action: () => callDM(sessionToken, messages, systemPrompt, onError) });
+          return null;
+        }
+      }
+    }
+
+    // SECTION 9 -- initializeSession FUNCTION
+    function initializeSession(selectedChar, selectedAdventure, response, currentMeta) {
+      return {
+        character: {
+          ...selectedChar,
+          stamina: { current: selectedChar.stamina.max, max: selectedChar.stamina.max }
+        },
+        campaign: {
+          adventure_id: selectedAdventure.id,
+          adventure_title: selectedAdventure.title,
+          story_device: response.story_device,
+          story_device_seed: response.story_device_seed || '',
+          spine: response.campaign_spine,
+          npcs: response.key_npcs || [],
+          factions: [],
+          hooks: response.hooks,
+          journal: [],
+          current_scene_id: ADVENTURE_MODULES[selectedAdventure.id]?.scenes?.[0]?.id ?? null
+        },
+        meta: { ...currentMeta, initialized: true, loading: false }
+      };
+    }
+
+    // SECTION 10 -- LOADING TIDBITS COMPONENT
+    const LORE_TIDBITS = [
+      'The Frontier spans seventeen inhabited star systems united under the Concordat of Free Worlds.',
+      'The four major races -- Human, Krix, Moluun, and Skrath -- each bring unique biological advantages to field operations.',
+      'The The Vaash are a serpentine race of unknown origin whose only known motivation is the destruction of all civilization.',
+      'Apex Law is the CFW\'s elite law enforcement agency, operating in the shadows between political systems.',
+      'Credits are the universal currency of the Frontier -- one credit buys a basic meal, one thousand buys a used skimmer.',
+      'Stamina Points represent a character\'s ability to absorb punishment. When they reach zero, the character falls unconscious.',
+      'The Korvath system, home of planet Cethara, sits on the frontier of explored space -- and beyond it lies the unknown.'
+    ];
+
+    function LoadingTidbits() {
+      const [tidbitIdx, setTidbitIdx] = useState(0);
+
+      useEffect(() => {
+        const interval = setInterval(() => {
+          setTidbitIdx(i => (i + 1) % LORE_TIDBITS.length);
+        }, 3000);
+        return () => clearInterval(interval);
+      }, []);
+
+      return (
+        <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center px-6">
+          <Loader size={40} className="text-yellow-400 animate-spin mb-6" />
+          <div className="text-yellow-400 font-bold text-lg mb-4 uppercase tracking-widest">Preparing Your Mission</div>
+          <div className="max-w-md text-center">
+            <p className="text-gray-400 text-sm italic leading-relaxed transition-all duration-500">
+              {LORE_TIDBITS[tidbitIdx]}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 11 -- HOOK CARD COMPONENT
+    function HookCard({ hook, index, onSelect }) {
+      const labels = ['Hook Alpha', 'Hook Beta', 'Hook Gamma'];
+      return (
+        <div className="bg-gray-800 border border-gray-700 hover:border-yellow-400 rounded-xl p-6 flex flex-col cursor-pointer transition-colors flex-1"
+             onClick={() => onSelect(index)}>
+          <div className="text-xs font-bold text-yellow-400 uppercase tracking-widest mb-2">{labels[index]}</div>
+          <h3 className="text-gray-100 font-bold text-base mb-3">{hook.title}</h3>
+          <p className="text-gray-300 text-sm leading-relaxed flex-1 mb-4">{hook.opening}</p>
+          <button className="w-full bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded hover:bg-yellow-300 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 cursor-pointer">
+            Begin with this hook
+          </button>
+        </div>
+      );
+    }
+
+    // SECTION 12 -- SESSION ZERO SCREEN
+    function SessionZeroScreen({ hooks, error, onHookSelect }) {
+      const [szState, setSzState] = useState('HOOKS'); // HOOKS | TRANSITION
+      const [selectedHookIdx, setSelectedHookIdx] = useState(null);
+
+      const handleHookSelect = (idx) => {
+        setSelectedHookIdx(idx);
+        setSzState('TRANSITION');
+        setTimeout(() => {
+          onHookSelect(idx);
+        }, 1500);
+      };
+
+      if (szState === 'TRANSITION') {
+        return (
+          <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center px-6">
+            <Loader size={40} className="text-yellow-400 animate-spin mb-6" />
+            <div className="text-yellow-400 font-bold text-lg uppercase tracking-widest">Preparing your adventure...</div>
+          </div>
+        );
+      }
+
+      if (error) {
+        return (
+          <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center px-6">
+            <AlertCircle size={40} className="text-red-400 mb-4" />
+            <div className="text-red-400 font-bold text-lg mb-2">Session Zero Failed</div>
+            <p className="text-gray-400 text-sm text-center max-w-md">{error.message}</p>
+            {error.recoverable && error.retry_action && (
+              <button onClick={error.retry_action} className="mt-4 bg-yellow-400 text-gray-900 font-bold py-2 px-6 rounded hover:bg-yellow-300">
+                Retry
+              </button>
+            )}
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen bg-gray-900 flex flex-col px-6 py-8">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-extrabold text-yellow-400 tracking-wide mb-2">Choose Your Hook</h2>
+            <p className="text-gray-400 text-sm">Select the opening that calls to you. Your choice shapes the adventure.</p>
+          </div>
+          <div className="flex flex-row gap-4 flex-1 max-w-5xl mx-auto w-full">
+            {hooks.map((hook, idx) => (
+              <HookCard key={idx} hook={hook} index={idx} onSelect={handleHookSelect} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // SECTION 4 -- APP COMPONENT
+
+    function App() {
+      const [gameState, setGameState] = useState(INITIAL_STATE);
+      const [sessionToken, setSessionToken] = useState(null);
+      const [selectedCharId, setSelectedCharId] = useState(null);
+      const [selectedAdventureId, setSelectedAdventureId] = useState(null);
+      const [phase, setPhase] = useState('SETUP');
+      const [sessionZeroData, setSessionZeroData] = useState(null);
+      const [szError, setSzError] = useState(null);
+      const [firstHookOpening, setFirstHookOpening] = useState(null);
+
+      // Session init: restore existing session or create new one on mount
+      useEffect(() => {
+        const existingToken = localStorage.getItem('sf_session_token');
+        if (existingToken) {
+          fetch(`/api/session/${existingToken}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+              if (data) {
+                setSessionToken(existingToken);
+              } else {
+                // Token invalid or expired — create a fresh session
+                return fetch('/api/session', { method: 'POST' })
+                  .then(r => r.json())
+                  .then(({ token }) => {
+                    localStorage.setItem('sf_session_token', token);
+                    setSessionToken(token);
+                  });
+              }
+            })
+            .catch(() => {
+              // Network error — still set the existing token so gameplay can proceed
+              setSessionToken(existingToken);
+            });
+        } else {
+          fetch('/api/session', { method: 'POST' })
+            .then(r => r.json())
+            .then(({ token }) => {
+              localStorage.setItem('sf_session_token', token);
+              setSessionToken(token);
+            })
+            .catch(() => {});
+        }
+      }, []); // eslint-disable-line -- fire only on mount
+
+      const handleBeginAdventure = useCallback(async () => {
+        const selectedChar = CHARACTER_ROSTER.find(c => c.id === selectedCharId);
+        const selectedAdventure = ADVENTURE_LIBRARY.find(a => a.id === selectedAdventureId);
+        if (!selectedChar || !selectedAdventure) return;
+
+        setGameState(prev => ({ ...prev, meta: { ...prev.meta, loading: true } }));
+        setPhase('SESSION_ZERO');
+        setSzError(null);
+
+        const systemPrompt = buildSystemPrompt({
+          ...INITIAL_STATE,
+          character: selectedChar,
+          campaign: { adventure_id: selectedAdventure.id, adventure_title: selectedAdventure.title }
+        });
+
+        const initUserMsg = `Begin Session Zero for the adventure "${selectedAdventure.title}". My character is ${selectedChar.name}, a ${selectedChar.race} ${selectedChar.archetype}. Generate a SessionZeroResponse JSON as specified in the schema. The story device should fit the adventure's genre (${selectedAdventure.genre}) and tone (${selectedAdventure.tone.join(', ')}). Create 3 distinct hooks that each offer a different way into the story.`;
+
+        const result = await callDM(sessionToken, [{ role: 'user', content: initUserMsg }], systemPrompt, (err) => {
+          setSzError(err);
+          setGameState(prev => ({ ...prev, meta: { ...prev.meta, loading: false } }));
+        });
+
+        if (!result) return; // error already handled
+
+        const validation = validateSessionZeroResponse(result);
+        if (!validation.valid) {
+          setSzError({ code: 'VALIDATION_ERROR', message: 'DM response missing required fields: ' + validation.errors.join(', '), recoverable: true, retry_action: handleBeginAdventure });
+          setGameState(prev => ({ ...prev, meta: { ...prev.meta, loading: false } }));
+          return;
+        }
+
+        const selectedChar2 = CHARACTER_ROSTER.find(c => c.id === selectedCharId);
+        const selectedAdventure2 = ADVENTURE_LIBRARY.find(a => a.id === selectedAdventureId);
+        const initData = initializeSession(selectedChar2, selectedAdventure2, result, gameState.meta);
+        setGameState(prev => ({ ...prev, ...initData }));
+        setSessionZeroData(result);
+      }, [sessionToken, selectedCharId, selectedAdventureId, gameState.meta]);
+
+      const handleHookSelect = useCallback((hookIdx) => {
+        if (sessionZeroData && sessionZeroData.hooks[hookIdx]) {
+          setFirstHookOpening(sessionZeroData.hooks[hookIdx].opening);
+        }
+        setPhase('GAME');
+      }, [sessionZeroData]);
+
+      const handleNewAdventure = useCallback(() => {
+        setGameState(INITIAL_STATE);
+        setPhase('SETUP');
+        setSelectedCharId(null);
+        setSelectedAdventureId(null);
+        setSessionZeroData(null);
+        setSzError(null);
+        setFirstHookOpening(null);
+      }, []);
+
+      const handleLoadSave = useCallback((jsonString) => {
+        return parseAndLoadSave(jsonString, setGameState, setPhase);
+      }, [setPhase]);
+
+      const p1_1_assertions = [
+        { label: 'INITIAL_STATE.character is null', pass: INITIAL_STATE.character === null },
+        { label: 'INITIAL_STATE.campaign is null', pass: INITIAL_STATE.campaign === null },
+        { label: 'meta.dev_mode is true', pass: INITIAL_STATE.meta.dev_mode === true },
+        { label: 'session.number is 1', pass: INITIAL_STATE.session.number === 1 },
+        { label: 'meta.initialized is false', pass: INITIAL_STATE.meta.initialized === false }
+      ];
+
+      const p1_2_assertions = [
+        { label: 'CHARACTER_ROSTER has 4 entries', pass: CHARACTER_ROSTER.length === 4 },
+        { label: 'All characters have stamina.max > 0', pass: CHARACTER_ROSTER.every(c => c.stamina.max > 0) },
+        { label: 'Rayla difficulty is experienced', pass: CHARACTER_ROSTER.find(c => c.id === 'rayla').ui_meta.difficulty === 'experienced' },
+        { label: 'All characters have skills array', pass: CHARACTER_ROSTER.every(c => Array.isArray(c.skills)) }
+      ];
+
+      const p1_3_assertions = [
+        { label: 'ADVENTURE_LIBRARY has 10 entries', pass: ADVENTURE_LIBRARY.length === 10 },
+        { label: 'All adventures have id and title', pass: ADVENTURE_LIBRARY.every(a => a.id && a.title) },
+        { label: 'Difficulties span Beginner to Advanced', pass: ADVENTURE_LIBRARY.some(a => a.difficulty === 'Beginner') && ADVENTURE_LIBRARY.some(a => a.difficulty === 'Advanced') }
+      ];
+      const p2_1_assertions = [
+        { label: 'callDM is a function', pass: typeof callDM === 'function' },
+        { label: 'validateDMResponse is a function', pass: typeof validateDMResponse === 'function' },
+        { label: 'validateSessionZeroResponse is a function', pass: typeof validateSessionZeroResponse === 'function' },
+        { label: 'buildSystemPrompt is a function', pass: typeof buildSystemPrompt === 'function' }
+      ];
+      const p2_2_assertions = [
+        { label: 'initializeSession is a function', pass: typeof initializeSession === 'function' },
+        { label: 'LORE_TIDBITS has 7 items', pass: LORE_TIDBITS.length === 7 },
+        { label: 'phase state is SETUP initially', pass: phase === 'SETUP' }
+      ];
+      const p3_1_assertions = [
+        { label: 'useDMTurn submitTurn is a function', pass: typeof useDMTurn === 'function' },
+        { label: 'MessageHistory component defined', pass: typeof MessageHistory === 'function' },
+        { label: 'ChoiceMenu component defined', pass: typeof ChoiceMenu === 'function' },
+        { label: 'session.turn_count starts at 0', pass: INITIAL_STATE.session.turn_count === 0 }
+      ];
+      const p3_2_assertions = [
+        { label: 'applyStateUpdates is a function', pass: typeof applyStateUpdates === 'function' },
+        { label: 'clampStamina(50,-60,55) === 0', pass: clampStamina(50, -60, 55) === 0 },
+        { label: 'clampStamina(50,10,55) === 55', pass: clampStamina(50, 10, 55) === 55 },
+        { label: 'applyStateUpdates immutable (returns new obj)', pass: (() => { const s = { ...INITIAL_STATE, character: { stamina: { current: 50, max: 55 }, seu: { total: 0, sources: [] }, status_effects: [], inventory: [], ammo: {}, xp: { total: 0, unspent: 0 }, credits: 0, skills: [] } }; const r = applyStateUpdates(s, { stamina_delta: -5 }); return r !== s && r.character !== s.character; })() }
+      ];
+      const p3_3_assertions = [
+        { label: 'CharacterSheet component defined', pass: typeof CharacterSheet === 'function' },
+        { label: 'StaminaBar is a function', pass: typeof StaminaBar === 'function' },
+        { label: 'SkillBadge is a function', pass: typeof SkillBadge === 'function' }
+      ];
+      const p4_1_assertions = [
+        { label: 'rollD100 returns int in [1,100]', pass: (() => { const r = rollD100(); return Number.isInteger(r) && r >= 1 && r <= 100; })() },
+        { label: 'resolveAttack is a function', pass: typeof resolveAttack === 'function' },
+        { label: 'COMBAT_PHASES has 4 keys', pass: Object.keys(COMBAT_PHASES).length === 4 },
+        { label: 'applyCombatStateUpdate is a function', pass: typeof applyCombatStateUpdate === 'function' }
+      ];
+      const p4_2_assertions = [
+        { label: 'CombatPanel is a function', pass: typeof CombatPanel === 'function' },
+        { label: 'DiceRollDisplay is a function', pass: typeof DiceRollDisplay === 'function' },
+        { label: 'InitiativeTracker is a function', pass: typeof InitiativeTracker === 'function' }
+      ];
+      const p5_1_assertions = [
+        { label: 'createSnapshot is a function', pass: typeof createSnapshot === 'function' },
+        { label: 'restoreSnapshot is a function', pass: typeof restoreSnapshot === 'function' },
+        { label: 'meta.snapshots is an array', pass: Array.isArray(INITIAL_STATE.meta.snapshots) },
+        { label: 'MetaControlsBar is a function', pass: typeof MetaControlsBar === 'function' }
+      ];
+      const p5_2_assertions = [
+        { label: 'JournalPanel is a function', pass: typeof JournalPanel === 'function' },
+        { label: 'SummaryCard is a function', pass: typeof SummaryCard === 'function' },
+        { label: 'EndSessionButton is a function', pass: typeof EndSessionButton === 'function' }
+      ];
+      const p6_1_assertions = [
+        { label: 'compressCampaignHistory is a function', pass: typeof compressCampaignHistory === 'function' },
+        { label: 'buildCompressedSystemPrompt is a function', pass: typeof buildCompressedSystemPrompt === 'function' },
+        { label: 'scene.compressed_summary initialized to null', pass: INITIAL_STATE.scene.compressed_summary === null }
+      ];
+      const p6_2_assertions = [
+        { label: 'parseAndLoadSave is a function', pass: typeof parseAndLoadSave === 'function' },
+        { label: 'validateSaveData is a function', pass: typeof validateSaveData === 'function' },
+        { label: 'ContinueCampaignPanel is a function', pass: typeof ContinueCampaignPanel === 'function' }
+      ];
+      const p7_1_assertions = [
+        { label: 'TOOLTIP_GLOSSARY has >= 20 entries', pass: Object.keys(TOOLTIP_GLOSSARY).length >= 20 },
+        { label: 'wrapTextWithTooltips is a function', pass: typeof wrapTextWithTooltips === 'function' },
+        { label: 'Tooltip is a function', pass: typeof Tooltip === 'function' }
+      ];
+      const p7_2_assertions = [
+        { label: 'SceneHeader is a function', pass: typeof SceneHeader === 'function' },
+        { label: 'ContextBar is a function', pass: typeof ContextBar === 'function' },
+        { label: 'MAP_DATA has 5 entries', pass: Object.keys(MAP_DATA).length === 5 }
+      ];
+      const allAssertions = [...p1_1_assertions, ...p1_2_assertions, ...p1_3_assertions, ...p2_1_assertions, ...p2_2_assertions, ...p3_1_assertions, ...p3_2_assertions, ...p3_3_assertions, ...p4_1_assertions, ...p4_2_assertions, ...p5_1_assertions, ...p5_2_assertions, ...p6_1_assertions, ...p6_2_assertions, ...p7_1_assertions, ...p7_2_assertions];
+
+      return (
+        <div>
+          {phase === 'SETUP' && (
+            <SetupScreen
+              selectedCharId={selectedCharId}
+              onCharSelect={setSelectedCharId}
+              selectedAdventureId={selectedAdventureId}
+              onAdventureSelect={setSelectedAdventureId}
+              onBeginAdventure={handleBeginAdventure}
+              onLoadSave={handleLoadSave}
+            />
+          )}
+          {phase === 'SESSION_ZERO' && gameState.meta.loading && <LoadingTidbits />}
+          {phase === 'SESSION_ZERO' && !gameState.meta.loading && sessionZeroData && (
+            <SessionZeroScreen
+              hooks={sessionZeroData.hooks}
+              error={szError}
+              onHookSelect={handleHookSelect}
+            />
+          )}
+          {phase === 'SESSION_ZERO' && !gameState.meta.loading && szError && !sessionZeroData && (
+            <SessionZeroScreen hooks={[]} error={szError} onHookSelect={handleHookSelect} />
+          )}
+          {phase === 'GAME' && (
+            <GameScreen
+              gameState={gameState}
+              setGameState={setGameState}
+              sessionToken={sessionToken}
+              firstHookOpening={firstHookOpening}
+              onNewAdventure={handleNewAdventure}
+            />
+          )}
+          {gameState.meta.dev_mode && <AssertionPanel assertions={allAssertions} />}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

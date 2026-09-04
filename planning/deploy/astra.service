@@ -1,0 +1,15 @@
+[Unit]
+Description=Astra Rising AI DM
+After=network.target
+
+[Service]
+Type=simple
+User=dev
+WorkingDirectory=/path/to/astra-rising
+EnvironmentFile=/path/to/astra-rising/.env
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

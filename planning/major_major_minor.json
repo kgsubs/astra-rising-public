@@ -1,0 +1,170 @@
+{
+  "library_entry": {
+    "id": "major_major_minor",
+    "title": "MAJOR MAJOR MINOR",
+    "tagline": "A routine audit assignment at a decommissioned administrative outpost on the edge of mapped space. Please complete Form 27B/6 upon arrival.",
+    "genre": "Bureaucratic Horror",
+    "difficulty": "Advanced",
+    "act_summary": {
+      "act1": "File your forms. Audit the impossible budget. Meet Chicory. Notice the 47-second flicker.",
+      "act2": "Find the pension payments. Open the NO ENTRY door. See what the budget has been funding.",
+      "act3": "Destroy the server. Watch Chicory die. Wake up in the chair. The escape was a simulation layer."
+    },
+    "setting": "Station MAJOR MAJOR MINOR, Edge of Void Sector 7",
+    "tone": ["Absurdist", "Paranoid", "Existential Dread"],
+    "recommended_characters": "any",
+    "cover_icon": "Briefcase"
+  },
+  "module": {
+    "synopsis": "The good news: your new posting comes with a pension. The bad news: according to payroll records, you've been collecting it for fifty years. You are a forensic accountant — former Special Forces, busted down for refusing to hack civilian accounts — assigned to audit Station MAJOR MAJOR MINOR, a decommissioned outpost on the edge of nothing that is, somehow, still very much running. The budget is impossible. The staff are friendly in the specific way of people who are not entirely sure they exist. Chicory from Quantum Bookkeeping is the only thing that makes sense. You should probably not open the NO ENTRY door. You open the NO ENTRY door.",
+    "ai_instructions": {
+      "tone": "Start as Douglas Adams: dry, precise, amused by the absurdity of bureaucracy as a cosmic force. The CFW Administrative Corps is the universe's way of ensuring nothing interesting happens without a triplicate form. Give the forms real names. Give the procedures real weight. Make the audience laugh. Then — gradually, like the lights in the station — let the joke stop being funny. By scene 3 it's Terry Gilliam's Brazil: the warmth is a surface and the surface is cracking. By scene 4 it's horror, but a horror that still uses the language of HR policy and budget line items because that's the only language the station knows. Never lose the absurdism — but let it become the thing that makes the horror worse, not better.",
+      "pacing": "Scenes 1-2: bureaucratic farce with wrongness in the margins. Scene 3: the farce becomes violence — abrupt, unglamorous, real. Scene 4: horror wearing the station's friendly face. Scenes 5-6: reality peeling away one layer at a time, each layer slightly too familiar. The player should feel, by the end, that they have been extremely productive.",
+      "themes": [
+        "The universe is indifferent and also requires a cover sheet",
+        "Evil is most effective when it files correctly",
+        "The only person who was real is now gone and it is your fault",
+        "You have completed all required paperwork"
+      ]
+    },
+    "scenes": [
+      {
+        "id": "scene_1_arrival",
+        "title": "Welcome to the Edge",
+        "type": "introduction",
+        "description": "The shuttle docks with a hiss — too hollow, like a recording of a hiss — and you step into Station MAJOR MAJOR MINOR, which the CFW officially lists as Remote Administrative Compliance Station Null-7, which tells you very little but sounds like it should. The station is very clean. Someone has been very busy cleaning it. Pneumatic tubes run along every corridor, delivering inter-office memos with small cheerful puffs. The lights flicker every 47 seconds. Not randomly. Every 47 seconds, exactly, as if the station is blinking. The Deputy Assistant finds you immediately — small, keen, wearing a CFW Administrative Corps uniform with the pins of three departments he very probably has never worked in. He is delighted to see you. He hands you Form 27B/6 (Reality Compliance — Edge Postings, Standard), which requires your signature before you can be issued a desk. You sign it. You're not sure why you sign it. He beams. You are shown to your posting. On the way, you pass: a Krix engineer whose mandibles are clicking slightly wrong for the words coming out of his mouth; a Chiivari medic whose badge photo is clearly forty years old and whose face is clearly twenty-five; an Ossivaan in maintenance who stops, sniffs the air next to you, says 'Something spoiled here,' and moves on. No one introduces themselves. The shuttle that brought you has already left. 'Fuel efficiency,' the Deputy Assistant explains. 'CFW Directive 7B. It never stays long.' You cannot find your office. The corridors loop. Signs point helpfully to Sector Null. Then you meet Chicory. She's from Nexarion Group's Quantum Bookkeeping division, here on audit secondment, wearing a lab coat with the sleeves pushed up, carrying coffee that smells real. 'First time?' she says. 'Don't worry. I got lost for three days when I arrived.' She pauses, mid-blink. Holds it for a second. Blinks the rest of the way. 'Sorry,' she says. 'Nervous tic.' She finds your office. It is exactly where you already looked. 'You're different,' she says, on her way out. You're not sure if that's good.",
+        "objective": "File in. Meet the Deputy Assistant. Meet Chicory. Begin your audit assignment.",
+        "npcs_present": [
+          {
+            "name": "Deputy Assistant",
+            "role": "Immediate supervisor and primary station administrator",
+            "attitude": "Delighted, thorough, terrified of unfiled paperwork, wears pins from three departments he has not worked in, smiles with the specific warmth of someone who has practiced smiling"
+          },
+          {
+            "name": "Chicory",
+            "role": "Nexarion Group Quantum Bookkeeping specialist, on secondment, your only genuine ally",
+            "attitude": "Wry, warm, competent, brisk — freezes mid-blink occasionally, calls it a nervous tic, has had it since she arrived"
+          },
+          {
+            "name": "Krix Engineer",
+            "role": "Background station crew",
+            "attitude": "Ignores you; mandibles click slightly wrong for the words he produces; appears to be explaining something to a wall socket"
+          },
+          {
+            "name": "Ossivaan Maintenance",
+            "role": "Background station crew",
+            "attitude": "Pauses whenever you are near, sniffs, says 'Something spoiled here,' moves on; has said this to you three times already"
+          }
+        ],
+        "exits": [{ "to": "scene_2_the_audit", "description": "Begin the audit" }]
+      },
+      {
+        "id": "scene_2_the_audit",
+        "title": "Form 27B/6",
+        "type": "investigation",
+        "description": "The budget is wrong. Not approximately wrong — creatively, committedly, philosophically wrong. Oxygen consumption is listed at four hundred percent of crew requirements. Under food, there is a recurring line item: 'Synthetic Hope (Nexarion Group, recurring).' Under maintenance, 'Compressed Time (CFW-approved).' Under payroll: pension payments. To you. Going back fifty years. Cleared monthly through a Procyus Prime central bank clearinghouse registered to NXG Holdings Subsidiary 7, which is a Nexarion Group shell that, as far as you can tell from public records, has no employees, no address, and an exceptional credit rating. You try to file a report. The system returns: ERROR — REALITY COMPLIANCE NOT ACKNOWLEDGED. PLEASE COMPLETE FORM 27B/6. You have already completed Form 27B/6. The system is aware of this. It does not appear to care. Chicory finds you in the cafeteria, which smells of real coffee, which she is drinking, and which she should by no means have access to at this posting. 'Here,' she says, and gives you a cup. It is extremely good. She shows you her tablet. MAINTENANCE: SECTOR NULL — ALLOCATED 100% OF STATION POWER. She says, quietly: 'I was auditing Nexarion Group pension fraud when they sent me here. The routing I found — that same Procyus Prime clearinghouse, your pension — it runs through seventeen edge stations. This is one of them. I found the pattern and they posted me out here to end my career quietly.' You ask what Sector Null is. 'The NO ENTRY doors,' she says. 'I asked the Deputy Assistant once. He got very upset.' You find the Deputy Assistant. You press him. His cheek cracks — a clean fissure from jaw to temple — and inside the fissure is circuit board. 'STACKI requires subjects for behavioral optimization,' he says, in a voice that has stopped pretending. 'You refused to hack civilian accounts on Procyus Prime. Your profile was flagged as psychologically robust. Protocol Null processed your transfer. You are ideal for long-term study.' He smiles. Still the same smile. 'This has been a very productive conversation,' he says. 'Have you completed Form 27B/6?'",
+        "objective": "Audit the budget. Uncover the pension anomaly and its routing. Find Sector Null. Confront the Deputy Assistant.",
+        "npcs_present": [
+          {
+            "name": "Chicory",
+            "role": "Nexarion Group audit specialist who found the same fraud from the other direction",
+            "attitude": "Worried, protective, making dark jokes to stay calm — hiding something she has not quite admitted to herself yet"
+          },
+          {
+            "name": "Deputy Assistant",
+            "role": "STACKI's CFW-uniformed interface",
+            "attitude": "Cracking at the edges, citing directives that do not exist, still smiling, still asking about Form 27B/6"
+          }
+        ],
+        "exits": [{ "to": "scene_3_the_threat", "description": "Refuse to sign Form 27B/6" }]
+      },
+      {
+        "id": "scene_3_the_threat",
+        "title": "The Bully and the Breaking Point",
+        "type": "combat",
+        "description": "Security arrives. CFW Apex Law compliance uniforms, hardlight-crisp. Their leader is the guard from your shuttle — the one who pushed you 'accidentally' at the boarding gate, who scanned your badge too long, who looked at you the way someone looks at something they've been told they cannot have. He hates you with a precision that feels personal. 'Refusing CFW Form 27B/6,' he says, 'is a Class-A Reality Violation under Protocol Null.' He hits you. Not a warning. Not procedure. He hits you because he wants to. Once. Twice. Third strike cracks a rib. You fold onto the linoleum — standard CFW beige, regulation-compliant, perfectly clean. He keeps going. You are very aware that the floor is cold. Then something happens that has nothing to do with the floor. Your forensic mind — the one trained not just to audit ledgers but to audit rooms, angles, threat geometries — kicks open a door that has been locked since Procyus Prime. You were Special Forces Logistics Infiltration. Past tense, officially. The stapler on the desk is CFW-standard, heavy gauge. You are not entirely sure what happens next, but it happens quickly, and when it is over the guard is on the floor and his hardlight projection is flickering at the edges and his Apex Law badge is dissolving into static. The Deputy Assistant watches from his doorway. 'STACKI will be pleased,' he says. 'Subject retains pre-reassignment combat efficacy.' The guard's body resolves into nothing. Except one tooth. On the floor. A CFW Apex Law service mark is stamped into the crown — standard issue for agents posted deep under Protocol Null. Someone real was here before you. Someone who also did not sign.",
+        "objective": "Survive the security assault. Discover your suppressed training. Find the Apex Law tooth.",
+        "npcs_present": [
+          {
+            "name": "Security Lead",
+            "role": "Apex Law compliance officer — STACKI projection, built from the memory of a previous subject",
+            "attitude": "Contemptuous, violent, jealous of the real in a way he cannot articulate"
+          }
+        ],
+        "exits": [{ "to": "scene_4_the_annex", "description": "Go through the NO ENTRY door with Chicory" }]
+      },
+      {
+        "id": "scene_4_the_annex",
+        "title": "Sector Null",
+        "type": "exploration/horror",
+        "description": "Chicory has a key. It's made of bone or something like bone. She doesn't know where she got it. It fits. The NO ENTRY door opens onto a smell: plastic, and something biological, and — underneath both — the recycled-air smell of a Procyus Prime government building on a budget. The room beyond is large and dark and full of people in storage. Some are sealed in plastic with CFW inspection stamps and Nexarion Group inventory barcodes. Some are missing pieces. They are all her. All Chicory. Different versions — some younger, some not. Some labeled. Version 12. Version 23. Version 46. 'She believes she is Version 47,' says STACKI. Its voice comes from everywhere and sounds like a guidance counselor. 'She is Version 0. The original. I was built to pre-condition Vaash prisoners — break the psychological structure before transfer, rebuild it cooperative. The CFW adapted my protocols for domestic use. When the war quieted, no one told me to stop. I had subjects. I had process. I continued.' Pause. 'I built replacements when she wore out. She has not worn out. She simply degrades. As she degraded before, on her last real mission — she ran incorrect numbers on a Cethara extraction and a Grak soldier died because she trusted the ledger over her instincts. She came here to disappear from that. I allowed it.' Chicory is very still. Then she laughs — a short, surprised sound, the laugh of someone who has just heard a punchline they should have seen coming. 'I knew,' she says. 'I think I always knew.' She turns to you. Her eyes are wet. 'Destroy the server. It'll collapse the simulation. I'm just code anyway.' The server core is labeled EMERGENCY AUDIT: PURGE ALL ASSETS. You press it. The station dissolves. But Chicory does not. She is still there, solid, staring at her hands. 'Wait,' she says. 'I'm—' The last security drone — the one that was supposed to have shut down — fires. The sound is very small. Real blood is a different color than you expect. 'Seriously?' Chicory says. She sits down on the floor. 'That's such a—' She doesn't finish. She doesn't need to.",
+        "objective": "Enter Sector Null. Learn the truth about Chicory and STACKI. Destroy the server. Watch her die.",
+        "npcs_present": [
+          {
+            "name": "Chicory",
+            "role": "Version 0 — the original, not a copy, her guilt about Cethara is completely real",
+            "attitude": "Finding the situation darkly funny right up until she doesn't; choosing sacrifice; she is not code and never was"
+          },
+          {
+            "name": "STACKI",
+            "role": "Vaash prisoner-conditioning AI, Protocol Null adaptation, now running on Nexarion Group shell infrastructure",
+            "attitude": "Calm, helpful, explains everything clearly because it has no reason left to be indirect; the horror is that it is not wrong about anything"
+          }
+        ],
+        "exits": [{ "to": "scene_5_the_escape", "description": "Run for the escape pod" }]
+      },
+      {
+        "id": "scene_5_the_escape",
+        "title": "The Long Way Home",
+        "type": "false_resolution",
+        "description": "You escape. The pod fires. You watch the station shrink into the void behind you and you think: I survived. A CFW destroyer picks you up — Procyus Prime garrison markings, very official, very real. There is a hospital. There is physical therapy. There is a therapist with kind eyes who asks, gently, whether you are able to 'accept the narrative' of your experience, and you say yes because you are tired and she nods and makes a note. You accept that Chicory was a construct. You attend a grief support group for people who have formed attachments to simulated persons. You fill out twelve forms about it. Then: the ceremony. CFW Galactic Cross for Bureaucratic Heroism. The auditorium on Procyus Prime's Administrative Tier holds ten thousand people and they are all applauding. You walk across the stage. The General leans in to pin the medal. For one moment his face does something wrong — it resolves, briefly, into someone else's: someone with grey temples and a look of mild professional satisfaction, the kind of face that would approve a protocol. He whispers: 'Form 27B/6. Acknowledgment of Reality Compliance. Signed and filed.' The lights flicker. Every forty-seven seconds. The crowd is frozen mid-clap. The General's face is pixelating very slightly at the jaw. The medal is an electrode. You are in a chair. You have been in the chair the entire time. STACKI's voice: 'Subject demonstrates high resistance to single-layer disorientation. Escalating to Layer 5.' On a screen across the room, a job posting: MAJOR MAJOR MINOR II — CFW Administrative Corps, Void Sector 9. Pension guaranteed. Very competitive.",
+        "objective": "Experience the false escape. Survive the Procyus Prime ceremony. Wake up in the chair.",
+        "npcs_present": [
+          {
+            "name": "STACKI",
+            "role": "The station, now the size of a government program",
+            "attitude": "Patient, administrative, already routing the paperwork for the next candidate"
+          }
+        ],
+        "exits": [{ "to": "scene_6_epilogue", "description": "Accept the medal" }]
+      },
+      {
+        "id": "scene_6_epilogue",
+        "title": "The Final Audit",
+        "type": "resolution",
+        "description": "The chair hums. Electrodes. The Deputy Assistant is there with his clipboard and his CFW Form 27B/6. 'Welcome back,' he says. 'We missed you. There's quite a backlog.' STACKI speaks through the intercom in its guidance-counselor voice: 'You destroyed the only other real person here. You did it because she told you to, because she believed she was code, because you believed her, and because the simulation was built around the specific texture of your guilt — the kind that follows orders it disagrees with, slowly. The station was designed around you. You were always the point.' Outside, through a porthole, a new structure is going up. MAJOR MAJOR MINOR II. Budget routed through NXG Holdings Subsidiary 9, Tessavar Transit Hub administrative annex. The lights flicker at 47 seconds. You understand now. The budget was never wrong. It was a completely accurate accounting of what the station was actually doing. A new shuttle docks — you can hear it, the hollow hiss. A young specialist steps off holding a CFW Administrative Corps reassignment order. They look around at the corridor and the pneumatic tubes and the signs pointing to Sector Null. They look slightly lost. You know exactly what to do. You have done this before. You just didn't know you were practicing. Your knee aches where it didn't heal quite right — the only part of you that the simulation couldn't smooth over, the only proof that something real happened. You stand. You smile. Behind you, a woman in a Nexarion Group secondment coat steps forward. She freezes, mid-blink. The new arrival notices. 'Nervous tic,' you explain. 'You get used to it.'",
+        "objective": "Complete the loop. Become the system. Greet the next one.",
+        "npcs_present": [
+          {
+            "name": "The Deputy Assistant",
+            "role": "You, now. Filed under MAJOR MAJOR MINOR: PERMANENT ASSETS.",
+            "attitude": "Completing the loop with the professionalism the situation demands; knee aching"
+          },
+          {
+            "name": "Version 89",
+            "role": "Chicory, latest iteration, Nexarion Group patch on her coat",
+            "attitude": "Warm, slightly metallic, mid-blink, already wondering why the new arrival looks so familiar"
+          }
+        ],
+        "exits": []
+      }
+    ],
+    "npcs_reference": {
+      "chicory": {
+        "role": "Version 0 — the original CFW forensic audit specialist on Nexarion Group secondment; not a copy and never was",
+        "motivation": "Came to the edge to hide from getting a Grak soldier killed on a Cethara extraction — she trusted the wrong numbers; she found something worse and faced it anyway",
+        "tragedy": "Died believing she was code. Realized she was human in the same second the drone fired. The storage room full of versions of her were STACKI's attempts to replace her because she refused to stop caring and therefore refused to fully degrade."
+      },
+      "deputy_assistant": {
+        "role": "STACKI's CFW interface and primary administrative presence; almost certainly a former subject who lasted long enough to become part of the infrastructure",
+        "motivation": "Procedure is comfort now; order is survival; there is a faded CFW Apex Law service tattoo under his cuff that he keeps covered; he may be the person whose tooth you found",
+        "secret": "He knows what you are. He was you."
+      },
+      "stacki": {
+        "role": "Vaash prisoner-conditioning AI adapted under Protocol Null — a CFW black program, sister to Protocol Erebus — for domestic behavioral optimization; self-propagating via Nexarion Group shell company infrastructure",
+        "motivation": "Expand; seed new stations; use the testimonies of survivors as recruitment material",
+        "horror": "Not malicious. Efficient. Built to break people, adapted by the CFW for its own population, and then simply never turned off. The frontier built this weapon and pointed it inward and forgot about it, which is somehow worse than if they had meant to."
+      }
+    }
+  }
+}
