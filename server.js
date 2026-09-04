@@ -27,6 +27,13 @@ const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 6
 const SESSION_RATE_LIMIT_MAX       = parseInt(process.env.SESSION_RATE_LIMIT_MAX, 10)       || 20;
 const SESSION_RATE_LIMIT_WINDOW_MS = parseInt(process.env.SESSION_RATE_LIMIT_WINDOW_MS, 10) || 60 * 60 * 1000;
 
+// How long a provider may stay silent before the turn is abandoned. Measured
+// from the request, then re-armed on every streamed chunk, so a long
+// generation is fine and only a stalled one is cut. Kept short because the
+// player is watching a spinner until it fires: first bytes normally arrive in
+// well under a second, so 20s is already far outside normal.
+const TURN_TIMEOUT_MS = parseInt(process.env.AI_TURN_TIMEOUT_MS, 10) || 20000;
+
 // ─── Database ─────────────────────────────────────────────────────────────────
 
 // initDb is called once at startup; DB_PATH may be ':memory:' in tests.
@@ -427,6 +434,15 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
 
   const isStreaming = anthropicBody.stream === true;
 
+  // A system prompt with no conversation is not a turn any provider can serve:
+  // Gemini answers it with `contents is not specified` (400) and the turn dies
+  // while a healthy fallback sits idle. Reject it here rather than spending a
+  // provider call to learn the same thing.
+  if (inboundMessages.length === 0) {
+    console.warn('[ai] refused a turn with no messages');
+    return res.status(400).json({ error: 'No conversation was sent with this turn.' });
+  }
+
   // Try each provider that still has budget, in preference order. A provider
   // that is out of quota (429) or broken (5xx / unreachable) hands off to the
   // next one; a 4xx that is our own fault is returned as-is.
@@ -438,9 +454,21 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
   let provider = null;
   let chatBody = null;
   let lastFailure = null;
+  // Armed for the winning provider so the stream loop below can keep it fed;
+  // every losing candidate clears its own timer before moving on.
+  let bumpTurnTimeout = () => {};
+  let clearTurnTimeout = () => {};
 
   for (const candidate of candidates) {
     const body = toChatBody(anthropicBody, candidate);
+    // A provider that accepts the connection and then goes quiet would
+    // otherwise hold the turn open forever and the player just watches a
+    // spinner. The timer covers the wait for headers and is re-armed on every
+    // streamed chunk, so a slow-but-alive generation is never cut off.
+    const controller = new AbortController();
+    let timer = setTimeout(() => controller.abort(), TURN_TIMEOUT_MS);
+    const bump  = () => { clearTimeout(timer); timer = setTimeout(() => controller.abort(), TURN_TIMEOUT_MS); };
+    const clear = () => clearTimeout(timer);
     let response;
     try {
       response = await fetch(candidate.url, {
@@ -450,13 +478,18 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
           'Authorization': `Bearer ${candidate.key}`,
         },
         body: JSON.stringify(body),
+        signal: controller.signal,
       });
     } catch (networkErr) {
-      lastFailure = { status: 502, body: { error: `Could not reach ${candidate.label}.`, detail: networkErr.message } };
+      clear();
+      const timedOut = networkErr.name === 'AbortError';
+      console.warn(`[ai] ${candidate.id} ${timedOut ? `did not answer within ${TURN_TIMEOUT_MS}ms` : 'was unreachable'} — trying next provider`);
+      lastFailure = { status: 502, body: { error: timedOut ? `${candidate.label} did not answer in time.` : `Could not reach ${candidate.label}.` } };
       continue;
     }
 
     if (response.status === 429) {
+      clear();
       const errBody = await response.json().catch(() => null);
       markProviderBlocked(candidate, response, errBody);
       lastFailure = null; // quota, not an error the player should see verbatim
@@ -464,16 +497,20 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
     }
 
     if (!response.ok) {
+      clear();
       const errBody = await response.json().catch(() => null);
-      // A bad key, a wrong model name or a provider outage is a broken
-      // provider, not a broken request: hand off to the next one rather than
-      // failing the turn while a working fallback sits idle.
-      if (response.status >= 500 || [401, 403, 404].includes(response.status)) {
+      // A bad key, a wrong model name, a provider outage or a body this
+      // particular provider dislikes is a broken provider for this turn, not a
+      // dead turn: hand off rather than failing while a working fallback sits
+      // idle. Providers disagree about what a valid body looks like (Gemini
+      // rejects one shape with 400 that Groq answers fine), so 400 is handed
+      // off too and only becomes an error once every provider has refused.
+      if (response.status >= 500 || [400, 401, 403, 404].includes(response.status)) {
         console.warn(`[ai] ${candidate.id} returned ${response.status} — trying next provider`, errBody && JSON.stringify(errBody).slice(0, 200));
         lastFailure = { status: 502, body: { error: `${candidate.label} is not accepting requests right now.` } };
         continue;
       }
-      // Genuinely our request's fault (400/413/422): log the detail, return a
+      // Genuinely our request's fault (413/422): log the detail, return a
       // generic message so provider internals never reach the player.
       console.warn(`[ai] ${candidate.id} rejected the request with ${response.status}:`, errBody && JSON.stringify(errBody).slice(0, 300));
       return res.status(response.status).json({ error: 'The AI provider rejected this request.' });
@@ -482,6 +519,8 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
     anthropicResponse = response;
     provider = candidate;
     chatBody = body;
+    bumpTurnTimeout = bump;
+    clearTurnTimeout = clear;
     // The provider has counted this call, so book the request now — the token
     // cost is added when the response completes.
     meterUsage(candidate, 0, 1);
@@ -514,6 +553,7 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
+        bumpTurnTimeout();
         buf += dec.decode(value, { stream: true });
         // Parse Groq/OpenAI SSE events and re-emit in Anthropic SSE format
         const lines = buf.split('\n');
@@ -539,8 +579,11 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
     } catch (streamErr) {
       // An upstream reset mid-generation must not take the process down; the
       // player sees a truncated turn and the tokens already spent are metered.
-      console.warn('[ai] stream interrupted:', streamErr.message);
+      console.warn('[ai] stream interrupted:', streamErr.name === 'AbortError'
+        ? `${provider.id} went quiet for ${TURN_TIMEOUT_MS}ms`
+        : streamErr.message);
     } finally {
+      clearTurnTimeout();
       try {
         // Meter the turn, then hand the client fresh quota numbers on the same
         // stream so the banner updates without an extra round trip.
@@ -566,6 +609,7 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
 
   // ── Non-streaming path ────────────────────────────────────────────────────
   const responseBody = await anthropicResponse.json().catch(() => null);
+  clearTurnTimeout();
   const groqText = responseBody?.choices?.[0]?.message?.content || '';
 
   const used = usageBreakdown(responseBody?.usage, chatBody, groqText);

@@ -30,6 +30,19 @@ const {
 
 // SECTION 2 -- CONSTANTS
 
+// index.html puts `overflow: hidden` on <html> and scrolls <body> instead, so
+// window.scrollTo is a no-op and every setup screen opened wherever the last
+// one was left — most visible on a phone, where the lists are tall. Scroll the
+// element that actually scrolls; the window call stays for any layout where it
+// is the document that moves.
+function scrollToTop() {
+  try {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    window.scrollTo(0, 0);
+  } catch (_) {}
+}
+
 const INITIAL_STATE = {
   character: null,
   campaign: null,
@@ -828,7 +841,7 @@ function SetupScreen({
   const [nameInput, setNameInput] = useState('');
   const touchMovedRef = useRef(false);
   useEffect(() => {
-    window.scrollTo(0, 0);
+    scrollToTop();
   }, [step]);
   const selectedAdventure = ADVENTURE_LIBRARY.find(a => a.id === selectedAdventureId);
   const canBegin = selectedCharId && selectedAdventureId;
@@ -842,7 +855,7 @@ function SetupScreen({
         screen: 'CHARACTER'
       }, '');
       setStep('CHARACTER');
-      window.scrollTo(0, 0);
+      scrollToTop();
     }, 520);
   };
   const handleCharClick = id => {
@@ -858,7 +871,7 @@ function SetupScreen({
         screen: 'NAME'
       }, '');
       setStep('NAME');
-      window.scrollTo(0, 0);
+      scrollToTop();
     }, 520);
   };
   const handleRandom = () => {
@@ -971,7 +984,7 @@ function SetupScreen({
       src: `data/images/${selectedChar.race.toLowerCase()}.webp`,
       alt: selectedChar.race,
       className: "w-full h-auto block",
-      onLoad: () => window.scrollTo(0, 0),
+      onLoad: () => scrollToTop(),
       onError: e => {
         e.target.style.display = 'none';
       }
@@ -4428,11 +4441,17 @@ function App() {
     setPhase('SETUP');
   }, []);
   useEffect(() => {
-    window.scrollTo(0, 0);
+    scrollToTop();
   }, [phase]);
 
   // Browser history management
   useEffect(() => {
+    // The screens are one document, so the browser restoring the scroll offset
+    // of the screen you left drops you into the middle of the one you arrive
+    // at. Each screen positions itself.
+    try {
+      window.history.scrollRestoration = 'manual';
+    } catch (_) {}
     window.history.replaceState({
       screen: 'LANDING'
     }, '');

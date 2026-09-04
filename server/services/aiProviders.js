@@ -32,7 +32,9 @@ const PROVIDER_DEFS = {
     url: 'https://api.groq.com/openai/v1/chat/completions',
     keyEnv: 'GROQ_API_KEY',
     modelEnv: 'GROQ_MODEL',
-    defaultModel: 'llama-3.3-70b-versatile',
+    // llama-3.3-70b-versatile was decommissioned by Groq and returns
+    // 404 model_not_found; it silently killed the fallback chain.
+    defaultModel: 'openai/gpt-oss-120b',
     // Free tier: the 100k token/day ceiling binds long before 1000 requests.
     limits: { requestsPerDay: 1000, tokensPerDay: 100000 },
   },
