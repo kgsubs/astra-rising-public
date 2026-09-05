@@ -11,7 +11,20 @@
 // sits outside the runner.
 
 const { execFileSync } = require('child_process');
+const os   = require('os');
 const path = require('path');
+
+// Each suite requires server.js, which reads DB_PATH from .env — the live
+// database on this machine. They get their own throwaway file instead, and
+// rate limits high enough that a suite is not throttled by its own traffic.
+function suiteEnv(file) {
+  return {
+    ...process.env,
+    DB_PATH: path.join(os.tmpdir(), `astra-verify-${process.pid}-${file.replace(/\W/g, '')}.db`),
+    RATE_LIMIT_MAX: '100000',
+    SESSION_RATE_LIMIT_MAX: '100000',
+  };
+}
 
 const SUITES = [
   ['rule loader', 'check_rules.js'],
@@ -22,12 +35,20 @@ const SUITES = [
   ['phase two regression', 'regression.js'],
 ];
 
+afterAll(() => {
+  const fs = require('fs');
+  for (const [, file] of SUITES) {
+    const base = suiteEnv(file).DB_PATH;
+    for (const f of [base, `${base}-wal`, `${base}-shm`]) { try { fs.unlinkSync(f); } catch (_) {} }
+  }
+});
+
 describe('standalone verification suites', () => {
   for (const [label, file] of SUITES) {
     test(`${label} (server/tests/${file})`, () => {
       const script = path.join(__dirname, '..', 'server', 'tests', file);
       try {
-        execFileSync(process.execPath, [script], { encoding: 'utf8', timeout: 60000, stdio: 'pipe' });
+        execFileSync(process.execPath, [script], { encoding: 'utf8', timeout: 60000, stdio: 'pipe', env: suiteEnv(file) });
       } catch (err) {
         // The script's own output names which condition failed; surfacing it
         // here is the difference between a useful failure and "exit code 1".
