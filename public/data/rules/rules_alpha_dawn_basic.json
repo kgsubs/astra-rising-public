@@ -61,9 +61,9 @@
       "description": "Four playable races in the basic rules",
       "available": [
         "human",
-        "dralasite",
-        "vrusk",
-        "yazirian"
+        "moluun",
+        "krix",
+        "skrath"
       ],
       "human": {
         "description": "Most adaptable and versatile race",
@@ -74,7 +74,7 @@
         "movement": "10 meters/turn",
         "size": "Medium"
       },
-      "dralasite": {
+      "moluun": {
         "description": "Amoeboid shape-changers with elastic bodies",
         "ability_modifiers": {
           "STR": "+5",
@@ -99,7 +99,7 @@
         "movement": "10 meters/turn (can roll at walking speed)",
         "size": "Medium (variable)"
       },
-      "vrusk": {
+      "krix": {
         "description": "Insectoid beings with eight limbs and corporate mindset",
         "ability_modifiers": {
           "DEX": "+5",
@@ -126,7 +126,7 @@
         "movement": "15 meters/turn",
         "size": "Medium"
       },
-      "yazirian": {
+      "skrath": {
         "description": "Ape-like humanoids with gliding membranes and warrior culture",
         "ability_modifiers": {
           "DEX": "+5",
@@ -412,8 +412,8 @@
   },
   "movement": {
     "ground": {
-      "walking": "10m per turn (humans, dralasites, yazirians)",
-      "vrusk": "15m per turn",
+      "walking": "10m per turn (humans, moluuns, skraths)",
+      "krix": "15m per turn",
       "running": "2x walking speed"
     },
     "turn_length": "6 seconds"

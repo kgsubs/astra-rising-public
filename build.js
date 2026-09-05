@@ -1,5 +1,11 @@
 'use strict';
 
+// SUPERSEDED. The frontend was extracted out of the inline Babel block in
+// index.html into public/app.js as pre-compiled React.createElement calls, so
+// there is no JSX left for this to compile and running it errors out. It is
+// kept as the record of the build stage that was removed, not as a command:
+// the npm script was deleted so nobody runs it by accident. See CLAUDE.md.
+
 const babel = require('@babel/core');
 const fs = require('fs');
 const path = require('path');

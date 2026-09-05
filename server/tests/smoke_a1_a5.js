@@ -52,11 +52,11 @@ server.listen(0, async () => {
   check('A5: quick_checks present', !!(r6.body.quick_checks));
   check('A5: advanced_modifiers present', !!(r6.body.advanced_modifiers));
 
-  const r7 = await get(base + '/api/rules/character/vrusk');
-  check('A5: GET /api/rules/character/vrusk returns 200', r7.status === 200);
-  const r8 = await get(base + '/api/rules/character/humma');
-  check('A5: GET /api/rules/character/humma returns 200', r8.status === 200);
-  check('A5: humma has zebulon_data', !!(r8.body.zebulon_data));
+  const r7 = await get(base + '/api/rules/character/krix');
+  check('A5: GET /api/rules/character/krix returns 200', r7.status === 200);
+  const r8 = await get(base + '/api/rules/character/grak');
+  check('A5: GET /api/rules/character/grak returns 200', r8.status === 200);
+  check('A5: grak has zebulon_data', !!(r8.body.zebulon_data));
   const r9 = await get(base + '/api/rules/character/bogusrace');
   check('A5: GET /api/rules/character/bogusrace returns 404', r9.status === 404);
 

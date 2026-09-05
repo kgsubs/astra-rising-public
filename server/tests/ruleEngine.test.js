@@ -162,18 +162,18 @@ test('computeSTAThresholds always has unconscious = 0', () => {
 
 // ── computeRacialTriggerChance ────────────────────────────────────────────────
 
-test('computeRacialTriggerChance("yazirian", "Battle Rage") === 5', () => {
-  const r = computeRacialTriggerChance('yazirian', 'Battle Rage');
+test('computeRacialTriggerChance("skrath", "Battle Rage") === 5', () => {
+  const r = computeRacialTriggerChance('skrath', 'Battle Rage');
   assert.strictEqual(r, 5);
 });
 
-test('computeRacialTriggerChance("dralasite", "Lie Detection") === 5', () => {
-  const r = computeRacialTriggerChance('dralasite', 'Lie Detection');
+test('computeRacialTriggerChance("moluun", "Lie Detection") === 5', () => {
+  const r = computeRacialTriggerChance('moluun', 'Lie Detection');
   assert.strictEqual(r, 5);
 });
 
-test('computeRacialTriggerChance("vrusk", "Comprehension") === 15', () => {
-  const r = computeRacialTriggerChance('vrusk', 'Comprehension');
+test('computeRacialTriggerChance("krix", "Comprehension") === 15', () => {
+  const r = computeRacialTriggerChance('krix', 'Comprehension');
   assert.strictEqual(r, 15);
 });
 

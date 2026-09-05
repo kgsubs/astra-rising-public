@@ -6,6 +6,12 @@ This repository is a hands-on case study in dividing a problem between what a la
 
 **Live: [astrarising.com](https://astrarising.com)**
 
+> **This repository is a case study, not a distribution.** It is the real source
+> behind the live game, published to be read. It is not packaged for anyone else
+> to stand up: that needs provider API keys, a database and infrastructure that
+> are deliberately not here, and `npm start` will tell you so. The one thing that
+> does run anywhere is the test suite: `npm test`, no keys, no network.
+
 | | |
 |---|---|
 | ![Landing](planning/screenshots/landing.png) | ![Campaign select](planning/screenshots/campaigns.png) |
@@ -150,6 +156,41 @@ Four models failed outright, returning nothing usable. A player waiting on a dic
 1. **The frontend build was removed rather than fixed.** JSX compilation was dropped in favour of pre-compiled `React.createElement` calls, and Tailwind's runtime was replaced by a precompiled stylesheet. The icon bundle was cut to the 19 icons actually used, taking it to 8 KB. The trade-off is documented in `CLAUDE.md` so the constraint is not rediscovered later.
 2. **Session resumption was wrong in a way only real use exposed.** The client was treated as authoritative when resuming, which let a stale tab resurrect a finished game. The server became the source of truth, and a fresh save code is now minted on every new game.
 3. **Rules loading fails loudly.** An earlier version served whatever rules had loaded successfully. It now returns `503` rather than run a game on partial rules.
+
+---
+
+## Testing
+
+Two tiers, and both are expected green before anything ships.
+
+**Fast, on every change.** `npm test` runs in a couple of seconds with no keys
+and no network: the Jest suites in `tests/`, plus every standalone verification
+suite in `server/tests/`. Those standalone suites were written one per build
+packet and each asserts its own conditions; `tests/verification-suites.test.js`
+shells out to them so that nothing which looks like a test sits outside the
+runner. Each starts its own server on an ephemeral port, a rule that exists
+because an earlier version of them quietly tested whatever was listening on the
+production port and inherited its rate limits.
+
+**Slow, before a release.** `npm run qa` boots the app on a scratch port against
+a scratch database and a scripted stand-in for the AI, then drives a real
+browser through the whole product: the front page, starting a game, campaign,
+character, name, session zero, the opening scene, and four turns of play
+including a typed one, a chosen suggestion, a scene change and combat. It does
+that at phone and desktop size, checks that every screen opens at the top and
+never scrolls sideways, confirms the damage, money, loot and journal entries the
+game master described reached the character sheet, the server and a reload, and
+then breaks the AI on purpose in every way a provider can fail, requiring a
+clear message and a retry rather than a spinner that never ends. 143 checks,
+about 90 seconds.
+
+The stand-in AI is the point of that second tier. It speaks the same wire format
+the real providers do, so the server cannot tell the difference, which makes the
+run free, instant and identical every time, and keeps the metered free tier the
+live game depends on untouched. `qa/README.md` covers how to add a check.
+
+Both tiers are proven to be able to fail: reverting a known bug turns exactly
+the matching check red and leaves the rest green.
 
 ---
 

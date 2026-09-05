@@ -1,0 +1,329 @@
+{
+  "sessionZero": {
+    "story_device": "A dead courier's manifest names a cargo that was never loaded.",
+    "story_device_seed": "qa-seed-0001",
+    "campaign_spine": {
+      "act1_goal": "Find out who filed the manifest.",
+      "act2_complication": "The filing clerk has been dead for a month.",
+      "act3_convergence": "The cargo is still aboard, and it is awake."
+    },
+    "hooks": [
+      {
+        "id": "hook_a",
+        "title": "The Beacon",
+        "opening": "A distress beacon pulses once every nine seconds. Nobody else has answered it."
+      },
+      {
+        "id": "hook_b",
+        "title": "The Manifest",
+        "opening": "The manifest lists a crate that no dock crew remembers loading."
+      },
+      {
+        "id": "hook_c",
+        "title": "The Clerk",
+        "opening": "A dead clerk's terminal is still logged in, and still typing."
+      }
+    ],
+    "key_npcs": [
+      {
+        "name": "Vessa Tor",
+        "role": "Freighter mate",
+        "attitude": "wary"
+      },
+      {
+        "name": "Administrator Brynn",
+        "role": "Dock authority",
+        "attitude": "transactional"
+      }
+    ]
+  },
+  "turns": [
+    {
+      "_qa_name": "opening",
+      "narrative": "The airlock hisses open and frost crawls across the deck plates.\n\nSomewhere aft, a loose panel taps against its housing in the dark.\n\nVessa Tor watches you from the ramp and says nothing at all.",
+      "dice_rolls": [],
+      "state_updates": {
+        "stamina_delta": 0,
+        "seu_delta": 0,
+        "seu_source": null,
+        "ammo_updates": {},
+        "status_add": [],
+        "status_remove": [],
+        "inventory_add": [],
+        "inventory_remove": [],
+        "xp_delta": 0,
+        "credits_delta": 0,
+        "npc_updates": [],
+        "faction_updates": [],
+        "journal_entry": null,
+        "scene_id": null
+      },
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Head aft toward the sound",
+          "action_type": "explore"
+        },
+        {
+          "id": "c2",
+          "text": "Check the bridge first",
+          "action_type": "explore"
+        },
+        {
+          "id": "c3",
+          "text": "Scan for life signs",
+          "action_type": "skill"
+        }
+      ],
+      "scene_change": false,
+      "scene_header": null,
+      "scene_summary": "Boarded the derelict through the forward airlock.",
+      "combat_state_update": null,
+      "ooc_note": null,
+      "tooltip_terms": [
+        {
+          "term": "SEU",
+          "definition": "Energy charges that power beam weapons."
+        }
+      ]
+    },
+    {
+      "_qa_name": "state-heavy",
+      "narrative": "The panel comes away and something behind it takes a swing at you.\n\nYou get a hand up in time, mostly. The medkit in your pack is lighter afterwards.\n\nBrynn transfers the finder's fee before you have finished bleeding.",
+      "dice_rolls": [
+        {
+          "description": "Beam Weapons check",
+          "target": 47,
+          "roll": 22,
+          "success": true,
+          "rule_source": "alpha_dawn_basic"
+        },
+        {
+          "description": "Reaction Speed check",
+          "target": 50,
+          "roll": 81,
+          "success": false,
+          "rule_source": null
+        }
+      ],
+      "state_updates": {
+        "stamina_delta": -12,
+        "seu_delta": -5,
+        "seu_source": "M4 e-clip",
+        "ammo_updates": {
+          "M4 e-clip": -3
+        },
+        "status_add": [
+          "Bleeding"
+        ],
+        "status_remove": [],
+        "inventory_add": [
+          "Cracked data spike"
+        ],
+        "inventory_remove": [
+          "Frag grenade x2"
+        ],
+        "xp_delta": 25,
+        "credits_delta": 150,
+        "npc_updates": [
+          {
+            "name": "Administrator Brynn",
+            "attitude": "grateful"
+          }
+        ],
+        "faction_updates": [
+          {
+            "name": "Dock Authority",
+            "standing_delta": 1
+          }
+        ],
+        "journal_entry": "Opened the aft panel and took a hit for it. Brynn paid out.",
+        "scene_id": null
+      },
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Patch the wound",
+          "action_type": "skill"
+        },
+        {
+          "id": "c2",
+          "text": "Press on regardless",
+          "action_type": "explore"
+        }
+      ],
+      "scene_change": false,
+      "scene_header": null,
+      "scene_summary": "Ambushed at the aft panel; wounded but paid.",
+      "combat_state_update": null,
+      "ooc_note": null,
+      "tooltip_terms": []
+    },
+    {
+      "_qa_name": "scene-change",
+      "narrative": "The corridor gives way to the hold, and the hold is not empty.\n\nRows of cryo pods glow a soft, patient amber.\n\nEvery single one of them is occupied.",
+      "dice_rolls": [],
+      "state_updates": {
+        "stamina_delta": 0,
+        "seu_delta": 0,
+        "seu_source": null,
+        "ammo_updates": {},
+        "status_add": [],
+        "status_remove": [
+          "Bleeding"
+        ],
+        "inventory_add": [],
+        "inventory_remove": [],
+        "xp_delta": 10,
+        "credits_delta": 0,
+        "npc_updates": [],
+        "faction_updates": [],
+        "journal_entry": "Found the hold. The pods are full.",
+        "scene_id": "scene_2_hold"
+      },
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Read the pod manifest",
+          "action_type": "skill"
+        },
+        {
+          "id": "c2",
+          "text": "Wake one of them",
+          "action_type": "risky"
+        },
+        {
+          "id": "c3",
+          "text": "Back out quietly",
+          "action_type": "explore"
+        }
+      ],
+      "scene_change": true,
+      "scene_header": "The Hold",
+      "scene_summary": "Reached the cargo hold and found the pods occupied.",
+      "combat_state_update": null,
+      "ooc_note": null,
+      "tooltip_terms": []
+    },
+    {
+      "_qa_name": "combat",
+      "narrative": "The nearest pod cracks its seal and the thing inside is already moving.\n\nThere is no time to be clever about this.",
+      "dice_rolls": [
+        {
+          "description": "Initiative",
+          "target": 0,
+          "roll": 14,
+          "success": true,
+          "rule_source": "alpha_dawn_basic"
+        }
+      ],
+      "state_updates": {
+        "stamina_delta": 0,
+        "seu_delta": 0,
+        "seu_source": null,
+        "ammo_updates": {},
+        "status_add": [],
+        "status_remove": [],
+        "inventory_add": [],
+        "inventory_remove": [],
+        "xp_delta": 0,
+        "credits_delta": 0,
+        "npc_updates": [],
+        "faction_updates": [],
+        "journal_entry": null,
+        "scene_id": null
+      },
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Fire the laser pistol",
+          "action_type": "attack"
+        },
+        {
+          "id": "c2",
+          "text": "Fall back to the corridor",
+          "action_type": "move"
+        }
+      ],
+      "scene_change": false,
+      "scene_header": null,
+      "scene_summary": "Combat began in the hold.",
+      "combat_state_update": {
+        "active": true,
+        "round": 1,
+        "combatants": [
+          {
+            "name": "Sera",
+            "initiative": 14,
+            "is_player": true,
+            "stamina_current": 43,
+            "stamina_max": 55
+          },
+          {
+            "name": "Pod Sleeper",
+            "initiative": 9,
+            "is_player": false,
+            "stamina_current": 30,
+            "stamina_max": 30
+          }
+        ],
+        "phase": "initiative",
+        "initiative_order": [
+          {
+            "name": "Sera",
+            "initiative": 14,
+            "is_player": true,
+            "has_acted": false
+          },
+          {
+            "name": "Pod Sleeper",
+            "initiative": 9,
+            "is_player": false,
+            "has_acted": false
+          }
+        ]
+      },
+      "ooc_note": null,
+      "tooltip_terms": []
+    },
+    {
+      "_qa_name": "ooc",
+      "narrative": "",
+      "dice_rolls": [],
+      "state_updates": {
+        "stamina_delta": 0,
+        "seu_delta": 0,
+        "seu_source": null,
+        "ammo_updates": {},
+        "status_add": [],
+        "status_remove": [],
+        "inventory_add": [],
+        "inventory_remove": [],
+        "xp_delta": 0,
+        "credits_delta": 0,
+        "npc_updates": [],
+        "faction_updates": [],
+        "journal_entry": null,
+        "scene_id": null
+      },
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Fire the laser pistol",
+          "action_type": "attack"
+        },
+        {
+          "id": "c2",
+          "text": "Fall back to the corridor",
+          "action_type": "move"
+        }
+      ],
+      "scene_change": false,
+      "scene_header": null,
+      "scene_summary": "Paused to ask a rules question.",
+      "combat_state_update": null,
+      "ooc_note": "A laser pistol does 1d10 damage and costs one SEU per shot.",
+      "tooltip_terms": []
+    }
+  ]
+}

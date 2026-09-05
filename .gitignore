@@ -1,12 +1,12 @@
+node_modules
 node_modules/
+coverage/
+*.log
+
 .env
-astra_rising.db
-astra_rising.db-shm
-astra_rising.db-wal
+
 astra_rising.db
 astra_rising.db-shm
 astra_rising.db-wal
 
-node_modules
-coverage/
-*.log
+qa/runs/

@@ -93,7 +93,7 @@
   },
   "new_races": {
     "description": "Three rim races added after Second Neg War",
-    "humma": {
+    "grak": {
       "description": "Large, powerful marsupial-like humanoids",
       "ability_modifiers": {
         "STR": "+10",
@@ -118,7 +118,7 @@
       "movement": "10 meters/turn",
       "size": "Large"
     },
-    "ifshnit": {
+    "chiivari": {
       "description": "Small, goat-like humanoids, expert traders",
       "ability_modifiers": {
         "STR": "-5",
@@ -143,7 +143,7 @@
       "movement": "10 meters/turn",
       "size": "Small"
     },
-    "osakar": {
+    "ossivaan": {
       "description": "Tall, thin humanoids with exceptional senses",
       "ability_modifiers": {
         "STR": "+5",

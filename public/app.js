@@ -90,25 +90,6 @@ const LAYOUT = {
   full_screen: 'min-h-screen bg-gray-900 flex flex-col items-center justify-center'
 };
 
-// SECTION 3 -- ASSERTION PANEL
-
-function AssertionPanel({
-  assertions
-}) {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "fixed bottom-4 right-4 z-50 bg-gray-900 bg-opacity-90 border border-gray-700 rounded-lg p-3 max-h-64 overflow-y-auto w-72 shadow-xl"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "text-xs font-bold text-gray-300 uppercase tracking-widest mb-2 border-b border-gray-700 pb-1"
-  }, "DEV ASSERTIONS"), assertions.map((assertion, idx) => /*#__PURE__*/React.createElement("div", {
-    key: idx,
-    className: "flex items-center gap-2 py-0.5"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: `inline-block w-2 h-2 rounded-full flex-shrink-0 ${assertion.pass ? 'bg-green-400' : 'bg-red-500'}`
-  }), /*#__PURE__*/React.createElement("span", {
-    className: `text-xs ${assertion.pass ? 'text-green-300' : 'text-red-400'}`
-  }, assertion.label))));
-}
-
 // SECTION 3h -- ADVENTURE LIBRARY
 
 // SECTION 3c -- CHARACTER CARD COMPONENT
@@ -1874,7 +1855,8 @@ function useDMTurn({
       return acc;
     }, []);
     // Trim to MAX_RAW_TURNS pairs; older context is covered by scene_summary in the system prompt.
-    // After slicing, ensure the window starts with a user message (required by Anthropic API).
+    // After slicing, ensure the window starts with a user message: every
+    // provider requires the conversation to begin with one.
     let apiMessages = rawApiMessages.slice(-API_CONSTANTS.MAX_RAW_TURNS * 2);
     if (apiMessages.length > 0 && apiMessages[0].role === 'assistant') apiMessages = apiMessages.slice(1);
     apiMessages.push({
@@ -3509,7 +3491,7 @@ function GameScreen({
     className: "border-t border-gray-700"
   }, /*#__PURE__*/React.createElement(CombatPanel, {
     combatState: gameState.scene.combat_state,
-    diceRolls: []
+    diceRolls: latestDiceRolls
   }))), /*#__PURE__*/React.createElement("div", {
     className: "flex-shrink-0 p-2 flex flex-col gap-1.5 w-full"
   }, snapshots.length > 0 && /*#__PURE__*/React.createElement("div", {
@@ -4211,7 +4193,7 @@ async function callDM(sessionToken, messages, systemPrompt, onError, onChunk, ma
     } catch (retryErr) {
       onError({
         code: 'NETWORK_ERROR',
-        message: 'Network error: could not reach Anthropic API',
+        message: 'Network error: could not reach the game master.',
         recoverable: true,
         retry_action: () => callDM(sessionToken, messages, systemPrompt, onError, onChunk)
       });
@@ -4739,224 +4721,6 @@ function App() {
   const handleLoadSave = useCallback(jsonString => {
     return parseAndLoadSave(jsonString, setGameState, setPhase);
   }, [setPhase]);
-  const p1_1_assertions = [{
-    label: 'INITIAL_STATE.character is null',
-    pass: INITIAL_STATE.character === null
-  }, {
-    label: 'INITIAL_STATE.campaign is null',
-    pass: INITIAL_STATE.campaign === null
-  }, {
-    label: 'meta.dev_mode is true',
-    pass: INITIAL_STATE.meta.dev_mode === true
-  }, {
-    label: 'session.number is 1',
-    pass: INITIAL_STATE.session.number === 1
-  }, {
-    label: 'meta.initialized is false',
-    pass: INITIAL_STATE.meta.initialized === false
-  }];
-  const p1_2_assertions = [{
-    label: 'CHARACTER_ROSTER has 7 entries',
-    pass: CHARACTER_ROSTER.length === 7
-  }, {
-    label: 'All characters have stamina.max > 0',
-    pass: CHARACTER_ROSTER.every(c => c.stamina.max > 0)
-  }, {
-    label: 'Rayla difficulty is experienced',
-    pass: CHARACTER_ROSTER.find(c => c.id === 'rayla').ui_meta.difficulty === 'experienced'
-  }, {
-    label: 'All characters have skills array',
-    pass: CHARACTER_ROSTER.every(c => Array.isArray(c.skills))
-  }];
-  const p1_3_assertions = [{
-    label: 'ADVENTURE_LIBRARY has 11 entries',
-    pass: ADVENTURE_LIBRARY.length === 11
-  }, {
-    label: 'All adventures have id and title',
-    pass: ADVENTURE_LIBRARY.every(a => a.id && a.title)
-  }, {
-    label: 'Difficulties span Beginner to Advanced',
-    pass: ADVENTURE_LIBRARY.some(a => a.difficulty === 'Beginner') && ADVENTURE_LIBRARY.some(a => a.difficulty === 'Advanced')
-  }];
-  const p2_1_assertions = [{
-    label: 'callDM is a function',
-    pass: typeof callDM === 'function'
-  }, {
-    label: 'validateDMResponse is a function',
-    pass: typeof validateDMResponse === 'function'
-  }, {
-    label: 'validateSessionZeroResponse is a function',
-    pass: typeof validateSessionZeroResponse === 'function'
-  }, {
-    label: 'buildSystemPrompt is a function',
-    pass: typeof buildSystemPrompt === 'function'
-  }, {
-    label: 'buildSessionZeroPrompt is a function',
-    pass: typeof buildSessionZeroPrompt === 'function'
-  }];
-  const p2_2_assertions = [{
-    label: 'initializeSession is a function',
-    pass: typeof initializeSession === 'function'
-  }, {
-    label: 'LORE_TIDBITS has 10 items',
-    pass: LORE_TIDBITS.length === 10
-  }, {
-    label: 'phase state is SETUP initially',
-    pass: phase === 'SETUP'
-  }];
-  const p3_1_assertions = [{
-    label: 'useDMTurn submitTurn is a function',
-    pass: typeof useDMTurn === 'function'
-  }, {
-    label: 'MessageHistory component defined',
-    pass: typeof MessageHistory === 'function'
-  }, {
-    label: 'ChoiceMenu component defined',
-    pass: typeof ChoiceMenu === 'function'
-  }, {
-    label: 'session.turn_count starts at 0',
-    pass: INITIAL_STATE.session.turn_count === 0
-  }];
-  const p3_2_assertions = [{
-    label: 'applyStateUpdates is a function',
-    pass: typeof applyStateUpdates === 'function'
-  }, {
-    label: 'clampStamina(50,-60,55) === 0',
-    pass: clampStamina(50, -60, 55) === 0
-  }, {
-    label: 'clampStamina(50,10,55) === 55',
-    pass: clampStamina(50, 10, 55) === 55
-  }, {
-    label: 'applyStateUpdates immutable (returns new obj)',
-    pass: (() => {
-      const s = {
-        ...INITIAL_STATE,
-        character: {
-          stamina: {
-            current: 50,
-            max: 55
-          },
-          seu: {
-            total: 0,
-            sources: []
-          },
-          status_effects: [],
-          inventory: [],
-          ammo: {},
-          xp: {
-            total: 0,
-            unspent: 0
-          },
-          credits: 0,
-          skills: []
-        }
-      };
-      const r = applyStateUpdates(s, {
-        stamina_delta: -5
-      });
-      return r !== s && r.character !== s.character;
-    })()
-  }];
-  const p3_3_assertions = [{
-    label: 'CharacterSheet component defined',
-    pass: typeof CharacterSheet === 'function'
-  }, {
-    label: 'StaminaBar is a function',
-    pass: typeof StaminaBar === 'function'
-  }, {
-    label: 'SkillBadge is a function',
-    pass: typeof SkillBadge === 'function'
-  }];
-  const p4_1_assertions = [{
-    label: 'rollD100 returns int in [1,100]',
-    pass: (() => {
-      const r = rollD100();
-      return Number.isInteger(r) && r >= 1 && r <= 100;
-    })()
-  }, {
-    label: 'resolveAttack is a function',
-    pass: typeof resolveAttack === 'function'
-  }, {
-    label: 'COMBAT_PHASES has 4 keys',
-    pass: Object.keys(COMBAT_PHASES).length === 4
-  }, {
-    label: 'applyCombatStateUpdate is a function',
-    pass: typeof applyCombatStateUpdate === 'function'
-  }];
-  const p4_2_assertions = [{
-    label: 'CombatPanel is a function',
-    pass: typeof CombatPanel === 'function'
-  }, {
-    label: 'DiceRollDisplay is a function',
-    pass: typeof DiceRollDisplay === 'function'
-  }, {
-    label: 'InitiativeTracker is a function',
-    pass: typeof InitiativeTracker === 'function'
-  }];
-  const p5_1_assertions = [{
-    label: 'createSnapshot is a function',
-    pass: typeof createSnapshot === 'function'
-  }, {
-    label: 'restoreSnapshot is a function',
-    pass: typeof restoreSnapshot === 'function'
-  }, {
-    label: 'meta.snapshots is an array',
-    pass: Array.isArray(INITIAL_STATE.meta.snapshots)
-  }, {
-    label: 'MetaControlsBar is a function',
-    pass: typeof MetaControlsBar === 'function'
-  }];
-  const p5_2_assertions = [{
-    label: 'JournalPanel is a function',
-    pass: typeof JournalPanel === 'function'
-  }, {
-    label: 'SummaryCard is a function',
-    pass: typeof SummaryCard === 'function'
-  }, {
-    label: 'EndSessionButton is a function',
-    pass: typeof EndSessionButton === 'function'
-  }];
-  const p6_1_assertions = [{
-    label: 'compressCampaignHistory is a function',
-    pass: typeof compressCampaignHistory === 'function'
-  }, {
-    label: 'buildCompressedSystemPrompt is a function',
-    pass: typeof buildCompressedSystemPrompt === 'function'
-  }, {
-    label: 'scene.compressed_summary initialized to null',
-    pass: INITIAL_STATE.scene.compressed_summary === null
-  }];
-  const p6_2_assertions = [{
-    label: 'parseAndLoadSave is a function',
-    pass: typeof parseAndLoadSave === 'function'
-  }, {
-    label: 'validateSaveData is a function',
-    pass: typeof validateSaveData === 'function'
-  }, {
-    label: 'ContinueCampaignPanel is a function',
-    pass: typeof ContinueCampaignPanel === 'function'
-  }];
-  const p7_1_assertions = [{
-    label: 'TOOLTIP_GLOSSARY has >= 20 entries',
-    pass: Object.keys(TOOLTIP_GLOSSARY).length >= 20
-  }, {
-    label: 'wrapTextWithTooltips is a function',
-    pass: typeof wrapTextWithTooltips === 'function'
-  }, {
-    label: 'Tooltip is a function',
-    pass: typeof Tooltip === 'function'
-  }];
-  const p7_2_assertions = [{
-    label: 'SceneHeader is a function',
-    pass: typeof SceneHeader === 'function'
-  }, {
-    label: 'ContextBar is a function',
-    pass: typeof ContextBar === 'function'
-  }, {
-    label: 'CharacterStatusStrip component defined',
-    pass: typeof CharacterStatusStrip === 'function'
-  }];
-  const allAssertions = [...p1_1_assertions, ...p1_2_assertions, ...p1_3_assertions, ...p2_1_assertions, ...p2_2_assertions, ...p3_1_assertions, ...p3_2_assertions, ...p3_3_assertions, ...p4_1_assertions, ...p4_2_assertions, ...p5_1_assertions, ...p5_2_assertions, ...p6_1_assertions, ...p6_2_assertions, ...p7_1_assertions, ...p7_2_assertions];
   if (sessionInitState === 'pending') {
     return /*#__PURE__*/React.createElement("div", {
       style: {
@@ -5018,8 +4782,6 @@ function App() {
     firstHookOpening: firstHookOpening,
     onNewAdventure: handleNewAdventure,
     saveCode: saveCode
-  }), gameState.meta.dev_mode && /*#__PURE__*/React.createElement(AssertionPanel, {
-    assertions: allAssertions
   }));
 }
 ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(App, null));

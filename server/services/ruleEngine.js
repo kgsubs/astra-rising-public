@@ -123,7 +123,7 @@ function computeSTAThresholds(maxSTA) {
  * Parses the numeric trigger chance from a race's special ability description.
  * Source: alpha_dawn_basic.character_creation.races.*.special_abilities[].description
  * Returns integer percentage (e.g. 5 for "5% chance") or null if not found.
- * Example: computeRacialTriggerChance('yazirian', 'Battle Rage') → 5
+ * Example: computeRacialTriggerChance('skrath', 'Battle Rage') → 5
  */
 function computeRacialTriggerChance(race, abilityName) {
   const cache = getRulesCache();

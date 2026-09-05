@@ -100,14 +100,14 @@ function configuredProviders(env = process.env) {
     });
 }
 
-// Translates the Anthropic-shaped body the frontend sends into the
-// OpenAI-compatible body both providers accept.
-function toChatBody(anthropicBody, provider) {
+// Translates the body the frontend sends (a system string plus a messages
+// array) into the OpenAI-compatible body both providers accept.
+function toChatBody(clientBody, provider) {
   const messages = [];
-  if (anthropicBody.system) {
-    messages.push({ role: 'system', content: anthropicBody.system });
+  if (clientBody.system) {
+    messages.push({ role: 'system', content: clientBody.system });
   }
-  for (const m of (anthropicBody.messages || [])) {
+  for (const m of (clientBody.messages || [])) {
     messages.push({
       role: m.role,
       content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content),
@@ -116,8 +116,8 @@ function toChatBody(anthropicBody, provider) {
   const body = {
     model: provider.model,
     messages,
-    max_tokens: anthropicBody.max_tokens || 4096,
-    stream: anthropicBody.stream === true,
+    max_tokens: clientBody.max_tokens || 4096,
+    stream: clientBody.stream === true,
   };
   // Ask for a usage record on the final SSE chunk so streamed turns are
   // metered from real token counts rather than a character estimate.

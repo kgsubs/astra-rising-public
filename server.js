@@ -401,9 +401,9 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
   }
 
   // Strip session_token and game_state from the body before forwarding — both
-  // are our internal fields and must never be sent to Anthropic.
+  // are our internal fields and must never be sent to a provider.
   // eslint-disable-next-line no-unused-vars
-  const { session_token: _stripped, game_state: _gameStateRaw, ...anthropicBody } = req.body;
+  const { session_token: _stripped, game_state: _gameStateRaw, ...clientBody } = req.body;
 
   // Parse game_state and inject computed rules context into the system prompt.
   // Active modules are read from the DB for the session so they persist across requests.
@@ -417,7 +417,7 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
       } catch (_) {}
       const rulesContext = buildRulesContext(parsedGameState, activeModules);
       if (rulesContext) {
-        anthropicBody.system = (anthropicBody.system || '') + '\n\n' + rulesContext;
+        clientBody.system = (clientBody.system || '') + '\n\n' + rulesContext;
         console.log(`[rules] injected context block (~${rulesContext.split(/\s+/).filter(Boolean).length} words)${activeModules.length ? ' modules=' + activeModules.join(',') : ''}`);
       }
     } catch (e) {
@@ -426,13 +426,13 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
   }
 
   // Capture the user message for persistence (last entry in messages array).
-  // We capture before the await so we have it regardless of Anthropic's response.
-  const inboundMessages = anthropicBody.messages || [];
+  // We capture before the await so we have it regardless of the provider's reply.
+  const inboundMessages = clientBody.messages || [];
   const lastUserMsg = inboundMessages.length > 0
     ? inboundMessages[inboundMessages.length - 1]
     : null;
 
-  const isStreaming = anthropicBody.stream === true;
+  const isStreaming = clientBody.stream === true;
 
   // A system prompt with no conversation is not a turn any provider can serve:
   // Gemini answers it with `contents is not specified` (400) and the turn dies
@@ -450,7 +450,7 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
     .map(s => configuredProviders().find(p => p.id === s.id))
     .filter(Boolean);
 
-  let anthropicResponse = null;
+  let providerResponse = null;
   let provider = null;
   let chatBody = null;
   let lastFailure = null;
@@ -460,7 +460,7 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
   let clearTurnTimeout = () => {};
 
   for (const candidate of candidates) {
-    const body = toChatBody(anthropicBody, candidate);
+    const body = toChatBody(clientBody, candidate);
     // A provider that accepts the connection and then goes quiet would
     // otherwise hold the turn open forever and the player just watches a
     // spinner. The timer covers the wait for headers and is re-armed on every
@@ -516,7 +516,7 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
       return res.status(response.status).json({ error: 'The AI provider rejected this request.' });
     }
 
-    anthropicResponse = response;
+    providerResponse = response;
     provider = candidate;
     chatBody = body;
     bumpTurnTimeout = bump;
@@ -530,7 +530,7 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
     break;
   }
 
-  if (!anthropicResponse) {
+  if (!providerResponse) {
     if (lastFailure) return res.status(lastFailure.status).json(lastFailure.body);
     // Every remaining provider reported quota exhaustion.
     return res.status(429).json(exhaustedPayload(quotaSnapshot()));
@@ -545,7 +545,7 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
 
     let accText = '';
     let usageReport = null;
-    const reader = anthropicResponse.body.getReader();
+    const reader = providerResponse.body.getReader();
     const dec = new TextDecoder();
     let buf = '';
 
@@ -555,7 +555,8 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
         if (done) break;
         bumpTurnTimeout();
         buf += dec.decode(value, { stream: true });
-        // Parse Groq/OpenAI SSE events and re-emit in Anthropic SSE format
+        // Parse the provider's OpenAI-style SSE events and re-emit them in the
+        // event shape the frontend already reads.
         const lines = buf.split('\n');
         buf = lines.pop();
         for (const line of lines) {
@@ -608,7 +609,7 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
   }
 
   // ── Non-streaming path ────────────────────────────────────────────────────
-  const responseBody = await anthropicResponse.json().catch(() => null);
+  const responseBody = await providerResponse.json().catch(() => null);
   clearTurnTimeout();
   const groqText = responseBody?.choices?.[0]?.message?.content || '';
 
@@ -624,7 +625,7 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
     console.warn('[db] Failed to persist messages:', dbErr.message);
   }
 
-  // Return in Anthropic format so the frontend parser (data.content[0].text) works unchanged.
+  // Shape the reply the way the frontend parser expects (data.content[0].text).
   return res.status(200).json({ content: [{ type: 'text', text: groqText }], quota: quotaSnapshot() });
 });
 
@@ -715,21 +716,24 @@ app.post('/api/session/:token/modules', (req, res) => {
     return res.status(400).json({ error: 'modules must be an array of strings.' });
   }
 
-  // Validate: only allow known Gamma Dawn module IDs
+  // Validate: only allow known Gamma Dawn module IDs. GET /api/rules/optional-modules
+  // advertises these with a `gamma_` prefix, so both spellings are accepted and
+  // stored unprefixed; rejecting the id the API itself hands out is a trap.
   const VALID_MODULES = new Set(['psionics', 'mutations', 'cybernetics', 'reputation_system', 'alternate_combat', 'variant_races', 'environmental_hazards']);
-  const invalid = modules.filter(m => typeof m !== 'string' || !VALID_MODULES.has(m));
+  const normalised = modules.map(m => (typeof m === 'string' && m.startsWith('gamma_') ? m.slice(6) : m));
+  const invalid = normalised.filter(m => typeof m !== 'string' || !VALID_MODULES.has(m));
   if (invalid.length > 0) {
     return res.status(400).json({ error: `Unknown module(s): ${invalid.join(', ')}` });
   }
 
   try {
-    saveActiveModules(db, session.id, modules);
+    saveActiveModules(db, session.id, normalised);
   } catch (dbErr) {
     console.error('[db] Failed to save active modules:', dbErr.message);
     return res.status(500).json({ error: 'Failed to persist modules.' });
   }
 
-  return res.json({ ok: true, active_modules: modules });
+  return res.json({ ok: true, active_modules: normalised });
 });
 
 // ─── GET /api/session/:token/modules — get active optional modules (P2-E1) ────

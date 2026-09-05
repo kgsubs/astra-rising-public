@@ -50,10 +50,33 @@ async function testAsync(label, fn) {
 }
 
 // ── HTTP helpers ──────────────────────────────────────────────────────────────
+//
+// These used to talk to whatever was listening on port 3500, which on this
+// machine is the live site: the suite silently tested production, inherited its
+// rate limits, and passed or failed on its state. It now starts its own copy of
+// the app on an ephemeral port, so a run is self-contained and repeatable.
+
+const app = require('../../server');
+let testServer = null;
+let testPort   = 0;
+
+function startServer() {
+  return new Promise((resolve) => {
+    testServer = http.createServer(app);
+    testServer.listen(0, '127.0.0.1', () => {
+      testPort = testServer.address().port;
+      resolve();
+    });
+  });
+}
+
+function stopServer() {
+  return new Promise((resolve) => (testServer ? testServer.close(() => resolve()) : resolve()));
+}
 
 function httpGet(urlPath) {
   return new Promise((resolve, reject) => {
-    http.get({ host: 'localhost', port: 3500, path: urlPath }, (res) => {
+    http.get({ host: '127.0.0.1', port: testPort, path: urlPath }, (res) => {
       let body = '';
       res.on('data', d => (body += d));
       res.on('end', () => resolve({ status: res.statusCode, body }));
@@ -65,7 +88,7 @@ function httpPost(urlPath, headers, body) {
   return new Promise((resolve, reject) => {
     const str = JSON.stringify(body);
     const req = http.request(
-      { host: 'localhost', port: 3500, path: urlPath, method: 'POST',
+      { host: '127.0.0.1', port: testPort, path: urlPath, method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(str), ...headers } },
       (res) => {
         let data = '';
@@ -95,6 +118,8 @@ const SKRIX_STATE = {
 // ─── Main async runner ────────────────────────────────────────────────────────
 
 (async () => {
+
+  await startServer();
 
   // ── A1–A5: Rules API ────────────────────────────────────────────────────────
 
@@ -155,8 +180,8 @@ const SKRIX_STATE = {
   test('computeSkillTarget(50,2) === 45', () => assert.strictEqual(computeSkillTarget(50, 2), 45));
   test('computeSTAThresholds(50).dying === -80', () => assert.strictEqual(computeSTAThresholds(50).dying, -80));
   test('computeAbilityModifier(65) === "+10%"', () => assert.strictEqual(computeAbilityModifier(65), '+10%'));
-  test('computeRacialTriggerChance(yazirian,Battle Rage) === 5', () =>
-    assert.strictEqual(computeRacialTriggerChance('yazirian', 'Battle Rage'), 5));
+  test('computeRacialTriggerChance(skrath,Battle Rage) === 5', () =>
+    assert.strictEqual(computeRacialTriggerChance('skrath', 'Battle Rage'), 5));
   test('parseWeaponDamage(laser_pistol) non-null', () =>
     assert.ok(parseWeaponDamage('laser_pistol', 'beam_weapons')));
   test('parseDamageString(2d10).max === 20', () =>
@@ -198,8 +223,10 @@ const SKRIX_STATE = {
 
   console.log('\n── C2: rule_source in schema (static) ───────────────────────────');
 
+  // The frontend moved out of index.html into public/app.js; the schema this
+  // asserts on went with it.
   test('C2: rule_source in dice_rolls schema (both locations)', () => {
-    const src = fs.readFileSync(path.join(__dirname, '../../public/index.html'), 'utf8');
+    const src = fs.readFileSync(path.join(__dirname, '../../public/app.js'), 'utf8');
     const matches = src.match(/"rule_source"/g) || [];
     assert.ok(matches.length >= 2, `Expected >=2 occurrences, got ${matches.length}`);
   });
@@ -215,9 +242,11 @@ const SKRIX_STATE = {
     }
   });
 
-  test('D1: game-data.js has Humma, Ifshnit, Osakar races', () => {
+  // The roster was renamed; the rules JSON still keys the same races by their
+  // original names, which is why the D2 block below still says Grak.
+  test('D1: game-data.js has the Grak, Chiivari and Ossivaan races', () => {
     const src = fs.readFileSync(path.join(__dirname, '../../public/data/game-data.js'), 'utf8');
-    for (const race of ["race: 'Humma'", "race: 'Ifshnit'", "race: 'Osakar'"]) {
+    for (const race of ["race: 'Grak'", "race: 'Chiivari'", "race: 'Ossivaan'"]) {
       assert.ok(src.includes(race), `Missing: ${race}`);
     }
   });
@@ -226,9 +255,9 @@ const SKRIX_STATE = {
 
   console.log('\n── D2: Zebulon Race/Profession Injection (unit) ─────────────────');
 
-  const ctxHumma = buildRulesContext({
+  const ctxGrak = buildRulesContext({
     character: {
-      name: 'Grukk', race: 'Humma', archetype: 'Enforcer', psa: 'Military',
+      name: 'Grukk', race: 'Grak', archetype: 'Enforcer', psa: 'Military',
       stats: { str: 65, sta: 65, dex: 45, rs: 45, int: 40, log: 40, per: 35, ldr: 35 },
       stamina: { current: 65, max: 65 },
       skills: [{ name: 'Melee Weapons', level: 2 }], inventory: ['vibrosword'],
@@ -236,9 +265,9 @@ const SKRIX_STATE = {
     scene: { in_combat: false },
   }, []);
 
-  test('D2: Humma RACE block present', () => assert.ok(ctxHumma.includes('RACE (Humma)')));
-  test('D2: Spring Charge ability present', () => assert.ok(ctxHumma.includes('Spring Charge')));
-  test('D2: PROFESSION (enforcer) present', () => assert.ok(ctxHumma.includes('PROFESSION (enforcer)')));
+  test('D2: Grak RACE block present', () => assert.ok(ctxGrak.includes('RACE (Grak)')));
+  test('D2: Spring Charge ability present', () => assert.ok(ctxGrak.includes('Spring Charge')));
+  test('D2: PROFESSION (enforcer) present', () => assert.ok(ctxGrak.includes('PROFESSION (enforcer)')));
 
   // ── D3: Expanded Skills ──────────────────────────────────────────────────────
 
@@ -333,8 +362,8 @@ const SKRIX_STATE = {
     assert.ok(Array.isArray(JSON.parse(r.body).modules));
   });
 
-  await testAsync('REGR: GET /api/rules/character/vrusk returns 200', async () => {
-    const r = await httpGet('/api/rules/character/vrusk');
+  await testAsync('REGR: GET /api/rules/character/krix returns 200', async () => {
+    const r = await httpGet('/api/rules/character/krix');
     assert.strictEqual(r.status, 200);
   });
 
@@ -346,6 +375,8 @@ const SKRIX_STATE = {
     console.log('Failures:');
     failures.forEach(f => console.log('  \u2022 ' + f));
   }
+  await stopServer();
+
   if (failed === 0) {
     console.log('ALL TESTS PASSED');
     process.exit(0);

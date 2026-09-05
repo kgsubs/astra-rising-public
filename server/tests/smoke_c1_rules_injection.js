@@ -48,9 +48,30 @@ async function testAsync(label, fn) {
   }
 }
 
+// Starts its own copy of the app rather than talking to port 3500, which on a
+// dev box is the live site: a suite must not depend on, or disturb, production.
+
+const app = require('../../server');
+let testServer = null;
+let testPort   = 0;
+
+function startServer() {
+  return new Promise((resolve) => {
+    testServer = http.createServer(app);
+    testServer.listen(0, '127.0.0.1', () => {
+      testPort = testServer.address().port;
+      resolve();
+    });
+  });
+}
+
+function stopServer() {
+  return new Promise((resolve) => (testServer ? testServer.close(() => resolve()) : resolve()));
+}
+
 function httpGet(path) {
   return new Promise((resolve, reject) => {
-    http.get({ host: 'localhost', port: 3500, path }, (res) => {
+    http.get({ host: '127.0.0.1', port: testPort, path }, (res) => {
       let body = '';
       res.on('data', d => (body += d));
       res.on('end', () => resolve({ status: res.statusCode, body }));
@@ -63,7 +84,7 @@ function httpPost(path, headers, body) {
     const bodyStr = JSON.stringify(body);
     const req = http.request(
       {
-        host: 'localhost', port: 3500, path,
+        host: '127.0.0.1', port: testPort, path,
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(bodyStr), ...headers },
       },
@@ -96,6 +117,8 @@ const TEST_GAME_STATE = {
 // ── Run tests ─────────────────────────────────────────────────────────────────
 
 (async () => {
+
+  await startServer();
   // Condition 1: /api/healthz HTTP 200 (regression)
   await testAsync('Condition 1: /api/healthz returns HTTP 200', async () => {
     const r = await httpGet('/api/healthz');
@@ -146,6 +169,8 @@ const TEST_GAME_STATE = {
   // Summary
   console.log('');
   console.log(`Results: ${passed} passed, ${failed} failed`);
+  await stopServer();
+
   if (failed === 0) {
     console.log('ALL TESTS PASSED');
     process.exit(0);
