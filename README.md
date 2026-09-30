@@ -6,6 +6,20 @@
 
 **Live Build:** [astrarising.com](https://astrarising.com)
 
+**CONTENTS**
+
+- [DESIGN PRINCIPLES & BUSINESS VALUE](#design-principles--business-value)
+- [TECHNICAL OVERVIEW](#technical-overview)
+  - [ARCHITECTURE](#architecture)
+  - [HOW A TURN WORKS](#how-a-turn-works)
+  - [KEY DECISIONS](#key-decisions)
+  - [CHOOSING THE AI](#choosing-the-ai)
+  - [SECURITY AND COST](#security-and-cost)
+  - [HOW IT WAS PLANNED AND TESTED](#how-it-was-planned-and-tested)
+  - [TRADE-OFFS](#trade-offs)
+- [RUN IT YOURSELF](#run-it-yourself)
+- [LICENSE](#license)
+
 Astra Rising is a live, browser-based science-fiction role-playing game run by an AI game master. The AI writes the story. A rules engine on the server computes every roll, target and injury, so the game is fair and repeatable. Players pick up where they left off with a short save code.
 
 The problem it solves is general: a language model is good at language and unreliable at arithmetic and rules. This build draws a hard line between the two, picks its AI provider by measured speed and reliability, and runs inside free usage limits with automatic failover when a provider is busy or down.
