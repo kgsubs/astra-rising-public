@@ -1,6 +1,6 @@
 # Astra Rising
 
-*My client work stays confidential, so I build personal projects like this to share how I think and work. I loved playing [Star Frontiers](https://en.wikipedia.org/wiki/Star_Frontiers) as a kid. When I couldn’t find a free, well-designed version with an AI dungeon master, I built this one.*
+*My client work stays confidential, so I build personal projects like this to share how I think and work. I loved playing [Star Frontiers](https://en.wikipedia.org/wiki/Star_Frontiers) as a kid. When I couldn’t find a free, well-designed, mobile-friendly version with an AI dungeon master, I built this one.*
 
 **Live Build:** [astrarising.com](https://astrarising.com)
 
