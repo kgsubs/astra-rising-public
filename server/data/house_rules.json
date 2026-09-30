@@ -1,0 +1,62 @@
+{
+  "_readme": "Numbers the loaded rules files do not supply. Every entry is labeled \"source\": \"house\" so it is never mistaken for a rules-file citation.",
+  "enemy_threat_tiers": {
+    "source": "house",
+    "minion":  { "sta": 15, "to_hit": 40, "damage": "1d10",    "rs": 30 },
+    "soldier": { "sta": 30, "to_hit": 50, "damage": "1d10+2",  "rs": 40 },
+    "elite":   { "sta": 50, "to_hit": 60, "damage": "2d10",    "rs": 50 },
+    "boss":    { "sta": 90, "to_hit": 65, "damage": "2d10+4",  "rs": 55 }
+  },
+  "seu_per_shot": { "source": "house", "value": 2 },
+  "unarmed_damage": { "source": "house", "formula": "1d5" },
+  "xp_awards": {
+    "source": "house",
+    "survival": 1,
+    "ability_checks": 1,
+    "skill_checks": 1,
+    "discovery": 2,
+    "roleplaying": 2,
+    "innovation": 2,
+    "victory": 3,
+    "mission_success": 5
+  },
+  "xp_cap_per_turn": { "source": "house", "value": 15 },
+  "credit_bands": {
+    "source": "house",
+    "token": 10,
+    "small": 50,
+    "medium": 200,
+    "large": 750,
+    "fortune": 2500
+  },
+  "hazard_dice": {
+    "source": "house",
+    "minor": "1d10",
+    "moderate": "2d10",
+    "severe": "3d10"
+  },
+  "first_aid_healing": { "source": "house", "formula": "1d10" },
+  "stimdose_heal": { "source": "house", "value": 10 },
+  "per_turn_caps": {
+    "source": "house",
+    "player_rows_max": 2,
+    "combat_start_max_enemies": 4,
+    "xp_award_max": 15,
+    "credit_rewards_max": 1,
+    "inventory_add_max": 3,
+    "inventory_item_chars_max": 60,
+    "inventory_total_max": 40,
+    "status_add_max": 3,
+    "status_chars_max": 30,
+    "npc_updates_max": 5,
+    "npc_total_max": 5,
+    "faction_standing_step": 1,
+    "faction_standing_min": -5,
+    "faction_standing_max": 5,
+    "journal_chars_max": 300,
+    "choices_min": 2,
+    "choices_max": 4,
+    "choice_chars_max": 120,
+    "summary_chars_max": 600
+  }
+}

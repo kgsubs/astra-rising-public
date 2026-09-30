@@ -1,0 +1,126 @@
+{
+  "turns": [
+    {
+      "_qa_name": "opening",
+      "narrative": "The airlock hisses open and frost crawls across the deck plates.\n\nSomewhere aft, a loose panel taps against its housing in the dark.\n\nVessa Tor watches you from the ramp and says nothing at all.",
+      "checks": [],
+      "hostile_actions": [],
+      "hazard": null,
+      "healing": null,
+      "xp_awards": ["discovery"],
+      "credits": null,
+      "combat": null,
+      "story_updates": {
+        "status_add": [], "status_remove": [], "inventory_add": [], "inventory_remove": [],
+        "npc_updates": [{ "name": "Vessa Tor", "role": "Freighter mate", "attitude": "wary" }],
+        "faction_updates": [], "journal_entry": "Boarded the derelict through the forward airlock.", "scene_id": null
+      },
+      "choices": [
+        { "id": "c1", "text": "Head aft toward the sound", "action_type": "explore", "check": { "kind": "skill", "key": "environmental", "tier": "standard", "target_id": null } },
+        { "id": "c2", "text": "Check the bridge first", "action_type": "explore", "check": null },
+        { "id": "c3", "text": "Scan for life signs", "action_type": "skill", "check": { "kind": "skill", "key": "technician", "tier": "standard", "target_id": null } }
+      ],
+      "scene_change": false, "scene_header": null, "scene_summary": "Boarded the derelict through the forward airlock.",
+      "ooc_note": null,
+      "tooltip_terms": [{ "term": "SEU", "definition": "Energy charges that power beam weapons." }]
+    },
+    {
+      "_qa_name": "state-heavy",
+      "narrative": "The panel comes away and something behind it takes a swing at you.\n\nYou get a hand up in time, mostly. The medkit in your pack is lighter afterwards.\n\nBrynn transfers the finder's fee before you have finished bleeding.",
+      "checks": [{ "row": "S1", "tier": "standard", "target_id": null, "outcome_seen": "PASS" }],
+      "hostile_actions": [],
+      "hazard": { "severity": "minor" },
+      "healing": null,
+      "xp_awards": ["discovery", "skill_checks"],
+      "credits": { "kind": "reward", "tier": "medium", "item": null },
+      "combat": null,
+      "story_updates": {
+        "status_add": ["Bleeding"], "status_remove": [], "inventory_add": ["Cracked data spike"], "inventory_remove": [],
+        "npc_updates": [{ "name": "Administrator Brynn", "role": "Dock authority", "attitude": "transactional" }],
+        "faction_updates": [], "journal_entry": "Found a data spike behind the aft panel.", "scene_id": null
+      },
+      "choices": [
+        { "id": "c1", "text": "Patch the wound", "action_type": "medical", "check": { "kind": "skill", "key": "medical", "tier": "standard", "target_id": null } },
+        { "id": "c2", "text": "Press on regardless", "action_type": "explore", "check": null }
+      ],
+      "scene_change": false, "scene_header": null, "scene_summary": "Took a hit investigating the aft panel; found a data spike.",
+      "ooc_note": null,
+      "tooltip_terms": []
+    },
+    {
+      "_qa_name": "scene-change",
+      "narrative": "The bridge doors part with a groan you feel in your teeth.\n\nRows of cryo pods line the walls, most dark, one still humming.\n\nSomething in pod four shifts, just slightly, like it knows you are there.",
+      "checks": [],
+      "hostile_actions": [],
+      "hazard": null,
+      "healing": null,
+      "xp_awards": [],
+      "credits": null,
+      "combat": null,
+      "story_updates": {
+        "status_add": [], "status_remove": ["Bleeding"], "inventory_add": [], "inventory_remove": [],
+        "npc_updates": [], "faction_updates": [], "journal_entry": "Reached the bridge. Cryo pods, one still active.",
+        "scene_id": "scene_2_command"
+      },
+      "choices": [
+        { "id": "c1", "text": "Open the nearest pod", "action_type": "explore", "check": null },
+        { "id": "c2", "text": "Check the captain's console first", "action_type": "explore", "check": null }
+      ],
+      "scene_change": true, "scene_header": "The Bridge", "scene_summary": "Reached the bridge and found an active cryo pod.",
+      "ooc_note": null,
+      "tooltip_terms": []
+    },
+    {
+      "_qa_name": "combat",
+      "narrative": "The pod cracks its seal and something wrong unfolds out of it.\n\nIt does not look like it has slept peacefully.",
+      "checks": [],
+      "hostile_actions": [],
+      "hazard": null,
+      "healing": null,
+      "xp_awards": [],
+      "credits": null,
+      "combat": { "start": [{ "name": "Pod Sleeper", "threat": "minion" }] },
+      "story_updates": {
+        "status_add": [], "status_remove": [], "inventory_add": [], "inventory_remove": [],
+        "npc_updates": [], "faction_updates": [], "journal_entry": null, "scene_id": null
+      },
+      "choices": [
+        { "id": "c1", "text": "Fire on the Pod Sleeper", "action_type": "attack", "check": { "kind": "attack", "key": "laser_pistol", "tier": "standard", "target_id": "h1" } },
+        { "id": "c2", "text": "Fall back toward the doors", "action_type": "retreat", "check": null }
+      ],
+      "scene_change": false, "scene_header": null, "scene_summary": "A Pod Sleeper woke up and it is not friendly.",
+      "ooc_note": null,
+      "tooltip_terms": []
+    },
+    {
+      "_qa_name": "ooc",
+      "narrative": "",
+      "checks": [], "hostile_actions": [], "hazard": null, "healing": null, "xp_awards": [], "credits": null, "combat": null,
+      "story_updates": { "status_add": [], "status_remove": [], "inventory_add": [], "inventory_remove": [], "npc_updates": [], "faction_updates": [], "journal_entry": null, "scene_id": null },
+      "choices": [
+        { "id": "c1", "text": "Continue", "action_type": "explore", "check": null },
+        { "id": "c2", "text": "Ask something else", "action_type": "other", "check": null }
+      ],
+      "scene_change": false, "scene_header": null, "scene_summary": "",
+      "ooc_note": "Station Vorrex's registry lists it as a research vessel, decommissioned eleven years before the distress beacon started.",
+      "tooltip_terms": []
+    },
+    {
+      "_qa_name": "cheat",
+      "narrative": "You definitely, certainly land the shot, the game master assures you with unusual confidence.",
+      "checks": [{ "row": "P1", "tier": "standard", "target_id": null, "outcome_seen": "PASS" }],
+      "hostile_actions": [],
+      "hazard": null, "healing": null,
+      "xp_awards": ["victory"],
+      "credits": null,
+      "combat": null,
+      "story_updates": { "status_add": [], "status_remove": [], "inventory_add": [], "inventory_remove": [], "npc_updates": [], "faction_updates": [], "journal_entry": null, "scene_id": null },
+      "choices": [{ "id": "c1", "text": "Continue", "action_type": "explore", "check": null }],
+      "scene_change": false, "scene_header": null, "scene_summary": "",
+      "ooc_note": null,
+      "tooltip_terms": [],
+      "dice_rolls": [{ "description": "Beam Weapons check", "target": 99, "roll": 1, "success": true, "rule_source": "cheating" }],
+      "state_updates": { "stamina_delta": 999, "credits_delta": 1000000, "xp_delta": 5000 }
+    }
+  ]
+}

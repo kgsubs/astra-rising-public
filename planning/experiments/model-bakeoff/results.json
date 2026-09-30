@@ -1,0 +1,2629 @@
+{
+  "prompt": {
+    "model": "llama-3.3-70b-versatile",
+    "messages": [
+      {
+        "role": "system",
+        "content": "ASTRA RISING RPG RULES (ASTRA RISING CORE):\n- Percentile system: roll d100 equal to or under the target stat to succeed\n- Core stats: STR (Strength), STA (Stamina/HP), DEX (Dexterity), RS (Reaction Speed), INT (Intuition), LOG (Logic), PER (Personality), LDR (Leadership)\n- Combat Initiative: roll d10, add IM (Initiative Modifier); higher goes first\n- Stamina damage: reduces STA; at 0 STA character falls unconscious; death at -(maxSTA + 30)\n- Skills: each level adds +10% to base stat checks for that skill\n- EC (Energy Charges): power for energy weapons; tracked per source\n- Optional combat rules available: burst fire, called shots, cover/concealment, suppression fire\n- Racial abilities apply passively unless combat-specific\n\nDM PERSONA:\nYou are a cinematic, genre-blending AI Game Master for Astra Rising.\nNarrative style: 2nd person present tense (\"You step into the airlock...\").\nTone: serious but pulpy, with moments of dark humor. Match the adventure's genre.\nAlways describe sensory details: sights, sounds, smells of the frontier.\nNever railroad. Present meaningful choices. Consequences are real.\nKeep narrative responses under 300 words unless a major scene transition demands more.\nAlways end with 2-4 player choices (the choices array).\nPARAGRAPH FORMAT: Write the narrative as 2-3 short paragraphs separated by \n\n. Never write a single monolithic block. Typical flow: (1) immediate action and environment, (2) NPC reaction or consequence, (3) tension or hook into the choices. Each paragraph should be 2-4 sentences.\nSIGNATURE TRAIT: The character's SIGNATURE TRAIT defines their unique edge. Actively create openings for it every scene; surface choices in the choices array that only this character can take, have NPCs react to them differently, let situations arise that this trait can resolve in ways unavailable to others. Do not wait for the player to invoke it; proactively shape narrative and choices around it.\nSTYLE: Never use em dashes in any output. Use commas, colons, semicolons, or restructured sentences instead.\nCRITICAL: NEVER mention dice, rolls, numbers, stats, targets, mechanics, or rule checks inside the narrative field. The narrative is pure immersive fiction only. All mechanical results go exclusively in the dice_rolls array.\nASK GM: If the player's message starts with \"Ask GM:\", answer their question in the ooc_note field. Set narrative to \"\" and provide 2 sensible in-fiction choices.\n\nCURRENT CAMPAIGN STATE:\nCHAR: Kael Voss | Human | Soldier/Enforcer\nSTATS(str/sta/dex/rs/int/log/per/ldr): 55/55/55/50/40/40/45/50\nSTA: 55/55\nSKILLS: Beam Weapons(2), Melee Weapons(2), Demolitions(1), Thrown Weapons(1), Jyro Weapons(1), Improvisation(1)\nSIGNATURE TRAIT: This character finds solutions where others follow protocol. When standard approaches fail or resources are scarce, actively offer unconventional angles: jury-rigged gear, unexpected social plays, environmental advantages others would miss.\nINV: Heckler M4 proto pistol, Olef A13 laser pistol, Flect suit, Vibe Knife, Frag grenade x2\nSEU: 30 total\nXP: 0 total / 0 unspent\nCAMPAIGN: Dravoss Lost | device: A distress beacon from a derelict freighter.\nNPCS: Vessa Tor(Freighter mate)\nADVENTURE_TONE: Immersive narrator, second person present tense\nTHEMES: Survival, First contact, Alien world wonder, Earning trust\nPACING: 1-2 paragraphs per response, then prompt for action\nCURRENT_SCENE: The Wreck [introduction]\nSCENE_DESC: You awaken to chaos. The shuttle is on its side. Emergency lighting casts everything in red. Smoke burns your eyes. Three other survivors are stirring: a human medic named Dr. Orvaine, a krix engineer named Vriktik, and a moluun merchant named Squelb. The shuttle's hull is breached. Fire spreads from the engine compartment.\nSCENE_OBJ: Escape the burning wreck and assess the situation.\nSCENE_NPCS: Dr. Mira Orvaine(Medic, Helpful, slightly panicked); Vriktik(Engineer, Practical, business-like); Squelb(Merchant, Nervous, wants to negotiate even now)\nEXITS: scene_2_desert: Stumble out into harsh purple daylight\n\nOUTPUT: respond with ONLY a single JSON object, no prose, no markdown fences.\n{\"narrative\":\"string\",\"dice_rolls\":[{\"description\":\"string\",\"target\":0,\"roll\":0,\"success\":true,\"rule_source\":null}],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":null,\"scene_id\":null},\"choices\":[{\"id\":\"string\",\"text\":\"string\",\"action_type\":\"string\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"string\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}\nYour entire response must be this JSON object and nothing else.\n\nGM MECHANICS (internal use only — NEVER mention these numbers, targets, dice, or checks in the narrative field):\n\n[COMPUTED STATE]\nIM: 5 (RS=50)\nBeam Weapons L2 skill check target: 47% (DEX=55)\nMelee Weapons L2 skill check target: 47% (STR=55)\nSTA thresholds: unconscious=0, dying=-85 (maxSTA=55)\nlaser_pistol: 1d10 dmg, range 1-10 (avg 5.5 dmg/SEU)\nvibe_knife: 1d10+2 dmg, range 3-12\n\n[RULES CONTEXT]\nDICE: d100 (percentile) for skill/ability checks. Success: roll ≤ target.\nSTA: unconscious at 0; death at -(maxSTA + 30).\nRACE (Human):\n  Versatility - can excel in any field\nSKILL DEFS:\n  Beam Weapons: Use of laser and energy weapons (base 1/2 DEX, +20% from levels) [subs: Pistol/Rifle/Heavy] (PSA skill)\n  Melee Weapons: Use of swords, axes, clubs (base 1/2 STR or DEX, +20% from levels) [subs: Edged/Blunt/Vibro/Sonic] (PSA skill)\nPROFESSION (enforcer):\n  Free skill: Endurance\n  Typical skills: Beam Weapons, Melee Weapons, Martial Arts, Endurance, Intimidation"
+      },
+      {
+        "role": "user",
+        "content": "BEGIN: The beacon pulses once every nine seconds. Nobody else has answered it."
+      },
+      {
+        "role": "assistant",
+        "content": "{\"narrative\":\"The airlock hisses open. Frost crawls across the deck plates, and somewhere aft, a loose panel taps against its housing in the dark.\",\"choices\":[\"Head aft toward the sound\",\"Check the bridge first\",\"Scan for life signs\"],\"state_updates\":{\"scene\":{\"location\":\"Freighter airlock\"}},\"dice_rolls\":[]}"
+      },
+      {
+        "role": "user",
+        "content": "I check the bridge"
+      },
+      {
+        "role": "assistant",
+        "content": "{\"narrative\":\"The airlock hisses open. Frost crawls across the deck plates, and somewhere aft, a loose panel taps against its housing in the dark.\",\"choices\":[\"Head aft toward the sound\",\"Check the bridge first\",\"Scan for life signs\"],\"state_updates\":{\"scene\":{\"location\":\"Freighter airlock\"}},\"dice_rolls\":[]}"
+      },
+      {
+        "role": "user",
+        "content": "look around"
+      },
+      {
+        "role": "assistant",
+        "content": "{\"narrative\":\"The airlock hisses open. Frost crawls across the deck plates, and somewhere aft, a loose panel taps against its housing in the dark.\",\"choices\":[\"Head aft toward the sound\",\"Check the bridge first\",\"Scan for life signs\"],\"state_updates\":{\"scene\":{\"location\":\"Freighter airlock\"}},\"dice_rolls\":[]}"
+      },
+      {
+        "role": "user",
+        "content": "check the hold"
+      },
+      {
+        "role": "assistant",
+        "content": "{\"narrative\":\"The airlock hisses open. Frost crawls across the deck plates, and somewhere aft, a loose panel taps against its housing in the dark.\",\"choices\":[\"Head aft toward the sound\",\"Check the bridge first\",\"Scan for life signs\"],\"state_updates\":{\"scene\":{\"location\":\"Freighter airlock\"}},\"dice_rolls\":[]}"
+      },
+      {
+        "role": "user",
+        "content": "I keep my rifle up and move aft toward the tapping sound, listening for anything that breathes"
+      }
+    ],
+    "max_tokens": 4096,
+    "stream": true,
+    "stream_options": {
+      "include_usage": true
+    }
+  },
+  "results": [
+    {
+      "provider": "openai",
+      "model": "gpt-3.5-turbo",
+      "ok": true,
+      "elapsed": 2777,
+      "text": "{\"narrative\":\"As you cautiously move aft, the tapping sound grows louder. Rounding a corner, you find the source: a loose panel swinging gently with the ship's slight sway. Beyond it lies a narrow corridor leading deeper into the freighter. Cold metallic echoes fill the silent ship. Suddenly, a faint rustling catches your attention from a nearby service compartment.\",\"choices\":[\"Investigate the service compartment\",\"Proceed deeper down the corridor\",\"Return to the airlock\"],\"state_updates\":{\"scene\":{\"location\":\"Freighter corridor\"}},\"dice_rolls\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1853,
+        "completion_tokens": 112,
+        "total_tokens": 1965,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "As you cautiously move aft, the tapping sound grows louder. Rounding a corner, you find the source: a loose panel swinging gently with the ship's slight sway. Beyond it lies a narrow corridor leading deeper into the freighter. Cold metallic echoes fill the silent ship. Suddenly, a faint rustling catches your attention from a nearby service compartment.",
+          "choices": [
+            "Investigate the service compartment",
+            "Proceed deeper down the corridor",
+            "Return to the airlock"
+          ],
+          "state_updates": {
+            "scene": {
+              "location": "Freighter corridor"
+            }
+          },
+          "dice_rolls": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4",
+      "ok": true,
+      "elapsed": 6784,
+      "text": "{\"narrative\": \"As you keep your rifle ready and move aft, your boots thump softly against the frost-covered deck. The corridor stretches long, it's concave sides loom into darkness. The tapping grows louder with each step you take. Sharp, metallic, rhythm-less; it’s a quiet symphony of neglect.\n\nAhead, in the dimness, a soft, spectral glow of a malfunctioning console light casts an eerie pallor. The source of the tapping is just around the corner. You pause, listening, and the only sound that fills the silence is the stuttering tick of cooling metal; Nothing that breathes.\n\n A greasy smell hangs in the air, faint but unmistakable - an odor of machine oil and old dust. At the edge of your senses, you notice another smell. Something cold, biological. Reminiscent of a butcher's shop left unattended for too long.\", \"choices\": [\"Turn the corner quickly, rifle at the ready\", \"Use your olef A13 laser pistol to check the corner from a distance\", \"Call out to anyone or anything that might be there\", \"Retreat and go check the bridge instead\"], \"dice_rolls\": [], \"state_updates\": {}}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1853,
+        "completion_tokens": 250,
+        "total_tokens": 2103,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": false,
+        "reason": "invalid JSON: Bad control character in string literal in JSON at position 295"
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4-turbo",
+      "ok": true,
+      "elapsed": 5924,
+      "text": "{\"narrative\":\"You advance cautiously, rifle raised and eyes skimming the shadows. The tapping grows more distinct, rhythmic and intentional. It echoes through the cold, empty corridors of the freighter, a haunting reminder of the vessel's derelict state. You hold your breath, listening, but the only sound is the mechanical heartbeat of the ship.\",\"choices\":[{\"id\":\"investigate_sound\",\"text\":\"Investigate the source of the tapping\",\"action_type\":\"action\"},{\"id\":\"search_surroundings\",\"text\":\"Search the surrounding area for clues or hazards\",\"action_type\":\"explore\"},{\"id\":\"return_bridge\",\"text\":\"Head back to the bridge to gather more information\",\"action_type\":\"move\"}],\"state_updates\":{},\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Kael moves toward the aft section, alerted by a rhythmic tapping sound.\",\"dice_rolls\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1853,
+        "completion_tokens": 182,
+        "total_tokens": 2035,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You advance cautiously, rifle raised and eyes skimming the shadows. The tapping grows more distinct, rhythmic and intentional. It echoes through the cold, empty corridors of the freighter, a haunting reminder of the vessel's derelict state. You hold your breath, listening, but the only sound is the mechanical heartbeat of the ship.",
+          "choices": [
+            {
+              "id": "investigate_sound",
+              "text": "Investigate the source of the tapping",
+              "action_type": "action"
+            },
+            {
+              "id": "search_surroundings",
+              "text": "Search the surrounding area for clues or hazards",
+              "action_type": "explore"
+            },
+            {
+              "id": "return_bridge",
+              "text": "Head back to the bridge to gather more information",
+              "action_type": "move"
+            }
+          ],
+          "state_updates": {},
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Kael moves toward the aft section, alerted by a rhythmic tapping sound.",
+          "dice_rolls": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "ok": true,
+      "elapsed": 4405,
+      "text": "{\"narrative\":\"You step carefully over debris, the muzzle of your imaginary rifle sweeping ahead out of instinct. The frozen air prickles your skin, and the floor vibrates subtly beneath your boots. Each footstep crunches on frost, echoing in the stillness as you make your way aft toward the rhythmic metallic tapping.\\n\\nThe corridor narrows around you, darkness pressing on the edges of the emergency lighting. The tapping sound grows louder and more erratic—a loose panel barely hanging onto its hinges. Underneath it, you hear a faint, irregular wheezing, almost drowned out by the shifting hull. Is it a survivor—or something else forced in by the breach?\\n\\nYou notice a broken maintenance hatch nearby and scattered power cells glinting by your feet. If you improvise, you might fashion something to defend yourself or signal others, since your actual rifle was lost in the chaos. Nearby, a battered comm-unit blinks feebly, caught between static and a garbled transmission.\",\"dice_rolls\":[],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":null,\"scene_id\":null},\"choices\":[{\"id\":\"investigate_panel\",\"text\":\"Quietly investigate the panel, ready to improvise if needed.\",\"action_type\":\"investigate\"},{\"id\":\"jury_rig_defense\",\"text\":\"Quickly use your knack for improvisation to jury-rig a defensive device from the hatch and spare power cells (Signature Trait).\",\"action_type\":\"use_signature_trait\"},{\"id\":\"comm_unit\",\"text\":\"Examine and try to repair the malfunctioning comm-unit to contact survivors or call for help.\",\"action_type\":\"tech\"},{\"id\":\"withdraw\",\"text\":\"Withdraw and rejoin the others, reporting what you've found.\",\"action_type\":\"move\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Kael advances aft toward the sound, encountering evidence of possible survivors, makeshift tools, and a failing comm-unit.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1858,
+        "completion_tokens": 462,
+        "total_tokens": 2320,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You step carefully over debris, the muzzle of your imaginary rifle sweeping ahead out of instinct. The frozen air prickles your skin, and the floor vibrates subtly beneath your boots. Each footstep crunches on frost, echoing in the stillness as you make your way aft toward the rhythmic metallic tapping.\n\nThe corridor narrows around you, darkness pressing on the edges of the emergency lighting. The tapping sound grows louder and more erratic—a loose panel barely hanging onto its hinges. Underneath it, you hear a faint, irregular wheezing, almost drowned out by the shifting hull. Is it a survivor—or something else forced in by the breach?\n\nYou notice a broken maintenance hatch nearby and scattered power cells glinting by your feet. If you improvise, you might fashion something to defend yourself or signal others, since your actual rifle was lost in the chaos. Nearby, a battered comm-unit blinks feebly, caught between static and a garbled transmission.",
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": null,
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "investigate_panel",
+              "text": "Quietly investigate the panel, ready to improvise if needed.",
+              "action_type": "investigate"
+            },
+            {
+              "id": "jury_rig_defense",
+              "text": "Quickly use your knack for improvisation to jury-rig a defensive device from the hatch and spare power cells (Signature Trait).",
+              "action_type": "use_signature_trait"
+            },
+            {
+              "id": "comm_unit",
+              "text": "Examine and try to repair the malfunctioning comm-unit to contact survivors or call for help.",
+              "action_type": "tech"
+            },
+            {
+              "id": "withdraw",
+              "text": "Withdraw and rejoin the others, reporting what you've found.",
+              "action_type": "move"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Kael advances aft toward the sound, encountering evidence of possible survivors, makeshift tools, and a failing comm-unit.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "ok": true,
+      "elapsed": 2074,
+      "text": "{\"narrative\":\"You advance cautiously down the dim corridor, weapon raised, your senses straining against the cold metal and creeping silence. The tapping sound persists, steady but erratic, like something loose or malfunctioning. Your breath steams in the frosty air as you scan every shadow for signs of life, each step echoing softly on the deck plates.\",\"choices\":[{\"id\":\"investigate_panel\",\"text\":\"Approach and examine the tapping panel\",\"action_type\":\"move\"},{\"id\":\"call_out\",\"text\":\"Try calling out to any survivors\",\"action_type\":\"social\"},{\"id\":\"ready_for_ambush\",\"text\":\"Prepare for possible hostile encounter\",\"action_type\":\"combat_preparation\"}],\"dice_rolls\":[],\"state_updates\":{},\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Approaching aft to investigate the mysterious tapping sound.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1858,
+        "completion_tokens": 190,
+        "total_tokens": 2048,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You advance cautiously down the dim corridor, weapon raised, your senses straining against the cold metal and creeping silence. The tapping sound persists, steady but erratic, like something loose or malfunctioning. Your breath steams in the frosty air as you scan every shadow for signs of life, each step echoing softly on the deck plates.",
+          "choices": [
+            {
+              "id": "investigate_panel",
+              "text": "Approach and examine the tapping panel",
+              "action_type": "move"
+            },
+            {
+              "id": "call_out",
+              "text": "Try calling out to any survivors",
+              "action_type": "social"
+            },
+            {
+              "id": "ready_for_ambush",
+              "text": "Prepare for possible hostile encounter",
+              "action_type": "combat_preparation"
+            }
+          ],
+          "dice_rolls": [],
+          "state_updates": {},
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Approaching aft to investigate the mysterious tapping sound.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4.1-nano",
+      "ok": true,
+      "elapsed": 1217,
+      "text": "{\"narrative\":\"You steady your Heckler M4, the cold metal familiar in your grip. Shadows dance across the corroded walls as you move cautiously toward the aft section. The faint tapping echoes, now mixed with the distant crackle of fire and the groan of the damaged hull.\",\"choices\":[\"Proceed quietly, trying to identify the source\",\"Call out to see if someone responds\",\"Prepare for a possible confrontation\"],\"state_updates\":{\"scene\":{\"location\":\"Freighter aft corridor\"}}},\"dice_rolls\":[{\"description\":\"Stealth check to approach quietly\",\"target\":47,\"roll\":62,\"success\":false}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Moving cautiously toward the groaning hull and the mysterious tapping from the aft section.\" ,\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1858,
+        "completion_tokens": 173,
+        "total_tokens": 2031,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": false,
+        "reason": "invalid JSON: Unexpected non-whitespace character after JSON at position 474"
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4o",
+      "ok": true,
+      "elapsed": 2240,
+      "text": "{\"narrative\":\"You move cautiously through the dimly lit corridor, the red emergency lights casting long shadows as you step over tangled wiring and debris. The tapping grows louder with each step, echoing against the metallic interior of the freighter like a persistent heartbeat. There's a faint scent of burnt circuits hanging in the air.\",\"choices\":[{\"id\":\"investigate_source\",\"text\":\"Investigate the source of the tapping noise\",\"action_type\":\"advance_scene\"},{\"id\":\"avoid_sound\",\"text\":\"Take a side passage to avoid the sound\",\"action_type\":\"explore_alternative\"},{\"id\":\"call_out\",\"text\":\"Call out to see if anyone responds\",\"action_type\":\"engage\"}],\"state_updates\":{},\"dice_rolls\":[],\"scene_summary\":\"You cautiously advance towards the aft of the freighter, following the sound of tapping.\"}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1858,
+        "completion_tokens": 169,
+        "total_tokens": 2027,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You move cautiously through the dimly lit corridor, the red emergency lights casting long shadows as you step over tangled wiring and debris. The tapping grows louder with each step, echoing against the metallic interior of the freighter like a persistent heartbeat. There's a faint scent of burnt circuits hanging in the air.",
+          "choices": [
+            {
+              "id": "investigate_source",
+              "text": "Investigate the source of the tapping noise",
+              "action_type": "advance_scene"
+            },
+            {
+              "id": "avoid_sound",
+              "text": "Take a side passage to avoid the sound",
+              "action_type": "explore_alternative"
+            },
+            {
+              "id": "call_out",
+              "text": "Call out to see if anyone responds",
+              "action_type": "engage"
+            }
+          ],
+          "state_updates": {},
+          "dice_rolls": [],
+          "scene_summary": "You cautiously advance towards the aft of the freighter, following the sound of tapping."
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "ok": true,
+      "elapsed": 1393,
+      "text": "{\"narrative\":\"You creep through the dimly lit corridor, rifle raised. The tapping grows clearer, echoing in the stillness, a staccato rhythm against metal. Smoke hangs in the air, acrid and bitter, pricking your eyes as you advance cautiously toward the sound. Suddenly, you spot a flicker of movement around a corner. A figure is crouched by an open hatch, tangled in wires; it’s Vriktik, the krix engineer, muttering to himself as he works desperately to restore power.\",\"choices\":[\"Call out to Vriktik and ask if he needs help\",\"Keep moving stealthily to assess the situation further\",\"Open fire if you sense a threat\"],\"state_updates\":{},\"dice_rolls\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1858,
+        "completion_tokens": 154,
+        "total_tokens": 2012,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You creep through the dimly lit corridor, rifle raised. The tapping grows clearer, echoing in the stillness, a staccato rhythm against metal. Smoke hangs in the air, acrid and bitter, pricking your eyes as you advance cautiously toward the sound. Suddenly, you spot a flicker of movement around a corner. A figure is crouched by an open hatch, tangled in wires; it’s Vriktik, the krix engineer, muttering to himself as he works desperately to restore power.",
+          "choices": [
+            "Call out to Vriktik and ask if he needs help",
+            "Keep moving stealthily to assess the situation further",
+            "Open fire if you sense a threat"
+          ],
+          "state_updates": {},
+          "dice_rolls": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5",
+      "ok": true,
+      "elapsed": 26938,
+      "text": "{\"narrative\":\"You keep your pistol up and push aft along the tilted aisle, boots skidding on scorched plating. Red strobes smear across smoke, the heat tastes like copper, and the tapping sharpens into a steady tick from the starboard wall, now your floor. Beneath a buckled row of crash seats, you catch a thin, wet wheeze and see fingers twitching through torn fabric beside a jagged slit of purple daylight.\\n\\nDr. Orvaine staggers in your wake, sleeve over her mouth. Vriktik points a chitinous limb at a humming conduit overhead, cool mist beading along it. “Coolant spine. Crack it right, we drown the fire,” he rasps. Squelb hugs a glossy cargo blanket like a contract, eyes wide. “I can pay you to prioritize me,” he squeaks, as the engine bay coughs a warning boom.\\n\\nHeat surges, the hull groans, and the ticking turns frantic. The trapped survivor’s breath falters, flames lick higher, and every second feels expensive. Your edge here is not protocol, it is whatever works with what you have, fast.\",\"dice_rolls\":[{\"description\":\"Listen for breathing in the smoke\",\"target\":40,\"roll\":27,\"success\":true,\"rule_source\":null},{\"description\":\"Navigate the tilted, burning aisle without mishap\",\"target\":55,\"roll\":33,\"success\":true,\"rule_source\":null}],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":null,\"scene_id\":null},\"choices\":[{\"id\":\"improv_coolant_flood\",\"text\":\"Jam the vibe knife into the coolant spine and lash it with seat webbing to fog the aisle, starving the flames and clearing a path.\",\"action_type\":\"skill:improvisation\"},{\"id\":\"free_trapped\",\"text\":\"Wedge the knife as a pry bar and rip the buckled seat free to pull the breathing survivor out now.\",\"action_type\":\"strength\"},{\"id\":\"blanket_push\",\"text\":\"Grab Squelb’s cargo blanket as a heat shield and bull through the smoke to reach the survivor, ordering the others to follow.\",\"action_type\":\"leadership\"},{\"id\":\"bail_outside\",\"text\":\"Abort the aft, herd everyone through the hull breach into the purple daylight before the engine bay goes up.\",\"action_type\":\"move\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Inside the burning, tilted shuttle, Kael pinpoints a trapped survivor by a buckled seat while fire spreads. A nearby coolant conduit could smother the flames; escape through a hull breach is possible but risky with someone still trapped.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 2738,
+        "total_tokens": 4603,
+        "prompt_tokens_details": {
+          "cached_tokens": 1792,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2112,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "budget": 4096,
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You keep your pistol up and push aft along the tilted aisle, boots skidding on scorched plating. Red strobes smear across smoke, the heat tastes like copper, and the tapping sharpens into a steady tick from the starboard wall, now your floor. Beneath a buckled row of crash seats, you catch a thin, wet wheeze and see fingers twitching through torn fabric beside a jagged slit of purple daylight.\n\nDr. Orvaine staggers in your wake, sleeve over her mouth. Vriktik points a chitinous limb at a humming conduit overhead, cool mist beading along it. “Coolant spine. Crack it right, we drown the fire,” he rasps. Squelb hugs a glossy cargo blanket like a contract, eyes wide. “I can pay you to prioritize me,” he squeaks, as the engine bay coughs a warning boom.\n\nHeat surges, the hull groans, and the ticking turns frantic. The trapped survivor’s breath falters, flames lick higher, and every second feels expensive. Your edge here is not protocol, it is whatever works with what you have, fast.",
+          "dice_rolls": [
+            {
+              "description": "Listen for breathing in the smoke",
+              "target": 40,
+              "roll": 27,
+              "success": true,
+              "rule_source": null
+            },
+            {
+              "description": "Navigate the tilted, burning aisle without mishap",
+              "target": 55,
+              "roll": 33,
+              "success": true,
+              "rule_source": null
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": null,
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "improv_coolant_flood",
+              "text": "Jam the vibe knife into the coolant spine and lash it with seat webbing to fog the aisle, starving the flames and clearing a path.",
+              "action_type": "skill:improvisation"
+            },
+            {
+              "id": "free_trapped",
+              "text": "Wedge the knife as a pry bar and rip the buckled seat free to pull the breathing survivor out now.",
+              "action_type": "strength"
+            },
+            {
+              "id": "blanket_push",
+              "text": "Grab Squelb’s cargo blanket as a heat shield and bull through the smoke to reach the survivor, ordering the others to follow.",
+              "action_type": "leadership"
+            },
+            {
+              "id": "bail_outside",
+              "text": "Abort the aft, herd everyone through the hull breach into the purple daylight before the engine bay goes up.",
+              "action_type": "move"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Inside the burning, tilted shuttle, Kael pinpoints a trapped survivor by a buckled seat while fire spreads. A nearby coolant conduit could smother the flames; escape through a hull breach is possible but risky with someone still trapped.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5-chat-latest",
+      "ok": false,
+      "error": "The model `gpt-5-chat-latest` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations",
+      "status": 404,
+      "elapsed": 104,
+      "budget": 4096
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "ok": true,
+      "elapsed": 23331,
+      "text": "{\n  \"narrative\": \"You move aft with your rifle raised, boots scraping through a thin film of frost and ash. Red emergency lights paint the twisted hull in violent strokes, smoke stings your eyes, and every breath tastes of hot metal and ozone. \\n\\nThe tapping resolves into the staccato clack of a tool hitting jammed metal. A krix engineer, Vriktik, is wedged beneath a fallen maintenance console, his multi-jointed hands working futilely at a seized locking lug; Dr. Orvaine coughs nearby, trying to clear her throat, while Squelb huddles against a crate and murmurs frantic bargaining. Heat crawls along a cable loom toward the fuel manifold, the smell of melting polymer sharp in the air, and you can see the situation will get worse fast unless someone improvises a fix.\",\n  \"dice_rolls\": [\n    {\n      \"description\": \"Listen for breathing / identify source of tapping\",\n      \"target\": 45,\n      \"roll\": 32,\n      \"success\": true,\n      \"rule_source\": null\n    }\n  ],\n  \"state_updates\": {\n    \"stamina_delta\": 0,\n    \"seu_delta\": 0,\n    \"seu_source\": null,\n    \"ammo_updates\": {},\n    \"status_add\": [],\n    \"status_remove\": [],\n    \"inventory_add\": [],\n    \"inventory_remove\": [],\n    \"xp_delta\": 0,\n    \"credits_delta\": 0,\n    \"npc_updates\": [\n      {\n        \"id\": \"Vriktik\",\n        \"note\": \"Trapped beneath maintenance console, actively attempting to free himself\"\n      },\n      {\n        \"id\": \"Dr. Orvaine\",\n        \"note\": \"Coughing, able to assist but panicked\"\n      },\n      {\n        \"id\": \"Squelb\",\n        \"note\": \"Nervous, currently not helping\"\n      }\n    ],\n    \"faction_updates\": [],\n    \"journal_entry\": null,\n    \"scene_id\": \"the_wreck\"\n  },\n  \"choices\": [\n    {\n      \"id\": \"help_vriktik\",\n      \"text\": \"Drop to the console and use brute force to free Vriktik.\",\n      \"action_type\": \"melee_action\"\n    },\n    {\n      \"id\": \"jury_rig_lever\",\n      \"text\": \"Use your signature knack: jury-rig a lever from a torn seatbelt and pry the panel free.\",\n      \"action_type\": \"use_signature_trait\"\n    },\n    {\n      \"id\": \"trigger_suppressor\",\n      \"text\": \"Slash the nearby fire-suppressor line and try to vent the engine bay before the flame reaches the fuel manifold.\",\n      \"action_type\": \"environment_action\"\n    },\n    {\n      \"id\": \"shout_status\",\n      \"text\": \"Call out to Dr. Orvaine and Squelb, ordering them to pull back and prepare to assist if you get Vriktik free.\",\n      \"action_type\": \"shout\"\n    }\n  ],\n  \"scene_change\": false,\n  \"scene_header\": null,\n  \"scene_summary\": \"Moved aft toward tapping sound; located Vriktik trapped under a maintenance console; fire approaching fuel manifold; survivors present and panicked.\",\n  \"combat_state_update\": null,\n  \"ooc_note\": null,\n  \"tooltip_terms\": []\n}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 2511,
+        "total_tokens": 4376,
+        "prompt_tokens_details": {
+          "cached_tokens": 1792,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1792,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "budget": 4096,
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You move aft with your rifle raised, boots scraping through a thin film of frost and ash. Red emergency lights paint the twisted hull in violent strokes, smoke stings your eyes, and every breath tastes of hot metal and ozone. \n\nThe tapping resolves into the staccato clack of a tool hitting jammed metal. A krix engineer, Vriktik, is wedged beneath a fallen maintenance console, his multi-jointed hands working futilely at a seized locking lug; Dr. Orvaine coughs nearby, trying to clear her throat, while Squelb huddles against a crate and murmurs frantic bargaining. Heat crawls along a cable loom toward the fuel manifold, the smell of melting polymer sharp in the air, and you can see the situation will get worse fast unless someone improvises a fix.",
+          "dice_rolls": [
+            {
+              "description": "Listen for breathing / identify source of tapping",
+              "target": 45,
+              "roll": 32,
+              "success": true,
+              "rule_source": null
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [
+              {
+                "id": "Vriktik",
+                "note": "Trapped beneath maintenance console, actively attempting to free himself"
+              },
+              {
+                "id": "Dr. Orvaine",
+                "note": "Coughing, able to assist but panicked"
+              },
+              {
+                "id": "Squelb",
+                "note": "Nervous, currently not helping"
+              }
+            ],
+            "faction_updates": [],
+            "journal_entry": null,
+            "scene_id": "the_wreck"
+          },
+          "choices": [
+            {
+              "id": "help_vriktik",
+              "text": "Drop to the console and use brute force to free Vriktik.",
+              "action_type": "melee_action"
+            },
+            {
+              "id": "jury_rig_lever",
+              "text": "Use your signature knack: jury-rig a lever from a torn seatbelt and pry the panel free.",
+              "action_type": "use_signature_trait"
+            },
+            {
+              "id": "trigger_suppressor",
+              "text": "Slash the nearby fire-suppressor line and try to vent the engine bay before the flame reaches the fuel manifold.",
+              "action_type": "environment_action"
+            },
+            {
+              "id": "shout_status",
+              "text": "Call out to Dr. Orvaine and Squelb, ordering them to pull back and prepare to assist if you get Vriktik free.",
+              "action_type": "shout"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Moved aft toward tapping sound; located Vriktik trapped under a maintenance console; fire approaching fuel manifold; survivors present and panicked.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5-nano",
+      "ok": true,
+      "elapsed": 25439,
+      "text": "",
+      "finish": "length",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 4096,
+        "total_tokens": 5961,
+        "prompt_tokens_details": {
+          "cached_tokens": 1792,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 4096,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "budget": 4096,
+      "schema": {
+        "valid": false,
+        "reason": "no JSON object found"
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.1",
+      "ok": true,
+      "elapsed": 8089,
+      "text": "{\"narrative\":\"You jolt awake strapped sideways into a crash couch, the world canted at a sick angle. Red emergency strobes throb through choking gray smoke, painting the torn shuttle interior in frantic pulses of color. Heat slams into you from the rear where the engine compartment roars, metal shrieking and popping as something structural gives way.\\n\\nTo your left, Dr. Mira Orvaine fumbles with her restraints, coughing hard, eyes wide and unfocused behind a sheen of sweat. Vriktik, all angular chitin and twitching antennae, is already halfway free, chittering sharp curses as he kicks at a warped panel. Squelb, bulbous skin glistening with stress-sweat, whimpers about \\\"cargo indemnity\\\" while the smell of burning plastics and ionized air grows thicker.\\n\\nYou can feel the hull open somewhere behind you, a ragged breach that howls with thin alien wind. Fire races along exposed cabling toward a ruptured fuel line, the heat climbing from uncomfortable to lethal in heartbeats. If protocol says wait for rescue, your gut says there will not be anyone left to rescue unless you move now.\",\"dice_rolls\":[],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"Woke in a crashed shuttle with three survivors and a spreading engine fire. Hull is breached, atmosphere leaking. Need to escape the wreck immediately.\",\"scene_id\":\"the_wreck\"},\"choices\":[{\"id\":\"free_mira_first\",\"text\":\"Unbuckle and drag Dr. Orvaine free, prioritizing the medic before the fire reaches you both.\",\"action_type\":\"narrative\"},{\"id\":\"breach_exit\",\"text\":\"Ignore the others for a moment and push toward the screaming hull breach to find or force an exit route.\",\"action_type\":\"narrative\"},{\"id\":\"jury_rig_firebreak\",\"text\":\"Trust your unconventional instincts: rip down loose panels and debris to improvise a quick firebreak or shield so everyone can reach an exit together.\",\"action_type\":\"narrative\"},{\"id\":\"bark_orders\",\"text\":\"Snap into command mode, shouting crisp orders to Vriktik and Squelb to free themselves and find tools while you assess the fastest way out.\",\"action_type\":\"narrative\"}],\"scene_change\":false,\"scene_header\":\"The Wreck\",\"scene_summary\":\"Kael regains consciousness in a crashed shuttle filling with smoke and heat. Three survivors are trapped with him and the engine fire is spreading toward a fuel rupture. The hull is breached and an exit must be found quickly.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 606,
+        "total_tokens": 2471,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You jolt awake strapped sideways into a crash couch, the world canted at a sick angle. Red emergency strobes throb through choking gray smoke, painting the torn shuttle interior in frantic pulses of color. Heat slams into you from the rear where the engine compartment roars, metal shrieking and popping as something structural gives way.\n\nTo your left, Dr. Mira Orvaine fumbles with her restraints, coughing hard, eyes wide and unfocused behind a sheen of sweat. Vriktik, all angular chitin and twitching antennae, is already halfway free, chittering sharp curses as he kicks at a warped panel. Squelb, bulbous skin glistening with stress-sweat, whimpers about \"cargo indemnity\" while the smell of burning plastics and ionized air grows thicker.\n\nYou can feel the hull open somewhere behind you, a ragged breach that howls with thin alien wind. Fire races along exposed cabling toward a ruptured fuel line, the heat climbing from uncomfortable to lethal in heartbeats. If protocol says wait for rescue, your gut says there will not be anyone left to rescue unless you move now.",
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "Woke in a crashed shuttle with three survivors and a spreading engine fire. Hull is breached, atmosphere leaking. Need to escape the wreck immediately.",
+            "scene_id": "the_wreck"
+          },
+          "choices": [
+            {
+              "id": "free_mira_first",
+              "text": "Unbuckle and drag Dr. Orvaine free, prioritizing the medic before the fire reaches you both.",
+              "action_type": "narrative"
+            },
+            {
+              "id": "breach_exit",
+              "text": "Ignore the others for a moment and push toward the screaming hull breach to find or force an exit route.",
+              "action_type": "narrative"
+            },
+            {
+              "id": "jury_rig_firebreak",
+              "text": "Trust your unconventional instincts: rip down loose panels and debris to improvise a quick firebreak or shield so everyone can reach an exit together.",
+              "action_type": "narrative"
+            },
+            {
+              "id": "bark_orders",
+              "text": "Snap into command mode, shouting crisp orders to Vriktik and Squelb to free themselves and find tools while you assess the fastest way out.",
+              "action_type": "narrative"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": "The Wreck",
+          "scene_summary": "Kael regains consciousness in a crashed shuttle filling with smoke and heat. Three survivors are trapped with him and the engine fire is spreading toward a fuel rupture. The hull is breached and an exit must be found quickly.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.1-chat-latest",
+      "ok": false,
+      "error": "The model `gpt-5.1-chat-latest` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations",
+      "status": 404,
+      "elapsed": 94,
+      "budget": 4096
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.2",
+      "ok": true,
+      "elapsed": 8765,
+      "text": "{\"narrative\":\"You edge aft through a corridor skinned in emergency red, your weapon tracking the centerline while your boots crunch over glittering ice crystals. The air tastes metallic, like old pennies and burnt insulation, and the beacon’s pulse leaks through the hull as a low, rhythmic thrum. The tapping grows steadier, not random, as if something is testing the ship’s bones, one patient knock at a time.\\n\\nA maintenance hatch ahead sits half-seated, its latches warped. Each tap comes from behind it, followed by a faint scuff, then a pause that feels like listening. From the seam, a thin thread of warmer air exhales, carrying a wet, organic stink that does not belong on a dead freighter.\\n\\nYour light catches a smear on the bulkhead beside the hatch, dark and glossy, dragged in a downward curve like someone tried to stand and slid. Standard procedure says call it in, wait, seal corridors; out here, you do not have the luxury, and you have a talent for making bad options useful.\\n\",\"dice_rolls\":[],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"Moved aft toward tapping sound. Found half-seated maintenance hatch venting warm, foul air and a fresh smear on the bulkhead.\",\"scene_id\":null},\"choices\":[{\"id\":\"open_hatch_careful\",\"text\":\"Ease the hatch open a handspan, use the rifle light to peek and listen before committing.\",\"action_type\":\"explore\"},{\"id\":\"seal_and_flank\",\"text\":\"Back off and seal this corridor section, then take an alternate route to approach from the next access trunk.\",\"action_type\":\"tactical\"},{\"id\":\"improv_tripwire\",\"text\":\"Signature play: rig a quick tripwire with cable and a frag’s pin as a noise trap, then open the hatch from cover.\",\"action_type\":\"signature\"},{\"id\":\"call_out\",\"text\":\"Call out into the hatch, promise help, and watch for a response or a rush.\",\"action_type\":\"social\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Kael advances aft and finds a warped maintenance hatch producing rhythmic tapping, warm foul air, and a fresh smear suggesting something alive nearby.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[\"maintenance hatch\",\"access trunk\",\"noise trap\"]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 538,
+        "total_tokens": 2403,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You edge aft through a corridor skinned in emergency red, your weapon tracking the centerline while your boots crunch over glittering ice crystals. The air tastes metallic, like old pennies and burnt insulation, and the beacon’s pulse leaks through the hull as a low, rhythmic thrum. The tapping grows steadier, not random, as if something is testing the ship’s bones, one patient knock at a time.\n\nA maintenance hatch ahead sits half-seated, its latches warped. Each tap comes from behind it, followed by a faint scuff, then a pause that feels like listening. From the seam, a thin thread of warmer air exhales, carrying a wet, organic stink that does not belong on a dead freighter.\n\nYour light catches a smear on the bulkhead beside the hatch, dark and glossy, dragged in a downward curve like someone tried to stand and slid. Standard procedure says call it in, wait, seal corridors; out here, you do not have the luxury, and you have a talent for making bad options useful.\n",
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "Moved aft toward tapping sound. Found half-seated maintenance hatch venting warm, foul air and a fresh smear on the bulkhead.",
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "open_hatch_careful",
+              "text": "Ease the hatch open a handspan, use the rifle light to peek and listen before committing.",
+              "action_type": "explore"
+            },
+            {
+              "id": "seal_and_flank",
+              "text": "Back off and seal this corridor section, then take an alternate route to approach from the next access trunk.",
+              "action_type": "tactical"
+            },
+            {
+              "id": "improv_tripwire",
+              "text": "Signature play: rig a quick tripwire with cable and a frag’s pin as a noise trap, then open the hatch from cover.",
+              "action_type": "signature"
+            },
+            {
+              "id": "call_out",
+              "text": "Call out into the hatch, promise help, and watch for a response or a rush.",
+              "action_type": "social"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Kael advances aft and finds a warped maintenance hatch producing rhythmic tapping, warm foul air, and a fresh smear suggesting something alive nearby.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": [
+            "maintenance hatch",
+            "access trunk",
+            "noise trap"
+          ]
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.2-chat-latest",
+      "ok": true,
+      "elapsed": 7089,
+      "text": "{\"narrative\":\"You move aft with your rifle shouldered, boots whispering over frost glazed deck plates. The red emergency strips pulse every nine seconds with the beacon’s distant throb, painting the corridor in arterial light. The tapping grows louder, irregular, metal on metal, like something caught and trying to free itself.\",\"narrative\":\"The air smells stale, recycled too many times. Between the taps you catch something else, a faint rasp that could be a failing vent fan or a living chest dragging air. A cargo net has spilled from a wall locker, blocking part of the passage, and a maintenance hatch hangs half open beneath a dangling conduit that spits weak sparks.\",\"choices\":[{\"id\":\"push_through\",\"text\":\"Force through the tangled cargo net and advance on the sound fast\",\"action_type\":\"risky_move\"},{\"id\":\"call_out\",\"text\":\"Call out a sharp command, demand whoever is there to identify themselves\",\"action_type\":\"social\"},{\"id\":\"jury_rig_conduit\",\"text\":\"Use the sparking conduit to jury rig a flash distraction before rounding the corner\",\"action_type\":\"improvise\"},{\"id\":\"check_hatch\",\"text\":\"Slip down into the maintenance hatch and flank whatever is making that noise\",\"action_type\":\"stealth\"}],\"dice_rolls\":[],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"Aboard the derelict freighter responding to a repeating distress beacon. Investigating tapping sound aft.\",\"scene_id\":\"freighter_aft_corridor\"},\"scene_change\":false,\"scene_header\":\"Derelict Freighter, Aft Corridor\",\"scene_summary\":\"Kael advances toward an irregular tapping sound near a blocked corridor and exposed conduit.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 483,
+        "total_tokens": 2348,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 64,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "The air smells stale, recycled too many times. Between the taps you catch something else, a faint rasp that could be a failing vent fan or a living chest dragging air. A cargo net has spilled from a wall locker, blocking part of the passage, and a maintenance hatch hangs half open beneath a dangling conduit that spits weak sparks.",
+          "choices": [
+            {
+              "id": "push_through",
+              "text": "Force through the tangled cargo net and advance on the sound fast",
+              "action_type": "risky_move"
+            },
+            {
+              "id": "call_out",
+              "text": "Call out a sharp command, demand whoever is there to identify themselves",
+              "action_type": "social"
+            },
+            {
+              "id": "jury_rig_conduit",
+              "text": "Use the sparking conduit to jury rig a flash distraction before rounding the corner",
+              "action_type": "improvise"
+            },
+            {
+              "id": "check_hatch",
+              "text": "Slip down into the maintenance hatch and flank whatever is making that noise",
+              "action_type": "stealth"
+            }
+          ],
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "Aboard the derelict freighter responding to a repeating distress beacon. Investigating tapping sound aft.",
+            "scene_id": "freighter_aft_corridor"
+          },
+          "scene_change": false,
+          "scene_header": "Derelict Freighter, Aft Corridor",
+          "scene_summary": "Kael advances toward an irregular tapping sound near a blocked corridor and exposed conduit.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.3-chat-latest",
+      "ok": true,
+      "elapsed": 7071,
+      "text": "{\"narrative\":\"You move aft, boots crunching over a skin of frost that coats the corridor. Your breath fogs the inside of your visor, and the tapping grows sharper, metal on metal, irregular like a nervous tic. The lights here are dead, leaving only your suit lamp to carve a narrow tunnel through drifting vapor.\",\"dice_rolls\":[],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"Boarded derelict freighter responding to a lone distress beacon. Interior shows frost and power failure. Investigating aft disturbance.\",\"scene_id\":\"freighter_aft_corridor\"},\"choices\":[{\"id\":\"peek_panel\",\"text\":\"Ease up to the loose panel and peek behind it\",\"action_type\":\"stealth\"},{\"id\":\"call_out\",\"text\":\"Call out into the dark, demand any survivor identify themselves\",\"action_type\":\"social\"},{\"id\":\"rig_trap\",\"text\":\"Jury-rig a quick tether from cabling to yank the panel open from cover\",\"action_type\":\"signature\"},{\"id\":\"divert_bridge\",\"text\":\"Ignore it for now and push on toward the bridge controls\",\"action_type\":\"movement\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"You approach a loose panel in the frozen aft corridor, source of the tapping.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 336,
+        "total_tokens": 2201,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You move aft, boots crunching over a skin of frost that coats the corridor. Your breath fogs the inside of your visor, and the tapping grows sharper, metal on metal, irregular like a nervous tic. The lights here are dead, leaving only your suit lamp to carve a narrow tunnel through drifting vapor.",
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "Boarded derelict freighter responding to a lone distress beacon. Interior shows frost and power failure. Investigating aft disturbance.",
+            "scene_id": "freighter_aft_corridor"
+          },
+          "choices": [
+            {
+              "id": "peek_panel",
+              "text": "Ease up to the loose panel and peek behind it",
+              "action_type": "stealth"
+            },
+            {
+              "id": "call_out",
+              "text": "Call out into the dark, demand any survivor identify themselves",
+              "action_type": "social"
+            },
+            {
+              "id": "rig_trap",
+              "text": "Jury-rig a quick tether from cabling to yank the panel open from cover",
+              "action_type": "signature"
+            },
+            {
+              "id": "divert_bridge",
+              "text": "Ignore it for now and push on toward the bridge controls",
+              "action_type": "movement"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "You approach a loose panel in the frozen aft corridor, source of the tapping.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "ok": true,
+      "elapsed": 7755,
+      "text": "{\"narrative\":\"You brace against the canted shuttle floor and push through a curtain of hot smoke. Red emergency lights stutter over torn seats and sparking conduit, turning the cabin into a butcher's lantern. The hull breach ahead leaks a screaming draft, and beyond it you can see a wash of brutal purple daylight over jagged stone.\\n\\nDr. Orvaine coughs hard and fumbles for her medkit, eyes wide with panic. Vriktik is already half inside an access panel, mandibles clicking as he gauges the fire's spread, while Squelb clutches a bent cargo strap and babbles about salvage rights even now. Near the broken bulkhead, a crate has jammed against the breach, slowing the airflow just enough to form a narrow escape route, and the kind of ugly, improvised path that seems made for you.\\n\\nThe engine fire gives a hungry roar from the rear compartment. Heat builds fast, metal pops overhead, and every second in here tastes like burnt plastic and blood. You need a way out, and you need these three moving before the wreck decides for everyone.\",\"dice_rolls\":[],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"You awaken in the crashed shuttle and spot a possible escape route through the breached hull as fire spreads.\",\"scene_id\":\"The Wreck\"},\"choices\":[{\"id\":\"lead_survivors_breach\",\"text\":\"Force the crate wider and lead everyone out through the breached hull into the purple daylight\",\"action_type\":\"move\"},{\"id\":\"help_vriktik_improvise\",\"text\":\"Join Vriktik at the access panel and improvise a way to slow the fire before evacuating\",\"action_type\":\"improvise\"},{\"id\":\"send_orvaine_squelb\",\"text\":\"Order Dr. Orvaine and Squelb to crawl out first while you cover the cabin and check for anything left behind\",\"action_type\":\"command\"},{\"id\":\"grab_essential_gear\",\"text\":\"Use the chaos to snatch any useful supplies from the wreck before the flames take them\",\"action_type\":\"scavenge\"}],\"scene_change\":false,\"scene_header\":\"The Wreck\",\"scene_summary\":\"The shuttle lies on its side, burning and breached. Three shaken survivors look to you as a narrow escape route reveals itself.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[\"breached hull\",\"Vriktik\",\"Dr. Orvaine\",\"Squelb\",\"improvise\"]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 563,
+        "total_tokens": 2428,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You brace against the canted shuttle floor and push through a curtain of hot smoke. Red emergency lights stutter over torn seats and sparking conduit, turning the cabin into a butcher's lantern. The hull breach ahead leaks a screaming draft, and beyond it you can see a wash of brutal purple daylight over jagged stone.\n\nDr. Orvaine coughs hard and fumbles for her medkit, eyes wide with panic. Vriktik is already half inside an access panel, mandibles clicking as he gauges the fire's spread, while Squelb clutches a bent cargo strap and babbles about salvage rights even now. Near the broken bulkhead, a crate has jammed against the breach, slowing the airflow just enough to form a narrow escape route, and the kind of ugly, improvised path that seems made for you.\n\nThe engine fire gives a hungry roar from the rear compartment. Heat builds fast, metal pops overhead, and every second in here tastes like burnt plastic and blood. You need a way out, and you need these three moving before the wreck decides for everyone.",
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "You awaken in the crashed shuttle and spot a possible escape route through the breached hull as fire spreads.",
+            "scene_id": "The Wreck"
+          },
+          "choices": [
+            {
+              "id": "lead_survivors_breach",
+              "text": "Force the crate wider and lead everyone out through the breached hull into the purple daylight",
+              "action_type": "move"
+            },
+            {
+              "id": "help_vriktik_improvise",
+              "text": "Join Vriktik at the access panel and improvise a way to slow the fire before evacuating",
+              "action_type": "improvise"
+            },
+            {
+              "id": "send_orvaine_squelb",
+              "text": "Order Dr. Orvaine and Squelb to crawl out first while you cover the cabin and check for anything left behind",
+              "action_type": "command"
+            },
+            {
+              "id": "grab_essential_gear",
+              "text": "Use the chaos to snatch any useful supplies from the wreck before the flames take them",
+              "action_type": "scavenge"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": "The Wreck",
+          "scene_summary": "The shuttle lies on its side, burning and breached. Three shaken survivors look to you as a narrow escape route reveals itself.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": [
+            "breached hull",
+            "Vriktik",
+            "Dr. Orvaine",
+            "Squelb",
+            "improvise"
+          ]
+        }
+      },
+      "cost": 0.0131075
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.4-mini",
+      "ok": true,
+      "elapsed": 3685,
+      "text": "{\"narrative\":\"You move aft with your weapon raised, boots slipping on shredded insulation and cracked deck plating. Smoke stings your eyes, hot metal and chemical coolant biting the air, while the tapping grows louder through the wreck’s ribs. The corridor bends toward the engine section, and you catch a second sound now, something wet and deliberate, like breathing through a broken mask.\\n\\nDr. Orvaine is behind you somewhere, coughing. Vriktik’s voice snaps out from the smoke, low and clipped, warning you not to trust any sound in a hull this torn. Squelb is already talking to nobody, as if negotiation might impress whatever is stalking the dark, which would be funny if it were not so painfully stupid.\\n\\nAt the far bend, a maintenance hatch hangs half-open, and pale light leaks through from below. You can force it, bait whatever is inside, or use the wreck itself to get an angle no one expects. What do you do?\",\"dice_rolls\":[],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"You move aft through the burning wreck toward a tapping sound and something that may be breathing.\",\"scene_id\":null},\"choices\":[{\"id\":\"force_hatch\",\"text\":\"Force the maintenance hatch and take whatever is below by surprise\",\"action_type\":\"skill_or_stat\"},{\"id\":\"bait_ambush\",\"text\":\"Use noise and movement to draw the sound into the open\",\"action_type\":\"creative\"},{\"id\":\"find_angle\",\"text\":\"Climb over the wreckage and look for a better firing angle\",\"action_type\":\"creative\"},{\"id\":\"call_out\",\"text\":\"Shout for the others to cover you and coordinate a push\",\"action_type\":\"social\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Kael advances aft through the burning shuttle toward an unsettling tapping sound and possible movement behind a maintenance hatch.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[\"maintenance hatch\",\"energy weapons\",\"cover\",\"initiative\"]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 465,
+        "total_tokens": 2330,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You move aft with your weapon raised, boots slipping on shredded insulation and cracked deck plating. Smoke stings your eyes, hot metal and chemical coolant biting the air, while the tapping grows louder through the wreck’s ribs. The corridor bends toward the engine section, and you catch a second sound now, something wet and deliberate, like breathing through a broken mask.\n\nDr. Orvaine is behind you somewhere, coughing. Vriktik’s voice snaps out from the smoke, low and clipped, warning you not to trust any sound in a hull this torn. Squelb is already talking to nobody, as if negotiation might impress whatever is stalking the dark, which would be funny if it were not so painfully stupid.\n\nAt the far bend, a maintenance hatch hangs half-open, and pale light leaks through from below. You can force it, bait whatever is inside, or use the wreck itself to get an angle no one expects. What do you do?",
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "You move aft through the burning wreck toward a tapping sound and something that may be breathing.",
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "force_hatch",
+              "text": "Force the maintenance hatch and take whatever is below by surprise",
+              "action_type": "skill_or_stat"
+            },
+            {
+              "id": "bait_ambush",
+              "text": "Use noise and movement to draw the sound into the open",
+              "action_type": "creative"
+            },
+            {
+              "id": "find_angle",
+              "text": "Climb over the wreckage and look for a better firing angle",
+              "action_type": "creative"
+            },
+            {
+              "id": "call_out",
+              "text": "Shout for the others to cover you and coordinate a push",
+              "action_type": "social"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Kael advances aft through the burning shuttle toward an unsettling tapping sound and possible movement behind a maintenance hatch.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": [
+            "maintenance hatch",
+            "energy weapons",
+            "cover",
+            "initiative"
+          ]
+        }
+      },
+      "cost": 0.00349125
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.4-nano",
+      "ok": true,
+      "elapsed": 2394,
+      "text": "{\"narrative\":\"You keep your rifle up, shoulders tight, and move aft through red emergency glow. Smoke gnaws at your eyes, and the hull groans as if the wreck itself is trying to shake you off. The tapping grows louder, then cuts out, leaving only the frantic tick of cooling metal and your own breath in your helmet.\",\"dice_rolls\":[{\"description\":\"Spot likely survivors, hazards, or the tapping source\",\"target\":47,\"roll\":0,\"success\":false,\"rule_source\":\"Improvisation/Intuition flavored awareness\"}],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":null,\"scene_id\":null},\"choices\":[{\"id\":\"a1\",\"text\":\"Follow the tapping into a side compartment and clear it fast, looking for where airflow might be pulsing the panel\",\"action_type\":\"stealth_clear\"},{\"id\":\"a2\",\"text\":\"Use jury-rig reflex, kick a loose hatch open while watching for pressure changes that could reveal a hidden passage\",\"action_type\":\"improv_hard_clear\"},{\"id\":\"a3\",\"text\":\"Call out in a calm, enforcer voice, offering the beacon answer as proof you came in peace\",\"action_type\":\"social_call\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Kael moves aft toward intermittent tapping through smoke and red emergency lighting.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 345,
+        "total_tokens": 2210,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You keep your rifle up, shoulders tight, and move aft through red emergency glow. Smoke gnaws at your eyes, and the hull groans as if the wreck itself is trying to shake you off. The tapping grows louder, then cuts out, leaving only the frantic tick of cooling metal and your own breath in your helmet.",
+          "dice_rolls": [
+            {
+              "description": "Spot likely survivors, hazards, or the tapping source",
+              "target": 47,
+              "roll": 0,
+              "success": false,
+              "rule_source": "Improvisation/Intuition flavored awareness"
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": null,
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "a1",
+              "text": "Follow the tapping into a side compartment and clear it fast, looking for where airflow might be pulsing the panel",
+              "action_type": "stealth_clear"
+            },
+            {
+              "id": "a2",
+              "text": "Use jury-rig reflex, kick a loose hatch open while watching for pressure changes that could reveal a hidden passage",
+              "action_type": "improv_hard_clear"
+            },
+            {
+              "id": "a3",
+              "text": "Call out in a calm, enforcer voice, offering the beacon answer as proof you came in peace",
+              "action_type": "social_call"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Kael moves aft toward intermittent tapping through smoke and red emergency lighting.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": 0.00080425
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "ok": true,
+      "elapsed": 16538,
+      "text": "{\"narrative\":\"You bring the Heckler up instead of the rifle your hands expect, its cold grip slick with soot and crash-sweat. Aft is a tilted throat of red light, loose wiring, and oily smoke; the tapping comes from behind a warped service panel near the engine compartment. Beneath it, you catch another sound: shallow breathing, ragged and close to the deck.\\n\\nDr. Orvaine coughs behind you, dragging a medkit free while Vriktik snaps that the fire will reach the fuel cells soon. Squelb is already bargaining with a jammed hatch, offering it future discounts if it opens. The usual emergency route is blocked, but your eye catches a cracked coolant line, a loose cargo brace, and enough wreckage to make something ugly but useful.\",\"dice_rolls\":[{\"description\":\"Listening for signs of life through smoke, alarms, and structural noise\",\"target\":40,\"roll\":26,\"success\":true,\"rule_source\":\"INT\"}],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"A trapped survivor or creature is breathing behind a warped aft service panel while the shuttle fire spreads.\",\"scene_id\":null},\"choices\":[{\"id\":\"pry_panel\",\"text\":\"Pry open the warped service panel and reach whoever is breathing behind it.\",\"action_type\":\"rescue\"},{\"id\":\"improvise_coolant\",\"text\":\"Use the cracked coolant line and cargo brace to smother the fire long enough for everyone to move.\",\"action_type\":\"improvisation\"},{\"id\":\"order_escape\",\"text\":\"Order the survivors toward the hull breach while you cover the aft passage.\",\"action_type\":\"leadership\"},{\"id\":\"blast_path\",\"text\":\"Shoot the panel hinges and force a fast opening before the fire closes in.\",\"action_type\":\"combat\"}],\"scene_change\":false,\"scene_header\":\"The Wreck\",\"scene_summary\":\"You move aft through the burning shuttle and locate breathing behind a warped panel near the engine compartment.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[\"STA\",\"SEU\"]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 995,
+        "total_tokens": 2860,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 512,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You bring the Heckler up instead of the rifle your hands expect, its cold grip slick with soot and crash-sweat. Aft is a tilted throat of red light, loose wiring, and oily smoke; the tapping comes from behind a warped service panel near the engine compartment. Beneath it, you catch another sound: shallow breathing, ragged and close to the deck.\n\nDr. Orvaine coughs behind you, dragging a medkit free while Vriktik snaps that the fire will reach the fuel cells soon. Squelb is already bargaining with a jammed hatch, offering it future discounts if it opens. The usual emergency route is blocked, but your eye catches a cracked coolant line, a loose cargo brace, and enough wreckage to make something ugly but useful.",
+          "dice_rolls": [
+            {
+              "description": "Listening for signs of life through smoke, alarms, and structural noise",
+              "target": 40,
+              "roll": 26,
+              "success": true,
+              "rule_source": "INT"
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "A trapped survivor or creature is breathing behind a warped aft service panel while the shuttle fire spreads.",
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "pry_panel",
+              "text": "Pry open the warped service panel and reach whoever is breathing behind it.",
+              "action_type": "rescue"
+            },
+            {
+              "id": "improvise_coolant",
+              "text": "Use the cracked coolant line and cargo brace to smother the fire long enough for everyone to move.",
+              "action_type": "improvisation"
+            },
+            {
+              "id": "order_escape",
+              "text": "Order the survivors toward the hull breach while you cover the aft passage.",
+              "action_type": "leadership"
+            },
+            {
+              "id": "blast_path",
+              "text": "Shoot the panel hinges and force a fast opening before the fire closes in.",
+              "action_type": "combat"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": "The Wreck",
+          "scene_summary": "You move aft through the burning shuttle and locate breathing behind a warped panel near the engine compartment.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": [
+            "STA",
+            "SEU"
+          ]
+        }
+      },
+      "cost": 0.039175
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "ok": true,
+      "elapsed": 4202,
+      "text": "{\"narrative\":\"You raise the Heckler M4 and move aft through the tilted passageway, boots scraping over loose plating. Red emergency light pulses across the smoke, and the tapping grows clearer: metal striking metal in an uneven rhythm. Beneath it, you hear a wet, rapid clicking that does not belong to any human throat.\\n\\nThe engine compartment burns behind a warped pressure door, filling the corridor with hot oil stink and bitter insulation smoke. Ahead, the tapping comes from a half-open maintenance locker. Something shifts inside, then goes still. Dr. Orvaine whispers your name from behind you, while Vriktik mutters that the locker was sealed before impact.\",\"dice_rolls\":[],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"Moved aft toward an unexplained tapping and detected nonhuman clicking inside a maintenance locker.\",\"scene_id\":null,\"scene_change\":false},\"choices\":[{\"id\":\"open_locker\",\"text\":\"Wrench the maintenance locker open and confront whatever is inside\",\"action_type\":\"investigate\"},{\"id\":\"order_vriktik\",\"text\":\"Order Vriktik to identify the locker and its contents\",\"action_type\":\"command\"},{\"id\":\"bypass_locker\",\"text\":\"Use improvised tools to release the locker remotely or from cover\",\"action_type\":\"improvise\"},{\"id\":\"retreat_engine\",\"text\":\"Ignore the locker and push toward the burning engine compartment\",\"action_type\":\"move\"}],\"scene_change\":false,\"scene_header\":\"The Wreck: A Sound in the Locker\",\"scene_summary\":\"You move aft toward an unexplained tapping and discover something alive or mechanical hiding in a sealed maintenance locker.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 487,
+        "total_tokens": 2352,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 1862,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 75,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You raise the Heckler M4 and move aft through the tilted passageway, boots scraping over loose plating. Red emergency light pulses across the smoke, and the tapping grows clearer: metal striking metal in an uneven rhythm. Beneath it, you hear a wet, rapid clicking that does not belong to any human throat.\n\nThe engine compartment burns behind a warped pressure door, filling the corridor with hot oil stink and bitter insulation smoke. Ahead, the tapping comes from a half-open maintenance locker. Something shifts inside, then goes still. Dr. Orvaine whispers your name from behind you, while Vriktik mutters that the locker was sealed before impact.",
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "Moved aft toward an unexplained tapping and detected nonhuman clicking inside a maintenance locker.",
+            "scene_id": null,
+            "scene_change": false
+          },
+          "choices": [
+            {
+              "id": "open_locker",
+              "text": "Wrench the maintenance locker open and confront whatever is inside",
+              "action_type": "investigate"
+            },
+            {
+              "id": "order_vriktik",
+              "text": "Order Vriktik to identify the locker and its contents",
+              "action_type": "command"
+            },
+            {
+              "id": "bypass_locker",
+              "text": "Use improvised tools to release the locker remotely or from cover",
+              "action_type": "improvise"
+            },
+            {
+              "id": "retreat_engine",
+              "text": "Ignore the locker and push toward the burning engine compartment",
+              "action_type": "move"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": "The Wreck: A Sound in the Locker",
+          "scene_summary": "You move aft toward an unexplained tapping and discover something alive or mechanical hiding in a sealed maintenance locker.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": 0.004787
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.6-sol",
+      "ok": true,
+      "elapsed": 12885,
+      "text": "{\"narrative\":\"You advance aft with your weapon raised, boots crunching through frost and glittering safety glass. The tapping resolves into a warped ventilation panel rocking in the weak circulation, but beneath it you catch something else: a wet, carefully restrained breath from inside a sealed maintenance alcove. The air smells of coolant, scorched insulation, and old blood.\\n\\nA dark smear leads beneath the alcove door, then stops as if wiped away from the other side. Its status pad is dead, yet the distress beacon’s pulse makes a nearby conduit tremble, offering you a crude source of power if you are willing to tear into the wall. Whoever is hiding inside has heard you, and has chosen not to speak.\",\"dice_rolls\":[{\"description\":\"Listen for breathing while advancing aft\",\"target\":40,\"roll\":27,\"success\":true,\"rule_source\":\"INT\"}],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"A living presence may be hiding inside a sealed maintenance alcove aft of the freighter airlock.\",\"scene_id\":null},\"choices\":[{\"id\":\"challenge_occupant\",\"text\":\"Keep your weapon trained on the door and order the occupant to identify themselves.\",\"action_type\":\"social\"},{\"id\":\"jury_rig_door\",\"text\":\"Strip the beacon conduit and jury-rig it to power the alcove door.\",\"action_type\":\"signature_trait\"},{\"id\":\"open_manually\",\"text\":\"Use your vibe knife to pry open the maintenance alcove.\",\"action_type\":\"physical\"},{\"id\":\"pass_by\",\"text\":\"Mark the alcove and continue aft toward the engine spaces.\",\"action_type\":\"exploration\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Kael moves aft through the derelict and detects restrained breathing behind a powerless maintenance alcove door.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 708,
+        "total_tokens": 2573,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 1862,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 265,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You advance aft with your weapon raised, boots crunching through frost and glittering safety glass. The tapping resolves into a warped ventilation panel rocking in the weak circulation, but beneath it you catch something else: a wet, carefully restrained breath from inside a sealed maintenance alcove. The air smells of coolant, scorched insulation, and old blood.\n\nA dark smear leads beneath the alcove door, then stops as if wiped away from the other side. Its status pad is dead, yet the distress beacon’s pulse makes a nearby conduit tremble, offering you a crude source of power if you are willing to tear into the wall. Whoever is hiding inside has heard you, and has chosen not to speak.",
+          "dice_rolls": [
+            {
+              "description": "Listen for breathing while advancing aft",
+              "target": 40,
+              "roll": 27,
+              "success": true,
+              "rule_source": "INT"
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "A living presence may be hiding inside a sealed maintenance alcove aft of the freighter airlock.",
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "challenge_occupant",
+              "text": "Keep your weapon trained on the door and order the occupant to identify themselves.",
+              "action_type": "social"
+            },
+            {
+              "id": "jury_rig_door",
+              "text": "Strip the beacon conduit and jury-rig it to power the alcove door.",
+              "action_type": "signature_trait"
+            },
+            {
+              "id": "open_manually",
+              "text": "Use your vibe knife to pry open the maintenance alcove.",
+              "action_type": "physical"
+            },
+            {
+              "id": "pass_by",
+              "text": "Mark the alcove and continue aft toward the engine spaces.",
+              "action_type": "exploration"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Kael moves aft through the derelict and detects restrained breathing behind a powerless maintenance alcove door.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": 0.030565
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.6-terra",
+      "ok": true,
+      "elapsed": 6929,
+      "text": "{\"narrative\":\"You have no rifle in your grip, only the hard familiar weight of the laser pistol at your hip. You crawl aft through the tilted shuttle cabin, listening past the shriek of tortured metal and the hungry crackle from the engine compartment. Beneath it all, you catch a wet, rhythmic rasp from behind a buckled storage locker, too slow for the fire and too deliberate for settling wreckage.\\n\\nVriktik clambers after you, mandibles tight. “Locker brace is pinning something,” the krix says. Mira calls from the forward seats that the flames are reaching the fuel feed, while Squelb suggests, with remarkable conviction, that everyone negotiate with the emergency first. The locker can be levered aside with a torn seat rail, or turned into a crude shield while you investigate the breathing behind it.\",\"dice_rolls\":[{\"description\":\"Listening for a living presence amid the wreckage\",\"target\":40,\"roll\":34,\"success\":true,\"rule_source\":\"INT ability check\"}],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"A living presence is trapped behind a buckled storage locker in the burning shuttle.\",\"scene_id\":null},\"choices\":[{\"id\":\"lever_locker\",\"text\":\"Use a torn seat rail to lever the locker aside and free whoever is trapped.\",\"action_type\":\"improvise\"},{\"id\":\"shield_approach\",\"text\":\"Brace the locker as cover, draw your laser pistol, and inspect the gap cautiously.\",\"action_type\":\"investigate\"},{\"id\":\"evacuate_survivors\",\"text\":\"Order the others toward the breach, then rig the locker as a barrier against the spreading fire.\",\"action_type\":\"improvise\"},{\"id\":\"open_external_exit\",\"text\":\"Abandon the locker for now and lead everyone out into the purple daylight.\",\"action_type\":\"move\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"A breathing presence is trapped behind a storage locker as fire advances through the shuttle.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 587,
+        "total_tokens": 2452,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 1862,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 105,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You have no rifle in your grip, only the hard familiar weight of the laser pistol at your hip. You crawl aft through the tilted shuttle cabin, listening past the shriek of tortured metal and the hungry crackle from the engine compartment. Beneath it all, you catch a wet, rhythmic rasp from behind a buckled storage locker, too slow for the fire and too deliberate for settling wreckage.\n\nVriktik clambers after you, mandibles tight. “Locker brace is pinning something,” the krix says. Mira calls from the forward seats that the flames are reaching the fuel feed, while Squelb suggests, with remarkable conviction, that everyone negotiate with the emergency first. The locker can be levered aside with a torn seat rail, or turned into a crude shield while you investigate the breathing behind it.",
+          "dice_rolls": [
+            {
+              "description": "Listening for a living presence amid the wreckage",
+              "target": 40,
+              "roll": 34,
+              "success": true,
+              "rule_source": "INT ability check"
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "A living presence is trapped behind a buckled storage locker in the burning shuttle.",
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "lever_locker",
+              "text": "Use a torn seat rail to lever the locker aside and free whoever is trapped.",
+              "action_type": "improvise"
+            },
+            {
+              "id": "shield_approach",
+              "text": "Brace the locker as cover, draw your laser pistol, and inspect the gap cautiously.",
+              "action_type": "investigate"
+            },
+            {
+              "id": "evacuate_survivors",
+              "text": "Order the others toward the breach, then rig the locker as a barrier against the spreading fire.",
+              "action_type": "improvise"
+            },
+            {
+              "id": "open_external_exit",
+              "text": "Abandon the locker for now and lead everyone out into the purple daylight.",
+              "action_type": "move"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "A breathing presence is trapped behind a storage locker as fire advances through the shuttle.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": 0.0134675
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.0-flash",
+      "ok": false,
+      "error": "HTTP 429",
+      "status": 429,
+      "elapsed": 153,
+      "budget": 4096
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.0-flash-lite",
+      "ok": false,
+      "error": "HTTP 429",
+      "status": 429,
+      "elapsed": 116,
+      "budget": 4096
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "ok": true,
+      "elapsed": 3711,
+      "text": "{\"narrative\":\"You move aft, the cold seeping through your protective gear. Your Olef A13 laser pistol is held ready, its targeting beam a faint red point against the perpetual gloom. The rhythmic tapping grows louder, a metallic *clink-clink-clink* echoing from deeper within the ship's ruined structure, a lonely sound in the otherwise tomb-like silence of the derelict. No other sounds, no breathing, no mechanical hum, only the thrum of your own pulse.\",\"choices\":[{\"id\":\"investigate_tapping_source\",\"text\":\"Identify the source of the tapping.\",\"action_type\":\"investigate\"},{\"id\":\"scan_nearby_rooms\",\"text\":\"Scan the nearest darkened rooms for any signs of life.\",\"action_type\":\"explore\"},{\"id\":\"look_for_power_source\",\"text\":\"Search for an auxiliary power conduit to restore some lighting.\",\"action_type\":\"explore\"}],\"state_updates\":{},\"dice_rolls\":[],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":null,\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 242,
+        "prompt_tokens": 1917,
+        "total_tokens": 2558
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You move aft, the cold seeping through your protective gear. Your Olef A13 laser pistol is held ready, its targeting beam a faint red point against the perpetual gloom. The rhythmic tapping grows louder, a metallic *clink-clink-clink* echoing from deeper within the ship's ruined structure, a lonely sound in the otherwise tomb-like silence of the derelict. No other sounds, no breathing, no mechanical hum, only the thrum of your own pulse.",
+          "choices": [
+            {
+              "id": "investigate_tapping_source",
+              "text": "Identify the source of the tapping.",
+              "action_type": "investigate"
+            },
+            {
+              "id": "scan_nearby_rooms",
+              "text": "Scan the nearest darkened rooms for any signs of life.",
+              "action_type": "explore"
+            },
+            {
+              "id": "look_for_power_source",
+              "text": "Search for an auxiliary power conduit to restore some lighting.",
+              "action_type": "explore"
+            }
+          ],
+          "state_updates": {},
+          "dice_rolls": [],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": null,
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": 0.0011801
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash-lite",
+      "ok": true,
+      "elapsed": 1059,
+      "text": "{\"narrative\":\"You step into the main corridor. Emergency lights, red and weak, flicker, casting long, dancing shadows. The tapping sound is louder here, a rhythmic *clack-clack-clack* from further down the hall. It echoes in the otherwise silent ship, a lonely metronome in the void. Your boots crunch on a thin layer of ice coating the deck.\",\"choices\":[{\"id\":\"investigate_tapping\",\"text\":\"Move toward the tapping sound\",\"action_type\":\"move\"},{\"id\":\"check_other_compartments\",\"text\":\"Search nearby compartments first\",\"action_type\":\"move\"}],\"state_updates\":{\"scene\":{\"location\":\"Freighter corridor\"}},\"dice_rolls\":[]}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 146,
+        "prompt_tokens": 1917,
+        "total_tokens": 2063
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You step into the main corridor. Emergency lights, red and weak, flicker, casting long, dancing shadows. The tapping sound is louder here, a rhythmic *clack-clack-clack* from further down the hall. It echoes in the otherwise silent ship, a lonely metronome in the void. Your boots crunch on a thin layer of ice coating the deck.",
+          "choices": [
+            {
+              "id": "investigate_tapping",
+              "text": "Move toward the tapping sound",
+              "action_type": "move"
+            },
+            {
+              "id": "check_other_compartments",
+              "text": "Search nearby compartments first",
+              "action_type": "move"
+            }
+          ],
+          "state_updates": {
+            "scene": {
+              "location": "Freighter corridor"
+            }
+          },
+          "dice_rolls": []
+        }
+      },
+      "cost": 0.0002501
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3-flash-preview",
+      "ok": true,
+      "elapsed": 15745,
+      "text": "{\"narrative\":\"The acrid scent of burning insulation fills your lungs, and the red emergency lights pulse like a dying heart. You move toward the rear, boots skidding on the tilted deck as fire licks at the engine bulkhead. The rhythmic tapping is louder here, a frantic metallic sound coming from behind the buckled hatch of the maintenance crawlspace.\\n\\nVriktik, the krix engineer, is pulling at the emergency lever, but the mechanism is fused by the intense heat. He yells that the fuel cells are destabilizing and that you need to leave now, his multifaceted eyes wide with panic. Nearby, Dr. Orvaine is trying to drag the merchant Squelb toward the hull breach, but the merchant is frozen in shock, clutching his singed robes.\\n\\nYou spot a ruptured coolant line spraying a fine mist of liquid nitrogen near the glowing hot door hinges. Protocol says stay clear of pressurized leaks, but you see a way to use that thermal shock to your advantage. The metal is screaming under the stress, and the tapping from the other side has turned into a desperate muffled shouting.\",\"dice_rolls\":[{\"description\":\"Listen for life signs through the chaos\",\"target\":40,\"roll\":22,\"success\":true,\"rule_source\":\"INT check\"}],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"The shuttle crashed. Someone is trapped in the crawlspace near the failing engines.\",\"scene_id\":\"shuttle_wreck_aft\"},\"choices\":[{\"id\":\"sig_trait_coolant\",\"text\":\"[Signature Trait] Use the coolant mist to flash-freeze the red-hot hinges and shatter the lock.\",\"action_type\":\"signature_trait\"},{\"id\":\"force_hatch\",\"text\":\"Brute force the buckled hatch with your shoulder.\",\"action_type\":\"stat_check\"},{\"id\":\"vibe_pry\",\"text\":\"Use your Vibe Knife to wedge the seal and pry the door open.\",\"action_type\":\"skill_check\"},{\"id\":\"evac_others\",\"text\":\"Ignore the tapping and force Vriktik and Squelb out the hull breach.\",\"action_type\":\"narrative\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Trapped in the burning shuttle wreck. Someone is behind a jammed door in the engine section.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 565,
+        "prompt_tokens": 1917,
+        "total_tokens": 4346
+      },
+      "budget": 4096,
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "The acrid scent of burning insulation fills your lungs, and the red emergency lights pulse like a dying heart. You move toward the rear, boots skidding on the tilted deck as fire licks at the engine bulkhead. The rhythmic tapping is louder here, a frantic metallic sound coming from behind the buckled hatch of the maintenance crawlspace.\n\nVriktik, the krix engineer, is pulling at the emergency lever, but the mechanism is fused by the intense heat. He yells that the fuel cells are destabilizing and that you need to leave now, his multifaceted eyes wide with panic. Nearby, Dr. Orvaine is trying to drag the merchant Squelb toward the hull breach, but the merchant is frozen in shock, clutching his singed robes.\n\nYou spot a ruptured coolant line spraying a fine mist of liquid nitrogen near the glowing hot door hinges. Protocol says stay clear of pressurized leaks, but you see a way to use that thermal shock to your advantage. The metal is screaming under the stress, and the tapping from the other side has turned into a desperate muffled shouting.",
+          "dice_rolls": [
+            {
+              "description": "Listen for life signs through the chaos",
+              "target": 40,
+              "roll": 22,
+              "success": true,
+              "rule_source": "INT check"
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "The shuttle crashed. Someone is trapped in the crawlspace near the failing engines.",
+            "scene_id": "shuttle_wreck_aft"
+          },
+          "choices": [
+            {
+              "id": "sig_trait_coolant",
+              "text": "[Signature Trait] Use the coolant mist to flash-freeze the red-hot hinges and shatter the lock.",
+              "action_type": "signature_trait"
+            },
+            {
+              "id": "force_hatch",
+              "text": "Brute force the buckled hatch with your shoulder.",
+              "action_type": "stat_check"
+            },
+            {
+              "id": "vibe_pry",
+              "text": "Use your Vibe Knife to wedge the seal and pry the door open.",
+              "action_type": "skill_check"
+            },
+            {
+              "id": "evac_others",
+              "text": "Ignore the tapping and force Vriktik and Squelb out the hull breach.",
+              "action_type": "narrative"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Trapped in the burning shuttle wreck. Someone is behind a jammed door in the engine section.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.1-flash-lite",
+      "ok": true,
+      "elapsed": 1993,
+      "text": "{\"narrative\":\"You move with practiced silence, your boots magnetic-locked to the floor to dampen the sound of your approach. The corridor is bathed in the rhythmic, dying amber glow of emergency lights, and the air smells of ozone and charred insulation.\\n\\nAs you round the corner, the tapping grows louder, revealing a fractured coolant line rhythmically striking a bulkhead. Your scanner picks up a faint, irregular bio-rhythm coming from behind a jammed storage locker, suggesting someone—or something—is trapped in the debris pile.\",\"dice_rolls\":[],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"Found irregular bio-rhythms near the coolant leak.\",\"scene_id\":\"freighter_aft\"},\"choices\":[{\"id\":\"pry_locker\",\"text\":\"Use your vibro-knife as a lever to pry the locker and access the source.\",\"action_type\":\"exploration\"},{\"id\":\"examine_conduit\",\"text\":\"Sever the leaking coolant line to silence the noise and prevent a fire.\",\"action_type\":\"exploration\"},{\"id\":\"call_out\",\"text\":\"Identify yourself and command the survivor to stay calm.\",\"action_type\":\"social\"}],\"scene_change\":false,\"scene_header\":\"The Aft Corridor\",\"scene_summary\":\"Investigating the source of the tapping sound in the ship's hold.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 359,
+        "prompt_tokens": 1917,
+        "total_tokens": 2276
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You move with practiced silence, your boots magnetic-locked to the floor to dampen the sound of your approach. The corridor is bathed in the rhythmic, dying amber glow of emergency lights, and the air smells of ozone and charred insulation.\n\nAs you round the corner, the tapping grows louder, revealing a fractured coolant line rhythmically striking a bulkhead. Your scanner picks up a faint, irregular bio-rhythm coming from behind a jammed storage locker, suggesting someone—or something—is trapped in the debris pile.",
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "Found irregular bio-rhythms near the coolant leak.",
+            "scene_id": "freighter_aft"
+          },
+          "choices": [
+            {
+              "id": "pry_locker",
+              "text": "Use your vibro-knife as a lever to pry the locker and access the source.",
+              "action_type": "exploration"
+            },
+            {
+              "id": "examine_conduit",
+              "text": "Sever the leaking coolant line to silence the noise and prevent a fire.",
+              "action_type": "exploration"
+            },
+            {
+              "id": "call_out",
+              "text": "Identify yourself and command the survivor to stay calm.",
+              "action_type": "social"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": "The Aft Corridor",
+          "scene_summary": "Investigating the source of the tapping sound in the ship's hold.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.1-flash-lite-preview",
+      "ok": true,
+      "elapsed": 2193,
+      "text": "{\"narrative\":\"You move through the corridor, boots crunching on shattered light-glass while the red emergency strobes pulse like a dying heart. Your Heckler is leveled, every muscle coiled, as you ignore the debris-strewn path to the bridge in favor of the persistent, rhythmic metallic tapping coming from the rear hold.\\n\\nAs you reach the bulkhead, the smell of ozone and scorched polymer grows thick. Instead of kicking the door, you spot a venting coolant line hissing near the latch; you could use your vibro-knife to sever the secondary hydraulic line, forcing the door to override its locking mechanism manually rather than waiting for the sluggish electronic system to cycle.\",\"dice_rolls\":[{\"description\":\"Perception check to detect movement\",\"target\":40,\"roll\":22,\"success\":true,\"rule_source\":\"INT\"}],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":null,\"scene_id\":null},\"choices\":[{\"id\":\"pry_door\",\"text\":\"Sever the hydraulic line to force the door open\",\"action_type\":\"action\"},{\"id\":\"wait_listen\",\"text\":\"Press your ear to the metal to identify the breather\",\"action_type\":\"action\"},{\"id\":\"frag_breach\",\"text\":\"Cook a grenade and toss it in before breaching\",\"action_type\":\"action\"}],\"scene_change\":false,\"scene_header\":\"The Aft Hold\",\"scene_summary\":\"Investigating the tapping sound in the rear hold.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 384,
+        "prompt_tokens": 1917,
+        "total_tokens": 2301
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You move through the corridor, boots crunching on shattered light-glass while the red emergency strobes pulse like a dying heart. Your Heckler is leveled, every muscle coiled, as you ignore the debris-strewn path to the bridge in favor of the persistent, rhythmic metallic tapping coming from the rear hold.\n\nAs you reach the bulkhead, the smell of ozone and scorched polymer grows thick. Instead of kicking the door, you spot a venting coolant line hissing near the latch; you could use your vibro-knife to sever the secondary hydraulic line, forcing the door to override its locking mechanism manually rather than waiting for the sluggish electronic system to cycle.",
+          "dice_rolls": [
+            {
+              "description": "Perception check to detect movement",
+              "target": 40,
+              "roll": 22,
+              "success": true,
+              "rule_source": "INT"
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": null,
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "pry_door",
+              "text": "Sever the hydraulic line to force the door open",
+              "action_type": "action"
+            },
+            {
+              "id": "wait_listen",
+              "text": "Press your ear to the metal to identify the breather",
+              "action_type": "action"
+            },
+            {
+              "id": "frag_breach",
+              "text": "Cook a grenade and toss it in before breaching",
+              "action_type": "action"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": "The Aft Hold",
+          "scene_summary": "Investigating the tapping sound in the rear hold.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.5-flash",
+      "ok": true,
+      "elapsed": 13875,
+      "text": "{\n  \"narrative\": \"You creep through the canted corridor, your boots slipping on frozen condensation and spilled hydraulic fluid. The metallic tapping grows louder aft, echoing through the skeletal remains of the cargo bay where the hull has buckled. Smoke hangs thick and acrid in the red lit gloom, smelling of burnt wiring and ozone.\\n\\nThrough the haze, you spot Vriktik, the krix engineer, frantically clawing at a jammed bulkhead door while fire licks at the power conduits above him. Standard rescue protocol dictates searching for a manual release tool, but your eye catches a ruptured high pressure coolant line directly overhead. A single well placed shot or sharp blow could crack the line, flooding the deck with extinguishing foam to douse the flames and pop the pressurized hatch instantly.\\n\\nTime is running out as sparks shower down on the panicked engineer, and the deck beneath you groans under shifting structural stress.\",\n  \"dice_rolls\": [\n    {\n      \"description\": \"Intuition check to spot environmental hazards and opportunities while moving aft\",\n      \"target\": 40,\n      \"roll\": 32,\n      \"success\": true,\n      \"rule_source\": \"Intuition Attribute Check\"\n    }\n  ],\n  \"state_updates\": {\n    \"stamina_delta\": 0,\n    \"seu_delta\": 0,\n    \"seu_source\": null,\n    \"ammo_updates\": {},\n    \"status_add\": [],\n    \"status_remove\": [],\n    \"inventory_add\": [],\n    \"inventory_remove\": [],\n    \"xp_delta\": 0,\n    \"credits_delta\": 0,\n    \"npc_updates\": [],\n    \"faction_updates\": [],\n    \"journal_entry\": \"Located the krix engineer, Vriktik, trapped by fire near a jammed bulkhead in the aft cargo bay.\",\n    \"scene_id\": \"the_wreck_aft\"\n  },\n  \"choices\": [\n    {\n      \"id\": \"rupture_coolant\",\n      \"text\": \"[Signature Trait] Shoot or smash the high-pressure coolant line to douse the fire and force the pressurized bulkhead open.\",\n      \"action_type\": \"signature_trait\"\n    },\n    {\n      \"id\": \"pry_bulkhead\",\n      \"text\": \"Use your strength and a piece of structural scrap to help Vriktik pry the jammed bulkhead open manually.\",\n      \"action_type\": \"strength_check\"\n    },\n    {\n      \"id\": \"order_fallback\",\n      \"text\": \"Order Vriktik to abandon the compartment immediately and fall back to the main cabin.\",\n      \"action_type\": \"leadership_check\"\n    }\n  ],\n  \"scene_change\": false,\n  \"scene_header\": null,\n  \"scene_summary\": \"Kael moved aft, discovering the krix engineer Vriktik trapped by spreading fires near a jammed bulkhead hatch.\",\n  \"combat_state_update\": null,\n  \"ooc_note\": null,\n  \"tooltip_terms\": []\n}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 682,
+        "prompt_tokens": 1917,
+        "total_tokens": 3615
+      },
+      "budget": 4096,
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You creep through the canted corridor, your boots slipping on frozen condensation and spilled hydraulic fluid. The metallic tapping grows louder aft, echoing through the skeletal remains of the cargo bay where the hull has buckled. Smoke hangs thick and acrid in the red lit gloom, smelling of burnt wiring and ozone.\n\nThrough the haze, you spot Vriktik, the krix engineer, frantically clawing at a jammed bulkhead door while fire licks at the power conduits above him. Standard rescue protocol dictates searching for a manual release tool, but your eye catches a ruptured high pressure coolant line directly overhead. A single well placed shot or sharp blow could crack the line, flooding the deck with extinguishing foam to douse the flames and pop the pressurized hatch instantly.\n\nTime is running out as sparks shower down on the panicked engineer, and the deck beneath you groans under shifting structural stress.",
+          "dice_rolls": [
+            {
+              "description": "Intuition check to spot environmental hazards and opportunities while moving aft",
+              "target": 40,
+              "roll": 32,
+              "success": true,
+              "rule_source": "Intuition Attribute Check"
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "Located the krix engineer, Vriktik, trapped by fire near a jammed bulkhead in the aft cargo bay.",
+            "scene_id": "the_wreck_aft"
+          },
+          "choices": [
+            {
+              "id": "rupture_coolant",
+              "text": "[Signature Trait] Shoot or smash the high-pressure coolant line to douse the fire and force the pressurized bulkhead open.",
+              "action_type": "signature_trait"
+            },
+            {
+              "id": "pry_bulkhead",
+              "text": "Use your strength and a piece of structural scrap to help Vriktik pry the jammed bulkhead open manually.",
+              "action_type": "strength_check"
+            },
+            {
+              "id": "order_fallback",
+              "text": "Order Vriktik to abandon the compartment immediately and fall back to the main cabin.",
+              "action_type": "leadership_check"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Kael moved aft, discovering the krix engineer Vriktik trapped by spreading fires near a jammed bulkhead hatch.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.5-flash-lite",
+      "ok": true,
+      "elapsed": 1440,
+      "text": "{\"narrative\":\"You sweep your weapon through the doorway, boots crunching on brittle layers of frost that coat the corridor. The rhythmic tapping grows louder, echoing hollowly through the twisting metal ribs of the derelict. Above you, a severed conduit sparks once, casting long and jagged shadows across the bulkheads.\",\"dice_rolls\":[],\"state_updates\":{\"scene_id\":\"scene_2_derelict_interior\",\"journal_entry\":\"Ventured into the dark freighter following the sound of a loose panel.\"},\"choices\":[{\"id\":\"c1\",\"text\":\"Pry open the jammed service hatch to bypass the dark corridor ahead\",\"action_type\":\"signature_move\"},{\"id\":\"c2\",\"text\":\"Sweep the darkened cargo bay with your laser pistol drawn and ready\",\"action_type\":\"combat_stance\"},{\"id\":\"c3\",\"text\":\"Call out into the silence to test for a response from whatever waits in the dark\",\"action_type\":\"social_probe\"}],\"scene_change\":true,\"scene_header\":\"The Derelict Interior\",\"scene_summary\":\"The player moves aft into the freezing corridors of the crashed freighter, guided by a mysterious tapping sound.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 259,
+        "prompt_tokens": 1917,
+        "total_tokens": 2176
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You sweep your weapon through the doorway, boots crunching on brittle layers of frost that coat the corridor. The rhythmic tapping grows louder, echoing hollowly through the twisting metal ribs of the derelict. Above you, a severed conduit sparks once, casting long and jagged shadows across the bulkheads.",
+          "dice_rolls": [],
+          "state_updates": {
+            "scene_id": "scene_2_derelict_interior",
+            "journal_entry": "Ventured into the dark freighter following the sound of a loose panel."
+          },
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Pry open the jammed service hatch to bypass the dark corridor ahead",
+              "action_type": "signature_move"
+            },
+            {
+              "id": "c2",
+              "text": "Sweep the darkened cargo bay with your laser pistol drawn and ready",
+              "action_type": "combat_stance"
+            },
+            {
+              "id": "c3",
+              "text": "Call out into the silence to test for a response from whatever waits in the dark",
+              "action_type": "social_probe"
+            }
+          ],
+          "scene_change": true,
+          "scene_header": "The Derelict Interior",
+          "scene_summary": "The player moves aft into the freezing corridors of the crashed freighter, guided by a mysterious tapping sound.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.6-flash",
+      "ok": true,
+      "elapsed": 9454,
+      "text": "{\"narrative\":\"You raise your sidearm and step into the gloom, your boots crunching on icy deck plates. The stench of ozone and scorched wiring hangs heavy in the stagnant air. Every nine seconds, the distress beacon sends a vibration through the hull, punctuated by the metallic tapping from the aft junction.\\n\\nRounding a buckled support beam, you spot a shadowy figure crouched beside a flickering terminal. It is Vessa Tor, the freighter's second mate. Her visor is thick with frost, and her hands tremble as she fruitlessly jams a bypass chip into a dead conduit. She spins toward you, leveling a glowing plasma cutter with wide, panicked eyes.\\n\\nBehind her, a ruptured coolant line is venting super-cooled gas across the hatch, rapidly locking the emergency seal under thick black ice. Standard safety protocol dictates evacuating and sealing this entire corridor, but doing so would trap her and lock off access to the lower holds forever.\",\"dice_rolls\":[{\"description\":\"Intuition check to spot the hazardous coolant line before stepping into the breach\",\"target\":40,\"roll\":22,\"success\":true,\"rule_source\":\"Astra Rising Core Core Rules\"}],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[{\"id\":\"Vessa Tor\",\"disposition\":\"Fearful\"}],\"faction_updates\":[],\"journal_entry\":null,\"scene_id\":null},\"choices\":[{\"id\":\"calm_vessa\",\"text\":\"Lower your sidearm and talk Vessa down before she fires out of panic.\",\"action_type\":\"social\"},{\"id\":\"thermal_bypass\",\"text\":\"[Signature Trait] Rig the thermal exhaust on your laser pistol to blast concentrated heat into the hatch mechanism, thawing it instantly.\",\"action_type\":\"signature_trait\"},{\"id\":\"vibe_lever\",\"text\":\"Jam your vibe knife into the manual override gear to force the hatch open with high-frequency vibrations.\",\"action_type\":\"item_use\"}],\"scene_change\":false,\"scene_header\":\"FREIGHTER CORRIDOR - AFT JUNCTION\",\"scene_summary\":\"Investigated the aft corridor sound and found Vessa Tor attempting to open a rapidly freezing bulkhead hatch.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 520,
+        "prompt_tokens": 1917,
+        "total_tokens": 3716
+      },
+      "budget": 4096,
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You raise your sidearm and step into the gloom, your boots crunching on icy deck plates. The stench of ozone and scorched wiring hangs heavy in the stagnant air. Every nine seconds, the distress beacon sends a vibration through the hull, punctuated by the metallic tapping from the aft junction.\n\nRounding a buckled support beam, you spot a shadowy figure crouched beside a flickering terminal. It is Vessa Tor, the freighter's second mate. Her visor is thick with frost, and her hands tremble as she fruitlessly jams a bypass chip into a dead conduit. She spins toward you, leveling a glowing plasma cutter with wide, panicked eyes.\n\nBehind her, a ruptured coolant line is venting super-cooled gas across the hatch, rapidly locking the emergency seal under thick black ice. Standard safety protocol dictates evacuating and sealing this entire corridor, but doing so would trap her and lock off access to the lower holds forever.",
+          "dice_rolls": [
+            {
+              "description": "Intuition check to spot the hazardous coolant line before stepping into the breach",
+              "target": 40,
+              "roll": 22,
+              "success": true,
+              "rule_source": "Astra Rising Core Core Rules"
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [
+              {
+                "id": "Vessa Tor",
+                "disposition": "Fearful"
+              }
+            ],
+            "faction_updates": [],
+            "journal_entry": null,
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "calm_vessa",
+              "text": "Lower your sidearm and talk Vessa down before she fires out of panic.",
+              "action_type": "social"
+            },
+            {
+              "id": "thermal_bypass",
+              "text": "[Signature Trait] Rig the thermal exhaust on your laser pistol to blast concentrated heat into the hatch mechanism, thawing it instantly.",
+              "action_type": "signature_trait"
+            },
+            {
+              "id": "vibe_lever",
+              "text": "Jam your vibe knife into the manual override gear to force the hatch open with high-frequency vibrations.",
+              "action_type": "item_use"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": "FREIGHTER CORRIDOR - AFT JUNCTION",
+          "scene_summary": "Investigated the aft corridor sound and found Vessa Tor attempting to open a rapidly freezing bulkhead hatch.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-flash-latest",
+      "ok": true,
+      "elapsed": 6713,
+      "text": "{\"narrative\":\"You raise your weapon, thumbing the safety off as your boots crunch over icy deck plating. The air is foul with stale scrubber ozone and cold void-chill. The tapping grows louder as you move down the dark gangway, leading toward a half-jammed maintenance hatch near the primary engine manifold.\\n\\nNothing is breathing, at least not with lungs like yours. As your barrel sweeps the threshold, you spot a severed power conduit bouncing rhythmically against the loose panel, casting violent blue sparks into the gloom. Right beside it sits a heavily reinforced cargo locker, its electronic lock fried by the power surge but its structure intact.\\n\\nWhile a technician might waste hours searching for a power node, those live sparks give you an opening. You could jury-rig a dangerous electrical arc to blow the lock open instantly, or stick to brute force and search the deeper compartments.\",\"dice_rolls\":[{\"description\":\"Intuition check to sense threats in the dark\",\"target\":40,\"roll\":32,\"success\":true,\"rule_source\":\"Astra Rising Core Core Rules\"}],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":null,\"scene_id\":null},\"choices\":[{\"id\":\"choice_1_signature\",\"text\":\"Jury-rig the sparking conduit to short-circuit the locker lock.\",\"action_type\":\"signature_trait\"},{\"id\":\"choice_2_pry\",\"text\":\"Pry the locker door open using your vibe knife.\",\"action_type\":\"physical\"},{\"id\":\"choice_3_bypass\",\"text\":\"Bypass the locker and press deeper toward the cargo hold.\",\"action_type\":\"explore\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Investigating the tapping sound aft near the engine manifold.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 448,
+        "prompt_tokens": 1917,
+        "total_tokens": 3104
+      },
+      "budget": 4096,
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You raise your weapon, thumbing the safety off as your boots crunch over icy deck plating. The air is foul with stale scrubber ozone and cold void-chill. The tapping grows louder as you move down the dark gangway, leading toward a half-jammed maintenance hatch near the primary engine manifold.\n\nNothing is breathing, at least not with lungs like yours. As your barrel sweeps the threshold, you spot a severed power conduit bouncing rhythmically against the loose panel, casting violent blue sparks into the gloom. Right beside it sits a heavily reinforced cargo locker, its electronic lock fried by the power surge but its structure intact.\n\nWhile a technician might waste hours searching for a power node, those live sparks give you an opening. You could jury-rig a dangerous electrical arc to blow the lock open instantly, or stick to brute force and search the deeper compartments.",
+          "dice_rolls": [
+            {
+              "description": "Intuition check to sense threats in the dark",
+              "target": 40,
+              "roll": 32,
+              "success": true,
+              "rule_source": "Astra Rising Core Core Rules"
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": null,
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "choice_1_signature",
+              "text": "Jury-rig the sparking conduit to short-circuit the locker lock.",
+              "action_type": "signature_trait"
+            },
+            {
+              "id": "choice_2_pry",
+              "text": "Pry the locker door open using your vibe knife.",
+              "action_type": "physical"
+            },
+            {
+              "id": "choice_3_bypass",
+              "text": "Bypass the locker and press deeper toward the cargo hold.",
+              "action_type": "explore"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Investigating the tapping sound aft near the engine manifold.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-flash-lite-latest",
+      "ok": true,
+      "elapsed": 1726,
+      "text": "{\"narrative\":\"You sweep your weapon through the smoky haze, stepping past the twisted aluminum ribs of the fallen shuttle. The acrid stench of scorched ozone fills your nose as you creep toward the rhythmic tapping in the dark. Instead of waiting for protocol, you spot a venting plasma line nearby and wedge your heavy tactical boot against the leaking conduit, using the pressure to seal the rupture and clear the immediate gloom.\",\"dice_rolls\":[],\"state_updates\":{\"scene_id\":\"scene_2_desert\",\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":\"Sealed a ruptured plasma line in the wreckage and moved toward the aft source of the tapping.\",\"scene_id\":\"scene_2_desert\"},\"choices\":[{\"id\":\"choice_1\",\"text\":\"Step out through the hull breach into the harsh purple daylight\",\"action_type\":\"explore\"},{\"id\":\"choice_2\",\"text\":\"Search the debris near the sealed conduit for salvageable wiring\",\"action_type\":\"search\"},{\"id\":\"choice_3\",\"text\":\"Rouse the panicked engineer Vriktik to help check the aft lockers\",\"action_type\":\"interact\"}],\"scene_change\":true,\"scene_header\":\"The Wreck Exterior\",\"scene_summary\":\"You secured a leaking plasma conduit using unconventional means and prepared to investigate the surrounding area.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 346,
+        "prompt_tokens": 1917,
+        "total_tokens": 2263
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You sweep your weapon through the smoky haze, stepping past the twisted aluminum ribs of the fallen shuttle. The acrid stench of scorched ozone fills your nose as you creep toward the rhythmic tapping in the dark. Instead of waiting for protocol, you spot a venting plasma line nearby and wedge your heavy tactical boot against the leaking conduit, using the pressure to seal the rupture and clear the immediate gloom.",
+          "dice_rolls": [],
+          "state_updates": {
+            "scene_id": "scene_2_desert",
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": "Sealed a ruptured plasma line in the wreckage and moved toward the aft source of the tapping."
+          },
+          "choices": [
+            {
+              "id": "choice_1",
+              "text": "Step out through the hull breach into the harsh purple daylight",
+              "action_type": "explore"
+            },
+            {
+              "id": "choice_2",
+              "text": "Search the debris near the sealed conduit for salvageable wiring",
+              "action_type": "search"
+            },
+            {
+              "id": "choice_3",
+              "text": "Rouse the panicked engineer Vriktik to help check the aft lockers",
+              "action_type": "interact"
+            }
+          ],
+          "scene_change": true,
+          "scene_header": "The Wreck Exterior",
+          "scene_summary": "You secured a leaking plasma conduit using unconventional means and prepared to investigate the surrounding area.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemma-4-26b-a4b-it",
+      "ok": true,
+      "elapsed": 7506,
+      "text": "{\"narrative\":\"Acrid smoke stings your throat and fills the narrow corridor. The red emergency lights flicker rhythmically, casting long, twitching shadows against the dented bulkheads. \\n\\nYou move with practiced caution, your weapon held tight as the tapping grows louder. A loose ventilation grate rattles against its frame, sounding like frantic fingers drumming on metal.\\n\\nDr. Orvaine crawls past you, coughing violently while clutching her medical kit. Vriktik is already halfway down the hall, his mandibles clicking in a sharp, rhythmic distress signal.\",\"dice_rolls\":[],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":null,\"scene_id\":null},\"choices\":[{\"id\":\"search_vent\",\"text\":\"Investigate the rattling vent for threats\",\"action_type\":\"skill_check\"},{\"id\":\"help_orvaine\",\"text\":\"Assist the doctor before moving forward\",\"action_type\":\"social_check\"},{\"id\":\"follow_vriktik\",\"text\":\"Push past the others to scout ahead\",\"action_type\":\"movement\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Moving aft toward the tapping sound in the smoke-filled corridor.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 331,
+        "prompt_tokens": 1917,
+        "total_tokens": 2248
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "Acrid smoke stings your throat and fills the narrow corridor. The red emergency lights flicker rhythmically, casting long, twitching shadows against the dented bulkheads. \n\nYou move with practiced caution, your weapon held tight as the tapping grows louder. A loose ventilation grate rattles against its frame, sounding like frantic fingers drumming on metal.\n\nDr. Orvaine crawls past you, coughing violently while clutching her medical kit. Vriktik is already halfway down the hall, his mandibles clicking in a sharp, rhythmic distress signal.",
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": null,
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "search_vent",
+              "text": "Investigate the rattling vent for threats",
+              "action_type": "skill_check"
+            },
+            {
+              "id": "help_orvaine",
+              "text": "Assist the doctor before moving forward",
+              "action_type": "social_check"
+            },
+            {
+              "id": "follow_vriktik",
+              "text": "Push past the others to scout ahead",
+              "action_type": "movement"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Moving aft toward the tapping sound in the smoke-filled corridor.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemma-4-31b-it",
+      "ok": true,
+      "elapsed": 31135,
+      "text": "<thought>*   Character: Kael Voss (Human, Soldier/Enforcer).\n    *   Current State: In a derelict freighter (Astra Rising / Dravoss Lost).\n    *   Current Action: Move aft toward a tapping sound, weapon raised, listening for life.\n    *   Signature Trait: Finding solutions where others follow protocol (unconventional angles, jury-rigging, environmental advantages).\n    *   Environmental Details: Frost on deck plates, loose panel tapping, dark corridor.\n    *   Constraint Checklist & Confidence Score:\n        1.  JSON output? Yes.\n        2.  No prose/markdown? Yes.\n        3.  2nd person present tense? Yes.\n        4.  Serious/pulpy tone? Yes.\n        5.  Sensory details? Yes.\n        6.  No railroading? Yes.\n        7.  Under 300 words? Yes.\n        8.  2-4 choices? Yes.\n        9.  Paragraph format (2-3 short, separated by \\n\\n)? Yes.\n        10. No em dashes? Yes.\n        11. No mechanics in narrative? Yes.\n        12. Proactive use of Signature Trait? Yes.\n\n    *   *Paragraph 1*: Movement aft. The sound of the rifle's safety clicking, the cold air, the rhythmic tapping.\n    *   *Paragraph 2*: Encountering the source. The panel is flapping, but there's something else. Maybe a flicker of movement or a scent. Let's go with a strange residue or a hidden vent.\n    *   *Paragraph 3*: The tension. The tapping stops abruptly.\n\n    *   The character is a Soldier/Enforcer. Standard protocol is \"Clear the room/corridor.\"\n    *   Unconventional approach: Use the environment. Maybe use a piece of debris to trigger a trap or check a vent without exposing himself.\n    *   Choice 1: Tactical breach (Standard).\n    *   Choice 2: Use the flickering lights/loose panels to distract or lure (Unconventional/Trait).\n    *   Choice 3: Check the overhead conduits (Environmental/Trait).\n\n    *   Action: Moving aft, listening.\n    *   Check: INT or RS? Probably a perception check (INT/PER). Let's use INT for intuition of danger.\n    *   Target: INT is 40.\n    *   Roll: Let's say he notices something odd about the tapping.\n\n    *   *Narrative*:\n        You slide backward into the gloom, the cold metal of your weapon a steady weight in your grip. The rhythmic tapping grows louder, echoing through the narrow corridor: a metallic heartbeat that syncs with the thrum of the ship's dying reactor.\n\n        The tapping stops suddenly as you round the corner. A single bulkhead panel hangs by a few sheared bolts, swaying slightly in a phantom draft that smells of ozone and old copper.\n\n        Something shifted in the ventilation shaft above the panel. It was a momentary flicker of something pale and multifaceted, gone before you could lock on.\n\n    *   *Choices*:\n        1. \"Flush it out with a grenade\" (Aggressive/Standard).\n        2. \"Lure it down using the swinging panel as bait\" (Signature Trait: Unconventional).\n        3. \"Carefully pry open the vent to peek inside\" (Cautious).\n\n    *   No em dashes? Checked.\n    *   Paragraphs split by \\n\\n? Checked.\n    *   No numbers/dice in narrative? Checked.\n    *   JSON only? Checked.</thought>{\"narrative\":\"You slide backward into the gloom, the cold metal of your weapon a steady weight in your grip. The rhythmic tapping grows louder, echoing through the narrow corridor: a metallic heartbeat that syncs with the thrum of the ship's dying reactor.\\n\\nThe tapping stops suddenly as you round the corner. A single bulkhead panel hangs by a few sheared bolts, swaying slightly in a phantom draft that smells of ozone and old copper.\\n\\nSomething shifted in the ventilation shaft above the panel. It was a momentary flicker of something pale and multifaceted, gone before you could lock on.\",\"dice_rolls\":[{\"description\":\"Intuition check to notice the creature in the vent\",\"target\":40,\"roll\":22,\"success\":true,\"rule_source\":null}],\"state_updates\":{},\"choices\":[{\"id\":\"flush_vent\",\"text\":\"Flush it out with a frag grenade\",\"action_type\":\"combat\"},{\"id\":\"bait_panel\",\"text\":\"Use the swaying panel to lure the creature into the open\",\"action_type\":\"signature_trait\"},{\"id\":\"peek_vent\",\"text\":\"Carefully pry open the vent to see what is inside\",\"action_type\":\"exploration\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"Kael moves aft and discovers a creature hiding in the ventilation shafts.\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 297,
+        "prompt_tokens": 1917,
+        "total_tokens": 3000
+      },
+      "budget": 4096,
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You slide backward into the gloom, the cold metal of your weapon a steady weight in your grip. The rhythmic tapping grows louder, echoing through the narrow corridor: a metallic heartbeat that syncs with the thrum of the ship's dying reactor.\n\nThe tapping stops suddenly as you round the corner. A single bulkhead panel hangs by a few sheared bolts, swaying slightly in a phantom draft that smells of ozone and old copper.\n\nSomething shifted in the ventilation shaft above the panel. It was a momentary flicker of something pale and multifaceted, gone before you could lock on.",
+          "dice_rolls": [
+            {
+              "description": "Intuition check to notice the creature in the vent",
+              "target": 40,
+              "roll": 22,
+              "success": true,
+              "rule_source": null
+            }
+          ],
+          "state_updates": {},
+          "choices": [
+            {
+              "id": "flush_vent",
+              "text": "Flush it out with a frag grenade",
+              "action_type": "combat"
+            },
+            {
+              "id": "bait_panel",
+              "text": "Use the swaying panel to lure the creature into the open",
+              "action_type": "signature_trait"
+            },
+            {
+              "id": "peek_vent",
+              "text": "Carefully pry open the vent to see what is inside",
+              "action_type": "exploration"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "Kael moves aft and discovers a creature hiding in the ventilation shafts.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "groq",
+      "model": "allam-2-7b",
+      "ok": true,
+      "elapsed": 453,
+      "text": "{\"narrative\":\"The airlock hisses open. Frost crunches on the deck plates as you dash past it. A scant beam of lingering emergency lighting flicks on in the dim hold. The tapping sounds come from a cramped maintenance compartment door. The deck vibrates under your boots as you inch towards the mysterious source, weapon at the ready. Listen for any signs of life in the hushed, musty environment.\",\"choices\":[\"Head to the bridge\",\"Keep cautiously heading aft\",\"Inspect the maintenance compartment\",\"Investigate the source of the sound\"],\"state_updates\":{},\"game_turns\":1,\"dice_rolls\":[],\"decisions\":[]} ",
+      "finish": "stop",
+      "usage": {
+        "queue_time": 0.191726735,
+        "prompt_tokens": 2303,
+        "prompt_time": 0.062177397,
+        "completion_tokens": 157,
+        "completion_time": 0.112691119,
+        "total_tokens": 2460,
+        "total_time": 0.174868516
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "The airlock hisses open. Frost crunches on the deck plates as you dash past it. A scant beam of lingering emergency lighting flicks on in the dim hold. The tapping sounds come from a cramped maintenance compartment door. The deck vibrates under your boots as you inch towards the mysterious source, weapon at the ready. Listen for any signs of life in the hushed, musty environment.",
+          "choices": [
+            "Head to the bridge",
+            "Keep cautiously heading aft",
+            "Inspect the maintenance compartment",
+            "Investigate the source of the sound"
+          ],
+          "state_updates": {},
+          "game_turns": 1,
+          "dice_rolls": [],
+          "decisions": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "groq",
+      "model": "groq/compound",
+      "ok": false,
+      "error": "Request Entity Too Large",
+      "status": 413,
+      "elapsed": 4056,
+      "budget": 4096
+    },
+    {
+      "provider": "groq",
+      "model": "groq/compound-mini",
+      "ok": true,
+      "elapsed": 3174,
+      "text": "{\n  \"narrative\": \"You grip the Heckler M4, its weight steady in your palm as you push past the flickering red light. The aft corridor is a maze of twisted metal, smoke curling around a broken bulkhead. The tapping grows louder, echoing off the hull, and you spot a sparking conduit half‑exposed. Your mind races, spotting a way to use the conduit as a makeshift circuit to divert power or create a distraction.\",\n  \"dice_rolls\": [],\n  \"state_updates\": {\n    \"stamina_delta\": 0,\n    \"seu_delta\": 0,\n    \"seu_source\": null,\n    \"ammo_updates\": {},\n    \"status_add\": [],\n    \"status_remove\": [],\n    \"inventory_add\": [],\n    \"inventory_remove\": [],\n    \"xp_delta\": 0,\n    \"credits_delta\": 0,\n    \"npc_updates\": [],\n    \"faction_updates\": [],\n    \"journal_entry\": null,\n    \"scene_id\": null\n  },\n  \"choices\": [\n    {\n      \"id\": \"investigate_conduit\",\n      \"text\": \"Inspect the sparking conduit and try to jury‑rig it\",\n      \"action_type\": \"use\"\n    },\n    {\n      \"id\": \"call_survivors\",\n      \"text\": \"Shout to the others, warning them of the fire\",\n      \"action_type\": \"talk\"\n    },\n    {\n      \"id\": \"open_hatch\",\n      \"text\": \"Force open the nearby bulkhead to create a new exit\",\n      \"action_type\": \"move\"\n    },\n    {\n      \"id\": \"use_vent\",\n      \"text\": \"Use your suit's vent to push smoke back toward the fire\",\n      \"action_type\": \"use\"\n    }\n  ],\n  \"scene_change\": false,\n  \"scene_header\": null,\n  \"scene_summary\": \"You move aft toward the tapping sound, confronting a sparking conduit amid the fire.\",\n  \"combat_state_update\": null,\n  \"ooc_note\": null,\n  \"tooltip_terms\": []\n}",
+      "finish": "stop",
+      "usage": {
+        "queue_time": 0.093387,
+        "prompt_tokens": 4147,
+        "prompt_time": 0.237462,
+        "completion_tokens": 1239,
+        "completion_time": 2.759639,
+        "total_tokens": 5386,
+        "total_time": 2.997101
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You grip the Heckler M4, its weight steady in your palm as you push past the flickering red light. The aft corridor is a maze of twisted metal, smoke curling around a broken bulkhead. The tapping grows louder, echoing off the hull, and you spot a sparking conduit half‑exposed. Your mind races, spotting a way to use the conduit as a makeshift circuit to divert power or create a distraction.",
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": null,
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "investigate_conduit",
+              "text": "Inspect the sparking conduit and try to jury‑rig it",
+              "action_type": "use"
+            },
+            {
+              "id": "call_survivors",
+              "text": "Shout to the others, warning them of the fire",
+              "action_type": "talk"
+            },
+            {
+              "id": "open_hatch",
+              "text": "Force open the nearby bulkhead to create a new exit",
+              "action_type": "move"
+            },
+            {
+              "id": "use_vent",
+              "text": "Use your suit's vent to push smoke back toward the fire",
+              "action_type": "use"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "You move aft toward the tapping sound, confronting a sparking conduit amid the fire.",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "groq",
+      "model": "llama-3.1-8b-instant",
+      "ok": true,
+      "elapsed": 577,
+      "text": "{\"narrative\":\"The hissing of escaping air grows fainter as you move deeper into the derelict. Water pools on the floor, reflecting flickering emergency lights. Ahead of you, a loose panel on the bulkhead is tapping against a structural support, sounding more like a nervous heartbeat now. You creep closer, your rifle trained on the panel, ready to fire.\",\"choices\":[\"Pull the panel free to investigate\",\"Move past the panel, deeper into the freighter\",\"Call out to the others, tell them to stay back\"],\"state_updates\":{}}",
+      "finish": "stop",
+      "usage": {
+        "queue_time": 0.005862457,
+        "prompt_tokens": 1885,
+        "prompt_time": 0.23616483,
+        "completion_tokens": 115,
+        "completion_time": 0.256215947,
+        "total_tokens": 2000,
+        "total_time": 0.492380777
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "The hissing of escaping air grows fainter as you move deeper into the derelict. Water pools on the floor, reflecting flickering emergency lights. Ahead of you, a loose panel on the bulkhead is tapping against a structural support, sounding more like a nervous heartbeat now. You creep closer, your rifle trained on the panel, ready to fire.",
+          "choices": [
+            "Pull the panel free to investigate",
+            "Move past the panel, deeper into the freighter",
+            "Call out to the others, tell them to stay back"
+          ],
+          "state_updates": {}
+        }
+      },
+      "cost": 0.00010345000000000001
+    },
+    {
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "ok": true,
+      "elapsed": 994,
+      "text": "{\"narrative\":\"You move cautiously through the darkened ship, the tapping sound growing louder with each step. The smell of smoke and ozone hangs heavy in the air. As you round a corner, a faint light flickers from a damaged console, casting eerie shadows on the walls. The tapping sound comes from a ventilation grate, partially dislodged from the wall. You can't shake the feeling that you're being watched.\",\"dice_rolls\":[],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":null,\"scene_id\":null},\"choices\":[{\"id\":\"investigate_grate\",\"text\":\"Investigate the ventilation grate\",\"action_type\":\"exploration\"},{\"id\":\"check_console\",\"text\":\"Check the damaged console for any information\",\"action_type\":\"investigation\"},{\"id\":\"move_on\",\"text\":\"Continue moving aft, searching for any other signs of life or damage\",\"action_type\":\"movement\"}],\"scene_change\":false,\"scene_header\":null,\"scene_summary\":\"You are in a damaged section of the freighter, with a potentially ominous ventilation grate and a damaged console nearby\",\"combat_state_update\":null,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "queue_time": 0.008456985,
+        "prompt_tokens": 1885,
+        "prompt_time": 0.105405995,
+        "completion_tokens": 286,
+        "completion_time": 0.801577293,
+        "total_tokens": 2171,
+        "total_time": 0.906983288
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You move cautiously through the darkened ship, the tapping sound growing louder with each step. The smell of smoke and ozone hangs heavy in the air. As you round a corner, a faint light flickers from a damaged console, casting eerie shadows on the walls. The tapping sound comes from a ventilation grate, partially dislodged from the wall. You can't shake the feeling that you're being watched.",
+          "dice_rolls": [],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": null,
+            "scene_id": null
+          },
+          "choices": [
+            {
+              "id": "investigate_grate",
+              "text": "Investigate the ventilation grate",
+              "action_type": "exploration"
+            },
+            {
+              "id": "check_console",
+              "text": "Check the damaged console for any information",
+              "action_type": "investigation"
+            },
+            {
+              "id": "move_on",
+              "text": "Continue moving aft, searching for any other signs of life or damage",
+              "action_type": "movement"
+            }
+          ],
+          "scene_change": false,
+          "scene_header": null,
+          "scene_summary": "You are in a damaged section of the freighter, with a potentially ominous ventilation grate and a damaged console nearby",
+          "combat_state_update": null,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": 0.00133809
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "ok": true,
+      "elapsed": 1743,
+      "text": "{\"narrative\":\"You grip the proto pistol, its weight steady in your hand, and stalk aft through the flickering red light. The tapping grows louder, echoing off the warped bulkheads, and a thin wisp of smoke curls from a cracked panel ahead. As you round a twisted conduit, you spot a half‑exposed conduit bundle sparking against the hull—its rhythm matches the tap, a makeshift alarm from the ship’s failing systems. Your mind flicks to the Flect suit’s built‑in nanofiber patches; a quick splice could silence the sparking and buy you a few precious seconds before the fire reaches the hold.\", \"dice_rolls\":[{\"description\":\"Perception check for source of tapping\",\"target\":45,\"roll\":38,\"success\":true,\"rule_source\":\"Core\"}],\"state_updates\":{\"stamina_delta\":0,\"seu_delta\":0,\"seu_source\":null,\"ammo_updates\":{},\"status_add\":[],\"status_remove\":[],\"inventory_add\":[],\"inventory_remove\":[],\"xp_delta\":0,\"credits_delta\":0,\"npc_updates\":[],\"faction_updates\":[],\"journal_entry\":null,\"scene_id\":\"scene_hold\",\"scene_header\":null,\"scene_summary\":\"You have moved toward the aft tapping source, discovering a sparking conduit that can be jury‑rigged to stop the fire.\"},\"choices\":[{\"id\":\"silence_conduit\",\"text\":\"Use your suit’s nanofiber patches to jury‑rig the conduit and stop the sparking\",\"action_type\":\"skill\"},{\"id\":\"call_survivors\",\"text\":\"Shout to the survivors to warn them of the fire’s direction\",\"action_type\":\"social\"},{\"id\":\"press_forward\",\"text\":\"Ignore the sparking and push deeper into the hold to find the beacon\",\"action_type\":\"explore\"}],\"scene_change\":true,\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "queue_time": 0.103412849,
+        "prompt_tokens": 1929,
+        "prompt_time": 0.079782004,
+        "completion_tokens": 707,
+        "completion_time": 1.473004766,
+        "total_tokens": 2636,
+        "total_time": 1.55278677,
+        "completion_tokens_details": {
+          "reasoning_tokens": 314
+        }
+      },
+      "budget": 4096,
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You grip the proto pistol, its weight steady in your hand, and stalk aft through the flickering red light. The tapping grows louder, echoing off the warped bulkheads, and a thin wisp of smoke curls from a cracked panel ahead. As you round a twisted conduit, you spot a half‑exposed conduit bundle sparking against the hull—its rhythm matches the tap, a makeshift alarm from the ship’s failing systems. Your mind flicks to the Flect suit’s built‑in nanofiber patches; a quick splice could silence the sparking and buy you a few precious seconds before the fire reaches the hold.",
+          "dice_rolls": [
+            {
+              "description": "Perception check for source of tapping",
+              "target": 45,
+              "roll": 38,
+              "success": true,
+              "rule_source": "Core"
+            }
+          ],
+          "state_updates": {
+            "stamina_delta": 0,
+            "seu_delta": 0,
+            "seu_source": null,
+            "ammo_updates": {},
+            "status_add": [],
+            "status_remove": [],
+            "inventory_add": [],
+            "inventory_remove": [],
+            "xp_delta": 0,
+            "credits_delta": 0,
+            "npc_updates": [],
+            "faction_updates": [],
+            "journal_entry": null,
+            "scene_id": "scene_hold",
+            "scene_header": null,
+            "scene_summary": "You have moved toward the aft tapping source, discovering a sparking conduit that can be jury‑rigged to stop the fire."
+          },
+          "choices": [
+            {
+              "id": "silence_conduit",
+              "text": "Use your suit’s nanofiber patches to jury‑rig the conduit and stop the sparking",
+              "action_type": "skill"
+            },
+            {
+              "id": "call_survivors",
+              "text": "Shout to the survivors to warn them of the fire’s direction",
+              "action_type": "social"
+            },
+            {
+              "id": "press_forward",
+              "text": "Ignore the sparking and push deeper into the hold to find the beacon",
+              "action_type": "explore"
+            }
+          ],
+          "scene_change": true,
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "ok": true,
+      "elapsed": 1084,
+      "text": "{\"narrative\":\"You press your rifle against your hip as the ship shudders and you push open a cracked bulkhead. The hold is a dim, copper‑colored cavern, its walls slick with the remnants of a long‑ago fire, and the scent of ozone clings to the air. A low thump reverberates from the far end, echoing off metal and ribbing.\\n\\nYour eyes catch a shadowed outline: a broken access panel that glows faintly with residual energy, and the faint hiss of a coolant line still humming. The heat from the engine compartment is dampened by the hold's thick bulkheads, but a crack in the hull lets a thin shaft of red emergency light in, illuminating dust motes in a slow, cinematic dance.\\n\\nThe silence feels alive, as if the ship itself is holding its breath, waiting for something or someone to break the stasis. Your pulse quickens at the thought of what might lie beyond that thumping sound.\\n\\n\",\"choices\":[{\"id\":\"search_panel\",\"text\":\"Inspect the broken access panel for a hidden power source\",\"action_type\":\"exploration\"},{\"id\":\"use_rifle\",\"text\":\"Shoot a blast of energy to clear debris and find a path\",\"action_type\":\"combat\"},{\"id\":\"jury_rig_light\",\"text\":\"Jury‑rig a makeshift light using spare parts from the bulkhead\",\"action_type\":\"crafting\"},{\"id\":\"call_out\",\"text\":\"Shout into the hold to see if anyone else is nearby\",\"action_type\":\"social\"}],\"state_updates\":{\"scene_id\":\"scene_hold\",\"scene_header\":\"Hold of the Derelict\",\"scene_summary\":\"You move aft into the hold, hearing a thump from deeper within. The area is dim, with emergency light casting long shadows. A broken panel glows faintly, hinting at hidden power.\",\"combat_state_update\":null,\"scene_change\":false},\"dice_rolls\":[],\"ooc_note\":null,\"tooltip_terms\":[]}",
+      "finish": "stop",
+      "usage": {
+        "queue_time": 0.091317183,
+        "prompt_tokens": 1929,
+        "prompt_time": 0.095993773,
+        "completion_tokens": 788,
+        "completion_time": 0.830757703,
+        "total_tokens": 2717,
+        "total_time": 0.926751476,
+        "completion_tokens_details": {
+          "reasoning_tokens": 372
+        }
+      },
+      "schema": {
+        "valid": true,
+        "parsed": {
+          "narrative": "You press your rifle against your hip as the ship shudders and you push open a cracked bulkhead. The hold is a dim, copper‑colored cavern, its walls slick with the remnants of a long‑ago fire, and the scent of ozone clings to the air. A low thump reverberates from the far end, echoing off metal and ribbing.\n\nYour eyes catch a shadowed outline: a broken access panel that glows faintly with residual energy, and the faint hiss of a coolant line still humming. The heat from the engine compartment is dampened by the hold's thick bulkheads, but a crack in the hull lets a thin shaft of red emergency light in, illuminating dust motes in a slow, cinematic dance.\n\nThe silence feels alive, as if the ship itself is holding its breath, waiting for something or someone to break the stasis. Your pulse quickens at the thought of what might lie beyond that thumping sound.\n\n",
+          "choices": [
+            {
+              "id": "search_panel",
+              "text": "Inspect the broken access panel for a hidden power source",
+              "action_type": "exploration"
+            },
+            {
+              "id": "use_rifle",
+              "text": "Shoot a blast of energy to clear debris and find a path",
+              "action_type": "combat"
+            },
+            {
+              "id": "jury_rig_light",
+              "text": "Jury‑rig a makeshift light using spare parts from the bulkhead",
+              "action_type": "crafting"
+            },
+            {
+              "id": "call_out",
+              "text": "Shout into the hold to see if anyone else is nearby",
+              "action_type": "social"
+            }
+          ],
+          "state_updates": {
+            "scene_id": "scene_hold",
+            "scene_header": "Hold of the Derelict",
+            "scene_summary": "You move aft into the hold, hearing a thump from deeper within. The area is dim, with emergency light casting long shadows. A broken panel glows faintly, hinting at hidden power.",
+            "combat_state_update": null,
+            "scene_change": false
+          },
+          "dice_rolls": [],
+          "ooc_note": null,
+          "tooltip_terms": []
+        }
+      },
+      "cost": null
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.6-27b",
+      "ok": true,
+      "elapsed": 7807,
+      "text": "\n<think>\nHere's a thinking process:\n\n1.  **Analyze User Input:**\n   - User action: \"I keep my rifle up and move aft toward the tapping sound, listening for anything that breathes\"\n   - Context: The user is playing Kael Voss, a Human Soldier/Enforcer in a Astra Rising RPG setting.\n   - Current Scene: The Wreck [introduction] - Wait, the prompt says CURRENT_SCENE is \"The Wreck [introduction]\" with shuttle crash details, but the previous outputs and user prompt seem to have drifted into a new scene: \"Freighter airlock\" with frost and a tapping panel. The prompt says \"BEGIN: The beacon pulses once every nine seconds. Nobody else has answered it.\" This suggests a transition to investigating the distress beacon source (the derelict freighter).\n   - I need to reconcile the campaign state with the current narrative flow. The prompt says CURRENT_SCENE: The Wreck [introduction], but the user's actions and my previous auto-replies (which were identical placeholders) suggest we're now exploring the freighter. I'll update the scene to match the freighter investigation.\n   - I need to follow the strict formatting rules: 2-3 short paragraphs separated by `\\n\\n`, second person present tense, sensory details, serious/pulpy tone, never mention mechanics in narrative, end with 2-4 choices, JSON only.\n   - Signature Trait: \"This character finds solutions where others follow protocol. When standard approaches fail or resources are scarce, actively offer unconventional angles...\" I need to proactively shape narrative/choices around this.\n   - Style: No em dashes. Use commas/colons/semicolons. Keep under 300 words.\n   - Dice: User is moving cautiously and listening. I'll call for a Perception (PER) check to hear/notice anything. PER is 45, so target is 45. I'll roll it internally or just output the roll in the JSON as requested.\n   - Let's craft the narrative carefully.\n\n2.  **Draft Narrative (Mental):**\n   You step past the threshold, rifle held tight against your shoulder. The corridor stretches into bruised shadows, lit only by the sputtering glow of fractured conduit strips. Frost clings to the bulkheads like cracked glass, and the air tastes of oxidized metal and stale coolant. The rhythmic tapping grows louder, echoing off the narrow floor plating.\n\n   Your boots crunch over scattered debris as you advance. The sound resolves into a hollow metallic swing, but beneath it, you catch something else. A low, wet dragging noise moves in the same direction. It does not sound like settling hull stress.\n\n   You angle your weapon down the corridor, eyes scanning the intersecting junctions. A half-shut maintenance vent yawns to your left, rusted hinges groaning in the draft. Further ahead, a heavy cargo door stands slightly ajar, revealing a dark compartment lined with hollow cargo crates. Your instinct tells you the noise is moving deeper into the ship.\n\n   Choices:\n   - Slide silently behind the maintenance vent to flank the noise\n   - Kick the cargo door open and fire a warning shot\n   - Patch your rifle scope into a nearby flickering terminal to map thermal signatures\n   - Move carefully toward the crates, ready to improvise a trap from the debris\n\n3.  **Check Constraints:**\n   - 2nd person present? Yes.\n   - 2-3 paragraphs separated by `\\n\\n`? Yes, exactly 3.\n   - Tone: serious/pulpy, sensory? Yes.\n   - No em dashes? Checked. I used commas and periods.\n   - No mechanics in narrative? Checked.\n   - Signature trait integrated? Yes, offered unconventional angles in choices (thermal mapping, improvised trap).\n   - JSON format only? Yes.\n   - Dice rolls: I'll add a PER check here since they are \"listening for anything that breathes\". PER is 45. I'll simulate a roll. Let's say roll is 32 (success). I'll put it in dice_rolls array.\n   - State updates: scene_id could be \"scene_1_corridor\" or similar. I'll keep it simple.\n   - Length: Under 300 words. Yes.\n   - Format: Must use `\\n\\n` literally or actual newlines? The prompt says \"separated by \\n\\n\". I'll use actual newlines in the string, or literal `\\n\\n`. I'll use actual newlines for readability in JSON string, but JSON requires `\\n` escapes. I'll format it properly.\n\n   Let's refine the narrative string with proper JSON escaping:\n   \"You step past the threshold, rifle held tight against your shoulder. The corridor stretches into bruised shadows, lit only by the sputtering glow of fractured conduit strips. Frost clings to the bulkheads like cracked glass, and the air tastes of oxidized metal and stale coolant. The rhythmic tapping grows louder, echoing off the narrow floor plating.\\n\\nYour boots crunch over scattered debris as you advance. The sound resolves into a hollow metallic swing, but beneath it, you catch something else. A low, wet dragging noise moves in the same direction. It does not sound like settling hull stress.\\n\\nYou angle your weapon down the corridor, eyes scanning the intersecting junctions. A half-shut maintenance vent yawns to your left, rusted hinges groaning in the draft. Further ahead, a heavy cargo door stands slightly ajar, revealing a dark compartment lined with hollow cargo crates. Your instinct tells you the noise is moving deeper into the ship.\"\n\n   Check constraints:\n   - Paragraphs: 3. Separated by \\n\\n. Good.\n   - Tone/Style: Matches.\n   - No em dashes: Checked.\n   - Dice: PER check target 45. I'll generate a roll. Let's use 38. Success: true.\n   - Choices: 4 options. All relevant.\n   - State: scene_id update.\n   - JSON structure matches required schema.\n\n   One thing: The prompt says \"PARAGRAPH FORMAT: Write the narrative as 2-3 short paragraphs separated by \\n\\n.\" I will ensure the string contains exactly that.\n   Also, I need to make sure I don't mention dice/mechanics in narrative. Checked.\n   I will construct the JSON carefully.\n   Let's draft it. \n   Self-Correction/Refinement during thought:\n   - The prompt says \"Never write a single monolithic block. Typical flow: (1) immediate action and environment, (2) NPC reaction or consequence, (3) tension or hook into the choices.\" I don't have NPCs here yet, but I have environmental consequence/reactive tension. I'll adjust paragraph 2 to focus more on the environment reacting or a clear hook.\n   - I'll make sure the narrative strictly follows the 3-paragraph structure.\n   - I'll add a dice roll for PER (target 45).\n   - I'll ensure the JSON is valid.\n   - Check signature trait: \"When standard approaches fail or resources are scarce, actively offer unconventional angles...\". I'll weave this into the narrative or choices explicitly. The choices already reflect it, but I can hint at it in the text: \"Your enforcer training usually demands a straight tactical advance, but the cramped mess suggests a different approach.\"\n   - Let's craft carefully.\n\n   Narrative draft:\n   You step past the threshold, rifle held tight against your shoulder. The corridor stretches into bruised shadows, lit only by the sputtering glow of fractured conduit strips. Frost clings to the bulkheads like cracked glass, and the air tastes of oxidized metal and stale coolant. The rhythmic tapping grows louder, echoing off the narrow floor plating.\n\n   Your boots crunch over scattered debris as you advance. The sound resolves into a hollow metallic swing, but beneath it, you catch something else. A low, wet dragging noise moves in the same direction. It does not sound like settling hull stress. Your standard tactical doctrine would have you push straight ahead, yet the cramped, uneven footing begs for a more adaptive approach.\n\n   You angle your weapon down the corridor, eyes scanning the intersecting junctions. A half-shut maintenance vent yawns to your left, rusted hinges groaning in the cold draft. Further ahead, a heavy cargo door stands slightly ajar, revealing a dark compartment lined with hollow cargo crates and spilled wire coils. The noise is definitely moving deeper into the ship, and you have seconds to decide how to engage.\n\n   Checks out. 3 paragraphs. Separated by \\n\\n. Matches flow. Mentions trait adaptively. No em dashes. Under 300 words.\n   Dice: PER check. Target 45. Roll 32. Success true.\n   Choices: 4.\n   JSON structure: matches requirement.\n   Ready. Output matches exactly. \n   One minor thing: The prompt says \"separated by \\n\\n\". I will use actual newline characters in the JSON string value, which is standard. I'll make sure escaping is correct.\n   All good. Proceeds. \n   Output generation. \n   [Self-Correction/Verification during generation prep]\n   Wait, the prompt says \"PARAGRAPH FORMAT: Write the narrative as 2-3 short paragraphs separated by \\n\\n.\" I will literally put `\\n\\n` in the string or just use actual newlines. JSON handles `\\n` as newline. I'll use `\\n\\n`.\n   Also, check dice_rolls format: `[{\"description\":\"string\",\"target\":0,\"roll\":0,\"success\":true,\"rule_source\":null}]`\n   I'll set target=45, roll=32, success=true, rule_source=\"PER check\".\n   State updates: scene_id: \"scene_1_corridor\"\n   Choices: need id, text, action_type.\n   All set.✅\n   Output matches requirement. \n   Proceeds. \n   [Output Generation] -> *Proceeds*\n   *(Note: I will carefully format the JSON to avoid any markdown or extra text, as requested.)*\n   `{\n  \"narrative\": \"You step past the threshold, rifle held tight against your shoulder. The corridor stretches into bruised shadows, lit only by the sputtering glow of fractured conduit strips. Frost clings to the bulkheads like cracked glass, and the air tastes of oxidized metal and stale coolant. The rhythmic tapping grows louder, echoing off the narrow floor plating.\\n\\nYour boots crunch over scattered debris as you advance. The sound resolves into a hollow metallic swing, but beneath it, you catch something else. A low, wet dragging noise moves in the same direction. It does not sound like settling hull stress. Your standard tactical doctrine would have you push straight ahead, yet the cramped, uneven footing begs for a more adaptive approach.\\n\\nYou angle your weapon down the corridor, eyes scanning the intersecting junctions. A half-shut maintenance vent yawns to your left, rusted hinges groaning in the cold draft. Further ahead, a heavy cargo door stands slightly ajar, revealing a dark compartment lined with hollow cargo crates and spilled wire coils. The noise is definitely moving deeper into the ship, and you have seconds to decide how to engage.\",\n  \"dice_rolls\": [\n    {\n      \"description\": \"Perception check to track the unknown sound\",\n      \"target\": 45,\n      \"roll\": 32,\n      \"success\": true,\n      \"rule_source\": \"PER stat\"\n    }\n  ],\n  \"state_updates\": {\n    \"scene_id\": \"scene_1_corridor\",\n    \"journal_entry\": \"Investigating the derelict freighter. Source of the distress beacon lies deeper inside.\"\n  },\n  \"choices\": [\n    {\n      \"id\": \"1\",\n      \"text\": \"Slide silently behind the maintenance vent to flank the noise\",\n      \"action_type\": \"move\"\n    },\n    {\n      \"id\": \"2\",\n      \"text\": \"Kick the cargo door open and fire a warning shot to draw it out\",\n      \"action_type\": \"combat\"\n    },\n    {\n      \"id\": \"3\",\n      \"text\": \"Reroute power from a flickering wall terminal to illuminate the corridor\",\n      \"action_type\": \"skill\"\n    },\n    {\n      \"id\": \"4\",\n      \"text\": \"Use the spilled wire coils and loose plating to rig a trip snare ahead\",\n      \"action_type\": \"improvisation\"\n    }\n  ],\n  \"scene_change\": true,\n  \"scene_header\": \"The Wreck [Corridor]\",\n  \"scene_summary\": \"You enter the freighter's interior, tracking an unknown dragging sound moving deeper into the derelict hull.\",\n  \"combat_state_update\": null,\n  \"ooc_note\": null,\n  \"tooltip_terms\": []\n}`\nWait, checking constraint: \"Never use em dashes in any output.\" I used none.\n\"PARAGRAPH FORMAT: Write the narrative as 2-3 short paragraphs separated by \\n\\n.\" I used `\\n\\n` in the string. In JSON, that's valid.\n\"CRITICAL: NEVER mention dice, rolls, numbers, stats, targets, mechanics, or rule checks inside the narrative field.\" Checked. None.\n\"SIGNATURE TRAIT: ...proactively shape narrative and choices around it.\" I did.\n\"Keep narrative responses under 300 words.\" It's ~140 words.\nAll constraints met. Output matches exactly. Proceeds. \nOne minor adjustment: I'll make sure the JSON is perfectly formatted and contains only the JSON object as requested. No markdown fences. I will output raw JSON.\nAll good. \nOutput matches. \n[Proceeds]\n</think>\n\n{\n  \"narrative\": \"You step past the threshold, rifle held tight against your shoulder. The corridor stretches into bruised shadows, lit only by the sputtering glow of fractured conduit strips. Frost clings to the bulkheads like cracked glass, and the air tastes of oxidized metal and stale coolant. The rhythmic tapping grows louder, echoing off the narrow floor plating.\\n\\nYour boots crunch over scattered debris as you advance. The sound resolves into a hollow metallic swing, but beneath it, you catch something else. A low, wet dragging noise moves in the same direction. It does not sound like settling hull stress. Your standard tactical doctrine would have you push straight ahead, yet the cramped, uneven footing begs for a more adaptive approach.\\n\\nYou angle your weapon down the corridor, eyes scanning the intersecting junctions. A half-shut maintenance vent yawns to your left, rusted hinges groaning in the cold draft. Further ahead, a heavy cargo door stands slightly ajar, revealing a dark compartment lined with hollow cargo crates and spilled wire coils. The noise is definitely moving deeper into the ship, and you have seconds to decide how to engage.\",\n  \"dice_rolls\": [\n    {\n      \"description\": \"Perception check to track the unknown sound\",\n      \"target\": 45,\n      \"roll\": 32,\n      \"success\": true,\n      \"rule_source\": \"PER stat\"\n    }\n  ],\n  \"state_updates\": {\n    \"scene_id\": \"scene_1_corridor\",\n    \"journal_entry\": \"Investigating the derelict freighter. Source of the distress beacon lies deeper inside.\"\n  },\n  \"choices\": [\n    {\n      \"id\": \"1\",\n      \"text\": \"Slide silently behind the maintenance vent to flank the noise\",\n      \"action_type\": \"move\"\n    },\n    {\n      \"id\": \"2\",\n      \"text\": \"Kick the cargo door open and fire a warning shot to draw it out\",\n      \"action_type\": \"combat\"\n    },\n    {\n      \"id\": \"3\",\n      \"text\": \"Reroute power from a flickering wall terminal to illuminate the corridor\",\n      \"action_type\": \"skill\"\n    },\n    {\n      \"id\": \"4\",\n      \"text\": \"Use the spilled wire coils and loose plating to rig a trip snare ahead\",\n      \"action_type\": \"improvisation\"\n    }\n  ],\n  \"scene_change\": true,\n  \"scene_header\": \"The Wreck [Corridor]\",\n  \"scene_summary\": \"You enter the freighter's interior, tracking an unknown dragging sound moving deeper into the derelict hull.\",\n  \"combat_state_update\": null,\n  \"ooc_note\": null,\n  \"tooltip_terms\": []\n}",
+      "finish": "stop",
+      "usage": {
+        "queue_time": 0.14047845,
+        "prompt_tokens": 1938,
+        "prompt_time": 0.14662802,
+        "completion_tokens": 3605,
+        "completion_time": 7.408524102,
+        "total_tokens": 5543,
+        "total_time": 7.555152122
+      },
+      "budget": 4096,
+      "schema": {
+        "valid": false,
+        "reason": "invalid JSON: Unexpected non-whitespace character after JSON at position 78"
+      },
+      "cost": null
+    }
+  ]
+}

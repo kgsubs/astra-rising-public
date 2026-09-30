@@ -1,0 +1,31 @@
+{
+  "_readme": "One template sentence per (kind, outcome), appended when the model's narrative contradicts the server's result, or when a threshold/refusal the model did not preview needs a line of its own. See Astra Dice Plan.md section 5, 'Contradictions between the story and the server result'.",
+  "skill": {
+    "PASS": "Whatever the story just said, the attempt actually lands.",
+    "FAIL": "Whatever the story just said, the attempt actually falls short."
+  },
+  "ability": {
+    "PASS": "The check actually succeeds.",
+    "FAIL": "The check actually fails."
+  },
+  "attack": {
+    "HIT": "The shot actually lands.",
+    "MISS": "The shot actually goes wide.",
+    "cannot_fire": "The weapon is dry. No charge to fire."
+  },
+  "enemy_attack": {
+    "HIT": "The blow actually lands.",
+    "MISS": "The blow actually misses."
+  },
+  "hazard": {
+    "HURT": "The hazard actually takes its toll.",
+    "CLEAR": "The hazard actually passes without harm."
+  },
+  "threshold": {
+    "unconscious": "Darkness takes you.",
+    "dead": "This is where it ends."
+  },
+  "purchase": {
+    "refused": "There isn't enough in the account for that."
+  }
+}
