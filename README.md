@@ -1,231 +1,269 @@
 # Astra Rising
 
-*My client work stays confidential, so I build personal projects like this to share how I think and work. I loved playing [Star Frontiers](https://en.wikipedia.org/wiki/Star_Frontiers) as a kid. When I couldn’t find a free, well-designed, mobile-friendly version with an AI dungeon master, I built this one.*
+*My client work stays confidential, so I build personal projects like this to share how I think and work. I loved playing [Star Frontiers](https://en.wikipedia.org/wiki/Star_Frontiers) as a kid. When I couldn’t find a free, well-designed, mobile-friendly version with an AI game master, I built this one.*
 
-**Live Build:** [astrarising.com](https://astrarising.com)
+**[Try the live app](https://astrarising.com)**
 
-## CONTENTS
+## Contents
 
-[WHAT IS THIS?](#what-is-this)\
-[DESIGN PRINCIPLES & BUSINESS VALUE](#design-principles--business-value)\
-[TECHNICAL OVERVIEW](#technical-overview)\
-[RUN IT YOURSELF](#run-it-yourself)\
-[LICENSE](#license)
+- [What is this?](#what-is-this)
+- [Design principles & business value](#design-principles--business-value)
+- [Key engineering decisions](#key-engineering-decisions)
+- [Architecture](#architecture)
+- [Validation & limitations](#validation--limitations)
+- [Technical reference](#technical-reference)
+- [Run it yourself](#run-it-yourself)
+- [License](#license)
 
-## WHAT IS THIS?
+## What is this?
 
 A browser-based sci-fi role-playing game with an AI game master. The server calculates the outcomes; AI tells the story. Players can leave and resume with a short save code.
 
 It demonstrates a practical business pattern: use rules to make decisions and AI to explain them.
 
-This repository is the real source behind the live product, published as a case study and licensed
-under MIT (see [License](#license)). It is fully installable with your own API key for Groq or
-Gemini.
-
 | | |
 |---|---|
-| ![Landing](planning/screenshots/landing.png) | ![Campaign select](planning/screenshots/campaigns.png) |
-| Session entry, with save-code resume | Campaign selection |
+| ![Landing](planning/screenshots/landing.png) | ![Campaign selection](planning/screenshots/campaigns.png) |
+| Start a session or resume with a save code | Choose a campaign |
 
----
+This is the source behind the live product, published as an installable case study under the MIT license.
 
-## DESIGN PRINCIPLES & BUSINESS VALUE
+## Design principles & business value
 
-- Keep decisions accountable. Explicit rules determine outcomes, giving the AI a calculated result to explain.
-- Use AI efficiently. Send only relevant rules, cap usage, and choose providers based on measured performance.
-- Plan for provider failures. Switch providers automatically when one fails or reaches its limit.
-- Let people pick up where they left off. Save codes preserve progress, a useful pattern for quotes, applications, and intake forms.
-- Make testing repeatable. A scripted AI substitute checks complete workflows and failure scenarios without paid API calls.
+- **Keep decisions accountable.** Explicit rules determine outcomes, giving the AI a calculated result to explain.
+- **Use AI efficiently.** Send only relevant rules, cap usage, and choose providers based on measured performance.
+- **Plan for provider failures.** Switch providers automatically when one fails or reaches its limit.
+- **Let people pick up where they left off.** Save codes preserve progress, a useful pattern for quotes, applications, and intake forms.
+- **Make testing repeatable.** A scripted AI substitute checks complete workflows and failure scenarios without paid API calls.
 
 The same separation of rules and explanation can support claims, lending, eligibility, and pricing workflows.
 
----
+## Key engineering decisions
 
-## TECHNICAL OVERVIEW
+### Keep outcomes under server control
 
-### ARCHITECTURE
+The server owns game state and calculates rolls, targets, damage, and other numerical changes. The AI receives those results and narrates them.
 
+This keeps authoritative state independent of the model’s arithmetic or interpretation of the rules. A stored turn log also lets retried requests return the same recorded result.
+
+The earlier client-driven AI relay was retired as part of this separation.
+
+[Outcome calculation](server/services/outcomeSheet.js) · [Rules engine](server/services/ruleEngine.js) · [State updates](server/services/resolveTurn.js)
+
+### Give the model only the rules it needs
+
+Each turn includes relevant rules rather than the full rules library, with a target budget of approximately 800 tokens for that material.
+
+This limits prompt size while keeping the applicable rules close to the task. The budget is a design target, not a guarantee for every request.
+
+[Rules selection](server/services/promptRulesInjector.js) · [Prompt construction](server/services/promptBuilder.js)
+
+### Choose providers through measurement
+
+An initial comparison tested 46 models on the same game turn. Of those, 37 returned the required format, four returned the wrong format, and five produced errors.
+
+That experiment informed provider selection using response time and format reliability. The application now uses Groq first and Gemini as backup, behind a shared interface.
+
+The comparison reflects the prompt and models available at the time. It is evidence of the selection process, not a current ranking or a complete assessment of narrative quality.
+
+[Experiment and raw results](planning/experiments/model-bakeoff/) · [Provider implementation](server/services/aiProviders.js)
+
+### Put boundaries around cost and failure
+
+The server checks provider quotas before calling AI, caps output, and applies request limits. If a provider fails or returns an unreadable response, the application can try the alternative.
+
+When all provider allowances are exhausted, the player receives a clear message showing when usage resets.
+
+This keeps the demo within configured limits while making capacity constraints visible.
+
+[Request handling and quota controls](server.js)
+
+### Keep the system simple enough to inspect
+
+Node, Express, and SQLite keep the application compact. The frontend is served directly, and sessions resume through a ten-character save code.
+
+The trade-off is explicit: SQLite ties this implementation to one machine. That simplicity suits the current build, but changes the work required to scale it across servers.
+
+[State storage](server/services/stateStore.js) · [Frontend](public/app.js)
+
+## Architecture
+
+```mermaid
+flowchart TD
+    A["Player action"] --> B["Server rules and rolls"]
+    B --> C["Recorded outcome"]
+    C --> D["Prompt with relevant rules"]
+    D --> E["AI provider with fallback"]
+    E --> F["Narration"]
+    C --> G["Server applies calculated changes"]
+    F --> H["Player sees the result"]
+    G --> H
 ```
-                     [ Player action ]
-                             |
-              +--------------+--------------+
-              |                             |
-              v                             v
-   [ Outcome sheet ]                 [ Game state, SQLite ]
-   every roll, target, injury        character, inventory,
-   rolled on the server              history, turn log
-              |                             |
-              +--------------+--------------+
-                             |
-                             v
-              [ Prompt built on the server ]
-                             |
-                             v
-              [ AI provider: Groq, then Gemini ]
-              quota checked first, output capped
-                             |
-                             v
-              [ One AI call narrates the outcome ]
-                             |
-                             v
-              [ Server applies the sheet's numbers ]
-```
 
-### HOW A TURN WORKS
+### How a turn works
 
-1. **The browser sends the action:** the turn number and the player's text or chosen option. Game
-   state stays on the server. (`server.js`, `POST /api/turn`)
-2. **The server rolls first.** Every check is rolled with `crypto.randomInt` against targets from
-   the rules engine, and the result is written as outcome words such as "HIT, target DOWN".
-   (`server/services/outcomeSheet.js`, `dice.js`, `ruleEngine.js`)
-3. **One AI call narrates it.** The server builds the prompt from stored state, and the AI describes
-   the outcome. If a reply comes back unreadable, the server retries once on the other provider. Output is
-   capped at 4,096 tokens. (`server/services/promptBuilder.js`)
-4. **The server applies the numbers.** Damage, energy spent and every other change come from the
-   sheet; the AI's text describes the result. (`server/services/resolveTurn.js`)
-5. **A retry replays the same result.** Each turn is saved to a turn log before the AI answers, so a retried
-   or duplicate request replays the same result.
+1. **Receive the action.** The browser sends the player’s action and turn number. Game state stays on the server.
+2. **Calculate and record the outcome.** The rules engine sets targets, the server rolls the checks, and the turn log preserves the result.
+3. **Generate the narration.** The model receives the outcome and relevant context. An unreadable reply triggers one retry through the other provider.
+4. **Apply the calculated changes.** Damage, energy use, and other state changes come from the server’s outcome sheet.
+5. **Handle retries consistently.** Duplicate or retried requests replay the recorded result.
 
-### KEY DECISIONS
+[Rolls](server/services/dice.js) · [Outcome sheet](server/services/outcomeSheet.js) · [Prompt builder](server/services/promptBuilder.js) · [Turn resolution](server/services/resolveTurn.js)
 
-- **The server owns game state.** It is the single writer, and the browser sends actions.
-  (`server/services/stateStore.js`)
-- **The old client-driven AI relay is retired.** `POST /api/chat` returns `410 Gone`.
-- **Rules are sent by relevance.** Each prompt carries the rules that turn needs, within a design
-  budget of about 800 tokens (a target set in code).
-  (`server/services/promptRulesInjector.js`)
-- **Games run with every ruleset loaded.** New games and turns check the rules first and return
-  `503 RULES_NOT_LOADED` until all of them are loaded.
-- **Rules stay on the server.** They live in `data/rules/`, outside the web folder.
-- **One format for every AI provider.** Groq and Gemini both use the OpenAI chat format, so adding a
-  third is a single registry entry. (`server/services/aiProviders.js`)
-- **Simple stack.** Node, Express 4 and SQLite in WAL mode, accessed synchronously through
-  `better-sqlite3`, so the data layer is plain synchronous code.
-- **The frontend ships as written.** `public/app.js` is plain `React.createElement` calls, served
-  directly.
-- **Sessions use save codes.** A session is a token plus a ten-character save code.
+## Validation & limitations
 
-### CHOOSING THE AI
+### What is tested
 
-Provider choice was decided by measurement. `planning/experiments/model-bakeoff/` holds the harness,
-prompt and raw results for **46 models** across OpenAI, Google and Groq, each given the same game
-turn. It was measured before 2026-09-03 on the turn prompt of that time, so it shows which models are
-fast and reliable. Of the 46, 37 answered in the required format, 4 answered in the wrong format,
-and 5 returned errors.
+Two suites check different levels of behavior:
 
-| Model | Latency | Note |
+| Suite | Coverage |
+|---|---|
+| **220 tests** | Application and service behavior, using a local AI substitute whenever the app starts |
+| **168 browser QA checks** | Complete gameplay at phone and desktop sizes, combat, checkpoint replay, and eight provider-failure scenarios |
+
+The replay checks verify that a repeated turn returns the same result. Failure checks verify clear messages and retry behavior.
+
+Both suites use a scripted AI substitute, so they run without paid AI calls. They verify application behavior; they do not establish the quality of every response from a live model.
+
+[Tests](tests/) · [No-real-provider check](tests/noRealProvider.test.js) · [Browser QA](qa/README.md)
+
+### Current limitations
+
+- **Demo capacity is limited.** The app operates within free provider allowances and can reach its daily limit.
+- **Narration remains model-generated.** Server control protects the numerical state; it does not guarantee that every sentence is correct.
+- **The database is local.** SQLite simplifies the build but ties it to one machine.
+- **Rules load at startup.** Changing them requires a restart. New games and turns are blocked until all rulesets have loaded.
+- **Tests run sequentially.** They share a database.
+- **Some game rules are simplified.** Those choices are documented in the specification.
+
+[Exact and simplified rules](planning/prd/PRD-v3.md) · [Build decisions and changes](planning/CHANGES.md)
+
+### Planning and build evidence
+
+The repository preserves the original risk analysis, implementation sequence, API contracts, and subsequent decisions. These documents show how the build developed, including changes from the initial plans.
+
+[Risks and sequencing](planning/PLAN.md) · [API and state contracts](planning/prd/PRD-v2.md) · [Change record](planning/CHANGES.md)
+
+## Technical reference
+
+<details>
+<summary>Stack and implementation map</summary>
+
+| Component | Implementation |
+|---|---|
+| Backend | Node and Express 4 |
+| Database | SQLite in WAL mode through `better-sqlite3` |
+| Frontend | React calls served directly from `public/app.js` |
+| AI providers | Groq first, Gemini as backup |
+| Provider interface | Shared OpenAI-compatible chat format |
+| Sessions | Session token and ten-character save code |
+| Rules | Server-side files in `data/rules/`, outside the public web folder |
+| Testing | Local scripted AI substitute and browser QA |
+
+| Location | Purpose |
+|---|---|
+| [server.js](server.js) | API routes, request limits, and quota handling |
+| [server/services/stateStore.js](server/services/stateStore.js) | Authoritative game state |
+| [server/services/ruleEngine.js](server/services/ruleEngine.js) | Rules and targets |
+| [server/services/outcomeSheet.js](server/services/outcomeSheet.js) | Calculated turn outcomes |
+| [server/services/resolveTurn.js](server/services/resolveTurn.js) | Applying state changes |
+| [server/services/promptBuilder.js](server/services/promptBuilder.js) | Narration requests |
+| [server/services/promptRulesInjector.js](server/services/promptRulesInjector.js) | Relevant-rule selection |
+| [server/services/aiProviders.js](server/services/aiProviders.js) | Provider registry |
+| [planning/](planning/) | Specifications, experiments, and build history |
+
+The retired `POST /api/chat` endpoint returns `410 Gone`. The old `build.js` remains as a historical reference.
+
+</details>
+
+<details>
+<summary>Usage controls and security configuration</summary>
+
+Default request limits are configurable in `.env`:
+
+| Limit | Default |
+|---|---|
+| Turns per session | 100 per hour |
+| Turns per IP address | 150 per hour |
+| New sessions per IP address | 20 per hour |
+| Turns per session per day | 300 |
+| Checkpoints | 200 per hour |
+| Module-route requests | 60 per hour |
+
+The server tracks daily provider allowances and checks them before every AI call. Output is capped at 4,096 tokens.
+
+Security headers use `helmet`. Content Security Policy is disabled to accommodate the current inline scripts and styles; that is a limitation of this implementation.
+
+</details>
+
+<details>
+<summary>Provider capacity snapshot: September 30, 2026</summary>
+
+These figures describe the recorded demo configuration, not permanent provider guarantees.
+
+| Provider / model | Recorded allowance | Basis |
 |---|---|---|
-| GPT-5, GPT-5-mini | 26.9s, 23.3s | Too slow for a game turn |
-| GPT-5.1 through 5.6, full size | 4.2s to 16.5s | Still too slow |
-| GPT-5.4-mini, GPT-5.4-nano, GPT-4.1-mini | 2.1s to 3.7s | Fast, valid format |
-| **llama-3.3-70b-versatile** | 1.0s | First choice; later retired by Groq, replaced by `openai/gpt-oss-120b` |
-| gemini-2.5-flash-lite | 1.1s | Fast, valid format |
-| **gemini-2.5-flash** | 3.7s | Chosen as backup |
+| Groq / `openai/gpt-oss-120b` | 1,000 requests and 200,000 tokens per day | Published limits checked September 30, 2026 |
+| Gemini / `gemini-2.5-flash` | 20 requests per day | Observed live limit error on September 30, 2026 |
 
-**Why Groq first, Gemini as backup:**
+An early-game turn measured approximately 2,000 tokens, giving an estimated 50–100 turns per day within the Groq token allowance. Longer sessions increase context size and can reduce capacity.
 
-- **Groq is faster and allows more.** Its free tier for `openai/gpt-oss-120b` is 1,000 requests and
-  200,000 tokens a day (Groq's published limits, checked 2026-09-30).
-- **Gemini covers bursts and outages.** Its free tier for `gemini-2.5-flash` is 20 requests a day
-  (measured from a live limit error, 2026-09-30).
-- **Rough capacity:** an early-game turn measured about 2,000 tokens (2026-09-30), so Groq's
-  allowance is roughly 50 to 100 turns a day. An estimate: turns grow as a game goes on.
+The initial model comparison favored `llama-3.3-70b-versatile` for speed. After Groq retired that model, the primary configuration changed to `openai/gpt-oss-120b`.
 
-### SECURITY AND COST
+[Original comparison and raw measurements](planning/experiments/model-bakeoff/)
 
-- **Six rate limits,** each adjustable in `.env`: turns per session (100 an hour), turns per IP
-  address (150 an hour), new sessions per IP (20 an hour), turns per session per day (300),
-  checkpoints (200 an hour) and module routes (60 an hour).
-- **Quota checked before every AI call.** The server tracks each provider's daily allowance. When
-  every provider is used up, players get a clear message with the time it resets. (`server.js`, `exhaustedPayload`)
-- **Security headers** via `helmet`. The content security policy is switched off so the page's
-  inline script and style block can run.
-- **Runs on free tiers.** A demo late in the day can reach the daily limit and show the quota message.
+</details>
 
-### HOW IT WAS PLANNED AND TESTED
+## Run it yourself
 
-- **Risks and sequencing:** `planning/PLAN.md`, sections A and B.
-- **Decisions with reasons and test counts:** `planning/CHANGES.md`, one entry per change.
-- **API and state contracts, packet dependency graph:** `planning/prd/PRD-v2.md`, sections 28 to 30.
-- **Which rules are followed exactly and which are simplified:** `planning/prd/PRD-v3.md`,
-  section 11.
-- **Tests, in two tiers:**
-  - `npm test`: 220 tests. Every test that starts the app points it at a local stand-in AI, so the
-    suite runs offline even with a `.env` holding real keys. (`tests/noRealProvider.test.js`)
-  - `npm run qa`: 168 checks. A scripted stand-in AI drives a real browser through the whole game
-    at phone and desktop size. The run includes combat, a checkpoint replay that proves a replayed turn
-    returns the same result, and eight kinds of provider failure, each of which must show a clear message and a
-    retry.
+You need Node 20 or later and an API key for Groq or Gemini. Configure both to exercise provider fallback.
 
-### TRADE-OFFS
+### 1. Install and test
 
-- **SQLite** ties the app to one machine, in exchange for a simple, fast data layer and test suite.
-- **Rules load at startup,** so a rules edit needs a restart.
-- **Tests run one at a time,** because they share one database.
-- **`build.js`** is the retired build step, kept in the repo for reference.
-
----
-
-## RUN IT YOURSELF
-
-**What you need**
-
-- Node 20 or later
-- At least one free AI key: Groq (console.groq.com) or Gemini (Google AI Studio). Both is best:
-  Groq runs first and Gemini is the backup.
-
-**1. Get the code**
-
-```
+```bash
 git clone https://github.com/kgsubs/astra-rising-public.git
 cd astra-rising-public
 npm ci
-```
-
-**2. Check it works (runs offline)**
-
-```
 npm test
 ```
 
-**3. Add your settings**
+Tests run offline using the local AI substitute.
 
-```
+### 2. Configure providers
+
+```bash
 cp .env.example .env
 ```
 
-Then fill in these lines in `.env`:
+Set one or both keys:
 
-| Setting | What goes there |
+| Variable | Source |
 |---|---|
-| `GROQ_API_KEY` | Groq console: API Keys |
-| `GEMINI_API_KEY` | Google AI Studio: Get API key |
+| `GROQ_API_KEY` | [Groq Console](https://console.groq.com) |
+| `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com) |
 
-**4. Set up the database**
+Groq runs first; Gemini provides backup.
 
-The game creates its SQLite database automatically the first time it starts.
+### 3. Start the app
 
-**5. Start it**
-
-```
+```bash
 npm start
 ```
 
-Open http://localhost:3500.
+The app creates its SQLite database on first start. Open http://localhost:3500.
 
-**6. Run the browser test suite (optional)**
+### 4. Run browser QA
 
-```
+```bash
 npm run qa
 ```
 
-This needs the `agent-browser` command-line tool installed first; see `qa/README.md`.
+This requires the `agent-browser` command-line tool. See [QA setup](qa/README.md).
 
-**Deploying to a server:** `planning/deploy/` has the reverse-proxy config, the service file and a
-setup script, with the domain and user as placeholders.
+**Server deployment:** see [planning/deploy/](planning/deploy/) for reverse-proxy configuration, the service file, and a setup script. Replace the domain and user placeholders before use.
 
----
+## License
 
-## LICENSE
+MIT. See [LICENSE](LICENSE).
 
-MIT. See `LICENSE`. Bundled fonts and images carry their own terms; see `THIRD_PARTY_NOTICES.md`.
+Bundled fonts and images carry their own terms. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
