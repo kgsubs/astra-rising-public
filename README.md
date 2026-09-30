@@ -17,7 +17,7 @@ The problem it solves is general: a language model is good at language and unrel
 
 ---
 
-## Design principles for this build, where else they can apply.
+## DESIGN PRINCIPLES & BUSINESS VALUE
 
 The pattern here is "rules decide, AI explains." Each part carries over directly:
 
@@ -29,9 +29,9 @@ The pattern here is "rules decide, AI explains." Each part carries over directly
 
 ---
 
-## Technical overview
+## TECHNICAL OVERVIEW
 
-### Architecture
+### ARCHITECTURE
 
 ```
                      [ Player action ]
@@ -59,7 +59,7 @@ The pattern here is "rules decide, AI explains." Each part carries over directly
               [ Server applies the sheet's numbers ]
 ```
 
-### How a turn works
+### HOW A TURN WORKS
 
 1. **The browser sends the action:** the turn number and the player's text or chosen option. Game
    state stays on the server. (`server.js`, `POST /api/turn`)
@@ -74,7 +74,7 @@ The pattern here is "rules decide, AI explains." Each part carries over directly
 5. **A retry replays the same result.** Each turn is saved to a turn log before the AI answers, so a retried
    or duplicate request replays the same result.
 
-### Key decisions
+### KEY DECISIONS
 
 - **The server owns game state.** It is the single writer, and the browser sends actions.
   (`server/services/stateStore.js`)
@@ -93,7 +93,7 @@ The pattern here is "rules decide, AI explains." Each part carries over directly
   directly.
 - **Sessions use save codes.** A session is a token plus a ten-character save code.
 
-### Choosing the AI
+### CHOOSING THE AI
 
 Provider choice was decided by measurement. `planning/experiments/model-bakeoff/` holds the harness,
 prompt and raw results for **46 models** across OpenAI, Google and Groq, each given the same game
@@ -119,7 +119,7 @@ and 5 returned errors.
 - **Rough capacity:** an early-game turn measured about 2,000 tokens (2026-09-30), so Groq's
   allowance is roughly 50 to 100 turns a day. An estimate: turns grow as a game goes on.
 
-### Security and cost
+### SECURITY AND COST
 
 - **Six rate limits,** each adjustable in `.env`: turns per session (100 an hour), turns per IP
   address (150 an hour), new sessions per IP (20 an hour), turns per session per day (300),
@@ -130,7 +130,7 @@ and 5 returned errors.
   inline script and style block can run.
 - **Runs on free tiers.** A demo late in the day can reach the daily limit and show the quota message.
 
-### How it was planned and tested
+### HOW IT WAS PLANNED AND TESTED
 
 - **Risks and sequencing:** `planning/PLAN.md`, sections A and B.
 - **Decisions with reasons and test counts:** `planning/CHANGES.md`, one entry per change.
@@ -145,7 +145,7 @@ and 5 returned errors.
     returns the same result, and eight kinds of provider failure, each of which must show a clear message and a
     retry.
 
-### Trade-offs
+### TRADE-OFFS
 
 - **SQLite** ties the app to one machine, in exchange for a simple, fast data layer and test suite.
 - **Rules load at startup,** so a rules edit needs a restart.
@@ -154,7 +154,7 @@ and 5 returned errors.
 
 ---
 
-## Run it yourself
+## RUN IT YOURSELF
 
 **What you need**
 
@@ -214,6 +214,6 @@ setup script, with the domain and user as placeholders.
 
 ---
 
-## License
+## LICENSE
 
 MIT. See `LICENSE`. Bundled fonts and images carry their own terms; see `THIRD_PARTY_NOTICES.md`.
