@@ -6,15 +6,13 @@ on 2026-09-30, not assumed from general knowledge about the font names.
 
 ## Fonts
 
-### Michroma
+### Audiowide
 
-- Files: `public/vendor/fonts/michroma-regular.woff2`,
-  `public/vendor/fonts/michroma-regular.woff`
-- License: SIL Open Font License 1.1 (OFL), per the font's own embedded
-  license URL: https://scripts.sil.org/OFL. Full license text:
-  `public/vendor/fonts/OFL-Michroma.txt`.
-- Copyright: 2011 The Michroma Project Authors
-  (https://github.com/googlefonts/Michroma-font)
+- Files: `public/vendor/fonts/audiowide-regular.woff2` (Latin subset)
+- License: SIL Open Font License 1.1 (OFL). Full license text:
+  `public/vendor/fonts/OFL-Audiowide.txt`.
+- Copyright: 2012 Brian J. Bonislawsky DBA Astigmatic (AOETI), with Reserved
+  Font Name "Audiowide"
 
 ### Karla
 

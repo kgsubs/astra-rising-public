@@ -278,26 +278,44 @@ function LandingScreen({
     }, 450);
   }
 
-  // Static star field
+  // Static star field, pinned to the browser window (the app shell is capped
+  // at 1280px wide) and redrawn whenever the window is resized.
   React.useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    const starCount = Math.floor(canvas.width * canvas.height / 1200);
-    for (var i = 0; i < starCount; i++) {
-      var x = Math.random() * canvas.width;
-      var y = Math.random() * canvas.height;
-      var r = Math.random() * 1.4 + 0.2;
-      var a = Math.random() * 0.7 + 0.3;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255,255,255,' + a + ')';
-      ctx.fill();
-    }
+    var draw = function () {
+      var w = canvas.clientWidth;
+      var h = canvas.clientHeight;
+      var dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, w, h);
+      var starCount = Math.floor(w * h / 1200);
+      for (var i = 0; i < starCount; i++) {
+        var x = Math.random() * w;
+        var y = Math.random() * h;
+        var r = Math.random() * 1.4 + 0.2;
+        var a = Math.random() * 0.7 + 0.3;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,' + a + ')';
+        ctx.fill();
+      }
+    };
+    draw();
+    var timer = null;
+    var onResize = function () {
+      clearTimeout(timer);
+      timer = setTimeout(draw, 150);
+    };
+    window.addEventListener('resize', onResize);
+    return function () {
+      clearTimeout(timer);
+      window.removeEventListener('resize', onResize);
+    };
   }, []);
 
   // Phase sequencer
@@ -339,8 +357,10 @@ function LandingScreen({
   }, /*#__PURE__*/React.createElement("canvas", {
     ref: canvasRef,
     style: {
-      position: 'absolute',
+      position: 'fixed',
       inset: 0,
+      width: '100vw',
+      height: '100vh',
       zIndex: 1,
       opacity: starsOpacity,
       transition: ease
@@ -365,7 +385,8 @@ function LandingScreen({
   }, /*#__PURE__*/React.createElement("div", {
     className: "text-[61px] sm:text-[clamp(49px,9.1vw,68px)]",
     style: {
-      fontFamily: "'Michroma', sans-serif",
+      fontFamily: "'Audiowide', sans-serif",
+      textTransform: 'uppercase',
       letterSpacing: '0.05em',
       lineHeight: 1.125,
       color: '#facc15',

@@ -1,11 +1,10 @@
-/* Michroma – sci-fi display font */
+/* Audiowide - sci-fi display font (SIL Open Font License, see OFL-Audiowide.txt) */
 @font-face {
-  font-family: 'Michroma';
+  font-family: 'Audiowide';
   font-style: normal;
   font-weight: 400;
   font-display: block;
-  src: url('/vendor/fonts/michroma-regular.woff2') format('woff2'),
-       url('/vendor/fonts/michroma-regular.woff') format('woff');
+  src: url('/vendor/fonts/audiowide-regular.woff2') format('woff2');
 }
 
 /* Karla – latin-ext (normal, weights 300–700) */
