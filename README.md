@@ -12,6 +12,7 @@ Gemini.
 
 **CONTENTS**
 
+- [WHAT IS THIS?](#what-is-this)
 - [DESIGN PRINCIPLES & BUSINESS VALUE](#design-principles--business-value)
 - [TECHNICAL OVERVIEW](#technical-overview)
   - [ARCHITECTURE](#architecture)
@@ -23,6 +24,8 @@ Gemini.
   - [TRADE-OFFS](#trade-offs)
 - [RUN IT YOURSELF](#run-it-yourself)
 - [LICENSE](#license)
+
+## WHAT IS THIS?
 
 Astra Rising is a live, browser-based science-fiction role-playing game run by an AI game master. The AI writes the story. A rules engine on the server computes every roll, target and injury, so the game is fair and repeatable. Players pick up where they left off with a short save code.
 
