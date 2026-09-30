@@ -6,6 +6,10 @@
 
 **Live Build:** [astrarising.com](https://astrarising.com)
 
+This repository is the real source behind the live product, published as a case study and licensed
+under MIT (see [License](#license)). It is fully installable with your own API key for Groq or
+Gemini.
+
 **CONTENTS**
 
 - [DESIGN PRINCIPLES & BUSINESS VALUE](#design-principles--business-value)
