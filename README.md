@@ -4,7 +4,7 @@
 
 **Live Build:** [astrarising.com](https://astrarising.com)
 
-**CONTENTS**
+## CONTENTS
 
 - [WHAT IS THIS?](#what-is-this)
 - [DESIGN PRINCIPLES & BUSINESS VALUE](#design-principles--business-value)
