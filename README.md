@@ -14,9 +14,9 @@
 
 ## WHAT IS THIS?
 
-Astra Rising is a live, browser-based science-fiction role-playing game run by an AI game master. The AI writes the story. A rules engine on the server computes every roll, target and injury, so the game is fair and repeatable. Players pick up where they left off with a short save code.
+A browser-based sci-fi role-playing game with an AI game master. The server calculates the outcomes; AI tells the story. Players can leave and resume with a short save code.
 
-The problem it solves is general: a language model is good at language and unreliable at arithmetic and rules. This build draws a hard line between the two, picks its AI provider by measured speed and reliability, and runs inside free usage limits with automatic failover when a provider is busy or down.
+It demonstrates a practical business pattern: use rules to make decisions and AI to explain them.
 
 This repository is the real source behind the live product, published as a case study and licensed
 under MIT (see [License](#license)). It is fully installable with your own API key for Groq or
@@ -31,13 +31,13 @@ Gemini.
 
 ## DESIGN PRINCIPLES & BUSINESS VALUE
 
-The pattern here is "rules decide, AI explains." Each part carries over directly:
+- Keep decisions accountable. Explicit rules determine outcomes, giving the AI a calculated result to explain.
+- Use AI efficiently. Send only relevant rules, cap usage, and choose providers based on measured performance.
+- Plan for provider failures. Switch providers automatically when one fails or reaches its limit.
+- Let people pick up where they left off. Save codes preserve progress, a useful pattern for quotes, applications, and intake forms.
+- Make testing repeatable. A scripted AI substitute checks complete workflows and failure scenarios without paid API calls.
 
-- **Rules engine plus AI narrator.** Insurance claim decisions, loan pre-qualification, benefits eligibility, or pricing quotes. The server computes the outcome under the policy and the AI writes the customer-facing explanation. The number always comes from the server.
-- **Relevance-based rules injection.** Customer support or compliance assistants that must cite the right clause of a large policy manual by sending only the relevant sections with each request.
-- **Provider chain with quota accounting and failover.** Any business feature that depends on an AI vendor and needs predictable cost and uptime.
-- **Resume by save code.** Intake forms, quotes or applications that a person can leave and pick up again with a short code.
-- **A scripted stand-in AI for testing.** Any AI product that needs repeatable, free, end-to-end tests before release.
+The same separation of rules and explanation can support claims, lending, eligibility, and pricing workflows.
 
 ---
 
