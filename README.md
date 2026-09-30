@@ -6,18 +6,7 @@
 
 ## CONTENTS
 
-- [WHAT IS THIS?](#what-is-this)
-- [DESIGN PRINCIPLES & BUSINESS VALUE](#design-principles--business-value)
-- [TECHNICAL OVERVIEW](#technical-overview)
-  - [ARCHITECTURE](#architecture)
-  - [HOW A TURN WORKS](#how-a-turn-works)
-  - [KEY DECISIONS](#key-decisions)
-  - [CHOOSING THE AI](#choosing-the-ai)
-  - [SECURITY AND COST](#security-and-cost)
-  - [HOW IT WAS PLANNED AND TESTED](#how-it-was-planned-and-tested)
-  - [TRADE-OFFS](#trade-offs)
-- [RUN IT YOURSELF](#run-it-yourself)
-- [LICENSE](#license)
+[What Is This?](#what-is-this) · [Design Principles & Business Value](#design-principles--business-value) · [Technical Overview](#technical-overview) · [Run It Yourself](#run-it-yourself) · [License](#license)
 
 ## WHAT IS THIS?
 
