@@ -3283,6 +3283,7 @@ function App() {
   const [szError, setSzError] = useState(null);
   const [firstHookOpening, setFirstHookOpening] = useState(null);
   const [sessionInitState, setSessionInitState] = useState('pending'); // 'pending' | 'ready' | 'error'
+  const [sessionInitError, setSessionInitError] = useState(null);
   const [saveCode, setSaveCode] = useState(() => localStorage.getItem('sf_save_code') || null);
   // Whether the server holds saved game state for this session; the server is
   // the source of truth for resuming, the local snapshot only a fallback.
@@ -3301,13 +3302,34 @@ function App() {
 
   const doSessionInit = useCallback(() => {
     setSessionInitState('pending');
+    setSessionInitError(null);
     const timeoutId = setTimeout(() => setSessionInitState('error'), 10000);
+    // A refused session (for example 429, too many new sessions from one
+    // address) stops here with the server's reason, instead of carrying on
+    // without a token.
+    const failSession = err => {
+      clearTimeout(timeoutId);
+      if (err && err.status === 429) {
+        const minutes = Math.max(1, Math.ceil((err.retryAfter || 0) / 60));
+        setSessionInitError(`Too many new games have been started from this address. Try again in about ${minutes} minute${minutes === 1 ? '' : 's'}.`);
+      }
+      setSessionInitState('error');
+    };
     const createSession = () => fetch('/api/session', {
       method: 'POST'
-    }).then(r => r.json()).then(({
+    }).then(async r => {
+      if (!r.ok) {
+        const err = new Error('Session request failed');
+        err.status = r.status;
+        err.retryAfter = parseInt(r.headers.get('Retry-After') || '0', 10);
+        throw err;
+      }
+      return r.json();
+    }).then(({
       token,
       save_code
     }) => {
+      if (!token) throw new Error('No session token returned');
       adoptSession(token, save_code);
       setServerHasSave(false);
       setSessionInitState('ready');
@@ -3323,15 +3345,9 @@ function App() {
         } else {
           return createSession();
         }
-      }).catch(() => {
-        clearTimeout(timeoutId);
-        setSessionInitState('error');
-      });
+      }).catch(failSession);
     } else {
-      createSession().then(() => clearTimeout(timeoutId)).catch(() => {
-        clearTimeout(timeoutId);
-        setSessionInitState('error');
-      });
+      createSession().then(() => clearTimeout(timeoutId)).catch(failSession);
     }
   }, [adoptSession]);
 
@@ -3632,10 +3648,10 @@ function App() {
       className: "text-red-400"
     }), /*#__PURE__*/React.createElement("p", {
       className: "text-red-400 font-bold"
-    }, "Unable to connect to the game server."), /*#__PURE__*/React.createElement("button", {
+    }, sessionInitError || "Unable to connect to the game server."), /*#__PURE__*/React.createElement("button", {
       onClick: doSessionInit,
       className: "bg-yellow-400 text-gray-900 font-bold px-6 py-2 rounded-lg hover:bg-yellow-300 cursor-pointer text-sm"
-    }, "Retry"), /*#__PURE__*/React.createElement("p", {
+    }, "Retry"), !sessionInitError && /*#__PURE__*/React.createElement("p", {
       className: "text-gray-600 text-xs"
     }, "If this persists, the server may be temporarily unavailable."));
   }
