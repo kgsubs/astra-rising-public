@@ -6,10 +6,6 @@
 
 **Live Build:** [astrarising.com](https://astrarising.com)
 
-This repository is the real source behind the live product, published as a case study and licensed
-under MIT (see [License](#license)). It is fully installable with your own API key for Groq or
-Gemini.
-
 **CONTENTS**
 
 - [WHAT IS THIS?](#what-is-this)
@@ -30,6 +26,10 @@ Gemini.
 Astra Rising is a live, browser-based science-fiction role-playing game run by an AI game master. The AI writes the story. A rules engine on the server computes every roll, target and injury, so the game is fair and repeatable. Players pick up where they left off with a short save code.
 
 The problem it solves is general: a language model is good at language and unreliable at arithmetic and rules. This build draws a hard line between the two, picks its AI provider by measured speed and reliability, and runs inside free usage limits with automatic failover when a provider is busy or down.
+
+This repository is the real source behind the live product, published as a case study and licensed
+under MIT (see [License](#license)). It is fully installable with your own API key for Groq or
+Gemini.
 
 | | |
 |---|---|
