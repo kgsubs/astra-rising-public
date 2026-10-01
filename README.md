@@ -25,6 +25,8 @@ It demonstrates a practical business pattern: use rules to make decisions and AI
 |---|---|
 | ![Landing](planning/screenshots/landing.png) | ![Campaign selection](planning/screenshots/campaigns.png) |
 | Start a session or resume with a save code | Choose a campaign |
+| ![Character selection](planning/screenshots/characters.png) | ![A game in progress](planning/screenshots/in-game.png) |
+| Choose a character | A game in progress, with the character sheet and combat underway |
 
 This is the source behind the live product, published as an installable case study under the MIT license.
 
@@ -114,16 +116,18 @@ flowchart TD
 
 ### What is tested
 
-Two suites check different levels of behavior:
+Four suites check different levels of behavior:
 
 | Suite | Coverage |
 |---|---|
 | **220 tests** | Application and service behavior, using a local AI substitute whenever the app starts |
-| **168 browser QA checks** | Complete gameplay at phone and desktop sizes, combat, checkpoint replay, and eight provider-failure scenarios |
+| **189 browser QA checks** | Complete gameplay at phone and desktop sizes, combat, checkpoint replay, provider-failure scenarios including the retry on the other provider, and that the title font and starfield really render at four screen widths |
+| **Real-AI evals** | Scripted situations played against the real model through the server's own routes: combat starts when anyone attacks, stories carry no raw numbers, out-of-character questions change nothing, replies parse |
+| **Live smoke check** | One real game and one real turn on the live site, plus the render checks, after every deploy and daily |
 
 The replay checks verify that a repeated turn returns the same result. Failure checks verify clear messages and retry behavior.
 
-Both suites use a scripted AI substitute, so they run without paid AI calls. They verify application behavior; they do not establish the quality of every response from a live model.
+The first two use a scripted AI substitute, so they run without paid AI calls. They verify application behavior; they do not establish the quality of every response from a live model. The evals and the smoke check use the real providers, stop cleanly when the free allowance runs out, and report that as a skip rather than a failure.
 
 [Tests](tests/) · [No-real-provider check](tests/noRealProvider.test.js) · [Browser QA](qa/README.md)
 

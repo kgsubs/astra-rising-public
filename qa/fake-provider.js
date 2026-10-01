@@ -27,6 +27,7 @@ const MODES = [
   'daily_limit', // 429 whose body reads as the day's quota being gone
   'server_error',// 500
   'malformed',   // 200 whose content is not the JSON the client expects
+  'malformed_once', // like malformed for one call, then back to ok (drives the other-provider retry)
   'truncated',   // 200 whose JSON is cut off mid-object
   'cheat',       // 200, valid v2 JSON that also carries legacy dice_rolls/state_updates fields a v2 server must ignore
 ];
@@ -142,7 +143,8 @@ function createFakeProvider({ port = 0, log = () => {} } = {}) {
 
       const { kind, payload } = nextTurn(body, activeMode);
       let content = bodyText(payload);
-      if (activeMode === 'malformed') content = 'I am afraid I cannot answer that in JSON.';
+      if (activeMode === 'malformed' || activeMode === 'malformed_once') content = 'I am afraid I cannot answer that in JSON.';
+      if (activeMode === 'malformed_once') mode = 'ok';
       if (activeMode === 'truncated') content = content.slice(0, Math.floor(content.length * 0.6));
 
       const usage = { prompt_tokens: 1200, completion_tokens: 400, total_tokens: 1600 };

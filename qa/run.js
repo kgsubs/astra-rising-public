@@ -23,6 +23,7 @@ const journeyChecks    = require('./checks/journey');
 const stateChecks      = require('./checks/state');
 const checkpointChecks = require('./checks/checkpoint');
 const resilienceChecks = require('./checks/resilience');
+const renderChecks     = require('./checks/render');
 
 const REAL      = process.argv.includes('--real');
 const KEEP      = process.argv.includes('--keep');
@@ -56,7 +57,7 @@ async function waitForServer(base, timeoutMs = 30000) {
 
 // Boot the app the way production does, but pointed at a scratch database and
 // the fake provider, on a port nothing else is using.
-function startServer({ port, dbPath, fakeUrl, logFile }) {
+function startServer({ port, dbPath, fakeUrl, logFile, extraEnv = {} }) {
   const env = {
     ...process.env,
     PORT: String(port),
@@ -82,6 +83,7 @@ function startServer({ port, dbPath, fakeUrl, logFile }) {
     // is a small, predictable 3, instead of the QA journey depending on
     // whatever crypto.randomInt happens to draw.
     ASTRA_DICE_SCRIPT: '3',
+    ...extraEnv,
   };
   const out = fs.openSync(logFile, 'a');
   const child = spawn(process.execPath, ['server.js'], { cwd: ROOT, env, stdio: ['ignore', out, out] });
@@ -94,13 +96,14 @@ async function main() {
 
   const layers = REAL ? 5 : 7;
   const steps = layers + (VIEWPORTS.length - 1);
-  const r = new Reporter(REAL ? 3 + VIEWPORTS.length : 5 + VIEWPORTS.length);
+  const r = new Reporter(REAL ? 4 + VIEWPORTS.length : 7 + VIEWPORTS.length);
 
   console.log(`Astra QA — ${REAL ? 'live site, real providers' : 'local app, fake provider'}`);
   console.log(`Run folder: ${dir}`);
   console.log('');
 
   let server = null;
+  let limited = null;
   let fake   = null;
   let base   = REAL_BASE;
   let fakeBase = null;
@@ -140,6 +143,23 @@ async function main() {
       await apiChecks.run(r, ctx);
     });
 
+    await step('Check the title font and the starfield really render, at four widths and after a resize', async () => {
+      await renderChecks.run(r, ctx);
+    });
+
+    if (!REAL) {
+      await step('A player turned away by the new-game limit is told why and for how long', async () => {
+        const port = 3900 + (process.pid % 90);
+        const limitedBase = `http://127.0.0.1:${port}`;
+        limited = startServer({
+          port, dbPath: dbPath + '-limited', fakeUrl: fakeBase + '/v1/chat/completions',
+          logFile: path.join(dir, 'server-limited.log'), extraEnv: { SESSION_RATE_LIMIT_MAX: '1' },
+        });
+        await waitForServer(limitedBase);
+        await renderChecks.refusedSession(r, ctx, limitedBase);
+      });
+    }
+
     for (const vp of VIEWPORTS) {
       await step(`Play the game end to end at ${vp.label} size (${vp.width}x${vp.height})`, async () => {
         await journeyChecks.run(r, ctx, vp);
@@ -168,8 +188,9 @@ async function main() {
   } finally {
     browser.close();
     if (server) server.kill('SIGTERM');
+    if (limited) limited.kill('SIGTERM');
     if (fake) await fake.close();
-    if (!KEEP) for (const f of [dbPath, dbPath + '-wal', dbPath + '-shm']) { try { fs.unlinkSync(f); } catch (_) {} }
+    if (!KEEP) for (const f of [dbPath, dbPath + '-limited'].flatMap(d => [d, d + '-wal', d + '-shm'])) { try { fs.unlinkSync(f); } catch (_) {} }
   }
 
   const result = r.summary();

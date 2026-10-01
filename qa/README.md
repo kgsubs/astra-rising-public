@@ -40,6 +40,7 @@ switches behavior; `POST /__reset` rewinds to the first canned turn.
 | `server_error` | 500 |
 | `malformed` | 200 whose content is not the JSON the client expects |
 | `truncated` | 200 whose JSON is cut off mid-object |
+| `malformed_once` | like `malformed` for one call, then back to `ok` (drives the retry on the other provider) |
 
 ## The layers
 
@@ -48,7 +49,34 @@ switches behavior; `POST /__reset` rewinds to the first canned turn.
 | `checks/api.js` | every route's success shape and every refusal: bad tokens, unknown ids, oversized bodies, empty conversations |
 | `checks/journey.js` | the path a player walks, in a real browser, at phone and desktop size; each screen arrives, opens at the top, and does not scroll sideways |
 | `checks/state.js` | what the DM said landed in the sheet, reached the server, and survived a reload |
-| `checks/resilience.js` | each provider failure produces a specific message and a usable game, never an endless spinner |
+| `checks/resilience.js` | each provider failure produces a specific message and a usable game, never an endless spinner; one unreadable reply is retried on the other provider |
+| `checks/render.js` | the title really draws in Audiowide (measured, not trusted from `document.fonts`), the starfield covers the window at 390, 1280, 2560 and 3440 wide and after a resize, and a player refused a new game is told why and for how long |
+
+## The four tiers
+
+| command | what it runs | when |
+|---|---|---|
+| `npm run check` | Jest, then this QA harness against the fake AI | before every release; the live build's deploy script runs it first and stops on any failure |
+| (inside `npm run qa`) | `checks/render.js` | every QA run |
+| `npm run eval` | `evals/run.js`: real-AI scenarios through this checkout's own server (session zero parses, an attacking hostile starts combat, a fight the AI narrates starts combat and never hurts through hazard, stories carry no raw numbers, Ask GM changes nothing, replies parse); about 5 AI calls per repeat | before a release and weekly, at a quiet hour; needs `EVAL_ENV_FILE` pointing at an `.env` with the keys |
+| `npm run smoke` | `smoke-live.js`: the live site's routes, one real new game and one real turn, and the render checks on the live page | after every deploy and daily; the live build reports both schedules to an uptime monitor that emails on a failure or a missed run |
+
+Every run writes a dated folder under `runs/` with `report.json`. Exit codes:
+0 all passed; 1 something is broken; 3 everything that ran passed, but the AI
+allowance stopped the real-AI part (`lib/allowance.js`).
+
+`npm run check` never touches a real AI: both providers point at the fake.
+`npm run eval` and `npm run smoke` share the live site's Groq and Gemini keys
+(Groq free tier: 1,000 requests and 200,000 tokens a day, 8,000 tokens a
+minute; Gemini: 20 requests a day), and the live site's meter cannot see their
+calls. So the evals refuse to start unless the live site reports at least
+`EVAL_MIN_GROQ_TOKENS` (default 100,000) Groq tokens and, when Gemini is in
+use, `EVAL_MIN_GEMINI_REQUESTS` (default 10) Gemini requests left; a spent
+allowance mid-run stops the run with exit 3; and each run prints what it used.
+The live build's deploy script treats a smoke exit 3 as passed, with the skip shown.
+
+Standing rule: every bug found by hand gets a check in the right tier before
+its fix ships.
 
 ## Adding a check
 

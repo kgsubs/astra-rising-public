@@ -115,6 +115,18 @@ async function run(r, ctx) {
     stallMid.settled === true && !stallMid.error,
     stallMid.error ? stallMid.error.text.slice(0, 90) : (stallMid.timedOut ? 'still spinning' : 'no error'));
 
+  // One unreadable answer: the server asks the other provider once, and the
+  // player gets a normal turn.
+  const before = (await (await fetch(fakeBase + '/__calls')).json()).calls.length;
+  await setMode(fakeBase, 'malformed_once');
+  const once = await takeTurn(b, 'QA probe: malformed_once', { timeout: 60000 });
+  const calls = (await (await fetch(fakeBase + '/__calls')).json()).calls.slice(before);
+  r.check('one unreadable answer is retried and the turn completes',
+    once.settled === true && !once.error, once.error ? once.error.text.slice(0, 90) : 'no error');
+  r.check('the retry goes to the other provider',
+    calls.length === 2 && calls[0].body.model !== calls[1].body.model,
+    calls.map(c => c.body.model).join(' then '));
+
   await setMode(fakeBase, 'ok');
 
   // These leave the providers blocked behind them, so they go last.

@@ -10,7 +10,10 @@
     "start": "node server.js",
     "build:css": "tailwindcss -i tailwind.source.css -o public/app.css --minify",
     "test": "jest --runInBand --forceExit",
-    "qa": "node qa/run.js"
+    "qa": "node qa/run.js",
+    "check": "npm test && npm run qa",
+    "smoke": "node qa/smoke-live.js",
+    "eval": "node evals/run.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",
