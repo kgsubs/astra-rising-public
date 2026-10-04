@@ -127,6 +127,17 @@ async function run(r, ctx) {
     calls.length === 2 && calls[0].body.model !== calls[1].body.model,
     calls.map(c => c.body.model).join(' then '));
 
+  // A reply that can only be patched up (story cut off mid-sentence, a stray
+  // "{") also goes to the other provider, and the player sees the clean one.
+  const before2 = (await (await fetch(fakeBase + '/__calls')).json()).calls.length;
+  await setMode(fakeBase, 'repaired_once');
+  const patched = await takeTurn(b, 'QA probe: repaired_once', { timeout: 60000 });
+  const calls2 = (await (await fetch(fakeBase + '/__calls')).json()).calls.slice(before2);
+  r.check('a patched-up reply is retried on the other provider',
+    calls2.length === 2 && calls2[0].body.model !== calls2[1].body.model, calls2.map(c => c.body.model).join(' then '));
+  r.check('the player never sees the cut-off story or a stray brace',
+    patched.settled === true && !patched.error && !/linking the|\{/.test(patched.tail), patched.tail.slice(0, 90));
+
   await setMode(fakeBase, 'ok');
 
   // These leave the providers blocked behind them, so they go last.

@@ -990,18 +990,21 @@ app.post('/api/turn', chatRateLimiter, ipChatRateLimiter, sessionDailyRateLimite
     }
 
     let parsed = parseModelOutput(rawText);
-    if (!parsed.ok) {
+    // An unreadable reply, or one that could only be patched up (its story
+    // kept as written, which on 2026-10-01 meant a sentence cut off mid-way
+    // and a stray "{"), gets one try on the other provider with the same
+    // prompt and sheet. A clean retry wins; otherwise a patched reply is
+    // still better than an error.
+    if (!parsed.ok || parsed.repaired) {
       const raw = String(rawText || '');
-      console.warn(`[turn] parse_failed provider=${providerId} finish=${finishReason} len=${raw.length} head=${JSON.stringify(raw.slice(0, 200))} tail=${JSON.stringify(raw.slice(-200))}`);
-      // A provider occasionally ends a stream early while reporting a normal
-      // finish; try the next provider once with the same prompt and sheet.
+      console.warn(`[turn] ${parsed.ok ? 'repaired' : 'parse_failed'} provider=${providerId} finish=${finishReason} len=${raw.length} head=${JSON.stringify(raw.slice(0, 200))} tail=${JSON.stringify(raw.slice(-200))}`);
       const keepAlive = setInterval(() => { try { res.write(`data: ${JSON.stringify({ type: 'astra_progress' })}\n\n`); } catch (_) { /* client gone */ } }, 5000);
       const retry = await callProviderForText({ system, messages, maxTokens: 4096, excludeProviderId: providerId });
       clearInterval(keepAlive);
       if (!retry.error) {
         const retryParsed = parseModelOutput(retry.text);
-        if (retryParsed.ok) { parsed = retryParsed; rawText = retry.text; providerId = retry.provider; }
-        else console.warn(`[turn] parse_failed provider=${retry.provider} finish=${retry.finishReason} len=${String(retry.text || '').length} (retry)`);
+        if (retryParsed.ok && (!retryParsed.repaired || !parsed.ok)) { parsed = retryParsed; rawText = retry.text; providerId = retry.provider; }
+        if (!retryParsed.ok || retryParsed.repaired) console.warn(`[turn] ${retryParsed.ok ? 'repaired' : 'parse_failed'} provider=${retry.provider} finish=${retry.finishReason} len=${String(retry.text || '').length} (retry)`);
       }
     }
     if (!parsed.ok) {

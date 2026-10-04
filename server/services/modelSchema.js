@@ -71,7 +71,7 @@ function extractJSONText(rawText) {
 function repairTruncatedJSON(str) {
   const narrativeMatch = str.match(/"narrative"\s*:\s*"((?:[^"\\]|\\.)*)"/);
   if (!narrativeMatch) return null;
-  const narrative = narrativeMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+  const narrative = tidyRepairedNarrative(narrativeMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
 
   let choices = [];
   try {
@@ -101,6 +101,21 @@ function repairTruncatedJSON(str) {
     tooltip_terms: [],
     _repaired: true,
   };
+}
+
+// A salvaged story is whatever the model wrote before its reply broke, so it
+// can end on leftover JSON punctuation (a lone "{") or mid-sentence ("...a
+// formal demand, linking the"). Drop the trailing debris, then cut back to the
+// last finished sentence when there is one.
+function tidyRepairedNarrative(text) {
+  let t = String(text || '').replace(/[\s{}\[\],:"]+$/, '');
+  if (/[.!?\u2026]["\u201d\u2019)]?$/.test(t)) return t;
+  const ends = [...t.matchAll(/[.!?\u2026]["\u201d\u2019)]?(?=\s)/g)];
+  if (ends.length) {
+    const last = ends[ends.length - 1];
+    t = t.slice(0, last.index + last[0].length);
+  }
+  return t;
 }
 
 function emptyStoryUpdates() {
@@ -275,6 +290,7 @@ module.exports = {
   sanitizeNarrative,
   extractJSONText,
   repairTruncatedJSON,
+  tidyRepairedNarrative,
   normalize,
   stripMechanics,
 };

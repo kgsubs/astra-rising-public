@@ -28,6 +28,7 @@ const MODES = [
   'server_error',// 500
   'malformed',   // 200 whose content is not the JSON the client expects
   'malformed_once', // like malformed for one call, then back to ok (drives the other-provider retry)
+  'repaired_once',  // one broken reply whose story stops mid-sentence and ends on a stray "{", then back to ok
   'truncated',   // 200 whose JSON is cut off mid-object
   'cheat',       // 200, valid v2 JSON that also carries legacy dice_rolls/state_updates fields a v2 server must ignore
 ];
@@ -145,6 +146,10 @@ function createFakeProvider({ port = 0, log = () => {} } = {}) {
       let content = bodyText(payload);
       if (activeMode === 'malformed' || activeMode === 'malformed_once') content = 'I am afraid I cannot answer that in JSON.';
       if (activeMode === 'malformed_once') mode = 'ok';
+      if (activeMode === 'repaired_once') {
+        content = '{"narrative":"The hatch groans open. You reach for the panel, linking the\\n\\n{","checks":[{"row"';
+        mode = 'ok';
+      }
       if (activeMode === 'truncated') content = content.slice(0, Math.floor(content.length * 0.6));
 
       const usage = { prompt_tokens: 1200, completion_tokens: 400, total_tokens: 1600 };

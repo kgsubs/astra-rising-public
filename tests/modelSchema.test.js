@@ -1,6 +1,6 @@
 'use strict';
 
-const { parseModelOutput, sanitizeNarrative, extractJSONText, repairTruncatedJSON, stripMechanics } = require('../server/services/modelSchema');
+const { parseModelOutput, sanitizeNarrative, extractJSONText, repairTruncatedJSON, stripMechanics, tidyRepairedNarrative } = require('../server/services/modelSchema');
 
 function validJSON(overrides = {}) {
   return JSON.stringify({
@@ -119,6 +119,28 @@ describe('modelSchema.js', () => {
   describe('repairTruncatedJSON', () => {
     test('returns null when no narrative field can be found at all', () => {
       expect(repairTruncatedJSON('{"choices": [')).toBeNull();
+    });
+
+    // Both seen live on 2026-10-01: a salvaged story that ended on a stray
+    // "{", and one that stopped mid-sentence.
+    test('a salvaged story loses trailing JSON debris', () => {
+      const r = parseModelOutput('{"narrative":"A chilling duet.\\n\\nWhat do you do next?\\n\\n{","checks":[{"row"');
+      expect(r.repaired).toBe(true);
+      expect(r.data.narrative).toBe('A chilling duet.\n\nWhat do you do next?');
+    });
+
+    test('a salvaged story is cut back to its last finished sentence', () => {
+      const r = parseModelOutput('{"narrative":"You access the protocols. You articulate a formal demand, linking the","checks":[{"row"');
+      expect(r.repaired).toBe(true);
+      expect(r.data.narrative).toBe('You access the protocols.');
+    });
+
+    test('a salvaged story with no finished sentence is kept as written', () => {
+      expect(tidyRepairedNarrative('The hatch groans open and')).toBe('The hatch groans open and');
+    });
+
+    test('closing quotes stay with their sentence', () => {
+      expect(tidyRepairedNarrative('He said \u201cstop.\u201d Then')).toBe('He said \u201cstop.\u201d');
     });
   });
 
