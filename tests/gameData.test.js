@@ -45,6 +45,16 @@ describe('gameData.js', () => {
     expect(getCharacter('nobody')).toBeNull();
   });
 
+  test('every scene exit leads to a scene that exists in the same adventure', () => {
+    const { ADVENTURE_MODULES } = loadGameData();
+    const dead = [];
+    for (const [id, mod] of Object.entries(ADVENTURE_MODULES)) {
+      const ids = new Set(mod.scenes.map(s => s.id));
+      for (const s of mod.scenes) for (const e of s.exits || []) if (!ids.has(e.to)) dead.push(`${id}: ${s.id} -> ${e.to}`);
+    }
+    expect(dead).toEqual([]);
+  });
+
   test('getAdventureLibraryEntry finds the library card for an adventure', () => {
     const entry = getAdventureLibraryEntry('ghost_station');
     expect(entry).not.toBeNull();

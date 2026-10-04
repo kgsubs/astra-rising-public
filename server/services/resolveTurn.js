@@ -382,7 +382,7 @@ function resolveTurn(state, sheet, out, ctx) {
     // roster is still listed immediately, with no roll, so the combat panel
     // shows who is in the fight the instant it starts.
     const openingOrder = [
-      { id: 'player', name: character.name, is_player: true, initiative_roll: null, has_acted: false },
+      { id: 'player', name: character.display_name || character.name, is_player: true, initiative_roll: null, has_acted: false },
       ...combatants.map(c => ({ id: c.id, name: c.name, is_player: false, initiative_roll: null, has_acted: false })),
     ];
     scene = {

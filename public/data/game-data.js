@@ -389,8 +389,7 @@
             npcs_present: [],
             exits: [
               { to: "scene_3_quarters", description: "Crew quarters" },
-              { to: "scene_4_lab", description: "Research lab (sealed door, requires override)" },
-              { to: "scene_5_mining", description: "Mining bay (where artifact was found)" }
+              { to: "scene_4_lab", description: "Research lab (sealed door, requires override)" }
             ]
           },
           {
@@ -653,7 +652,7 @@
             ],
             exits: [
               { to: "scene_6_vault", description: "Lyra alliance formed: find Dr. Vaskov's research" },
-              { to: "scene_7_station_alone", description: "Lyra refuses or player goes solo" }
+              { to: "scene_7_station", description: "Lyra refuses or player goes solo" }
             ]
           },
           {
@@ -755,7 +754,7 @@
             ],
             exits: [
               { to: "scene_5_the_queen", description: "The Queen must be dealt with" },
-              { to: "scene_6_escape", description: "Leave while you can" }
+              { to: "scene_6_aftermath", description: "Leave while you can" }
             ]
           },
           {

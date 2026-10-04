@@ -120,8 +120,8 @@ Four suites check different levels of behavior:
 
 | Suite | Coverage |
 |---|---|
-| **224 tests** | Application and service behavior, using a local AI substitute whenever the app starts |
-| **189 browser QA checks** | Complete gameplay at phone and desktop sizes, combat, checkpoint replay, provider-failure scenarios including the retry on the other provider, and that the title font and starfield really render at four screen widths |
+| **227 tests** | Application and service behavior, using a local AI substitute whenever the app starts |
+| **193 browser QA checks** | Complete gameplay at phone and desktop sizes, combat, checkpoint replay, provider-failure scenarios including the retry on the other provider, and that the title font and starfield really render at four screen widths |
 | **Real-AI evals** | Scripted situations played against the real model through the server's own routes: combat starts when anyone attacks, stories carry no raw numbers, out-of-character questions change nothing, replies parse |
 | **Live smoke check** | One real game and one real turn on the live site, plus the render checks, after every deploy and daily |
 

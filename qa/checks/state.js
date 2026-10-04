@@ -94,6 +94,18 @@ async function run(r, ctx) {
   r.check('the resumed game shows the same save code', b.localStorage('sf_save_code') === ctx.saveCode,
     `${b.localStorage('sf_save_code')} vs ${ctx.saveCode}`);
 
+  // The Save checkpoint button: a player can make a checkpoint from the sheet.
+  b.openSidebar('Player');
+  const saved = b.clickButton('Save checkpoint', { exact: true });
+  r.check('the sheet offers a Save checkpoint button', saved && saved.ok === true, saved && (saved.reason || ''));
+  if (saved && saved.ok) {
+    await b.waitForText('Checkpoints (', { timeout: 15000, label: 'for the checkpoint list' }).catch(() => {});
+    const listed = /Checkpoints \(\d+\)/.test(b.text());
+    const snaps = await (await fetch(`${base}/api/game/snapshot`, { headers: { 'X-Session-Token': token } })).json().catch(() => null);
+    r.check('pressing it saves a checkpoint on the server and lists it', listed && Array.isArray(snaps?.snapshots) && snaps.snapshots.length >= 1,
+      `listed=${listed} server=${snaps?.snapshots?.length}`);
+  }
+
   return ctx;
 }
 

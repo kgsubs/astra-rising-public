@@ -34,6 +34,13 @@ Enum fields:
 - If you introduce a hostile creature or person, set combat.start listing it; never harm the player through hazard for a creature's attack. If the player attacks and no hostile is present, narrate that there is no target and leave combat null.
 A choice's "check.key" must be one of the weapon, skill or enemy ids listed on the outcome sheet's IDS line: an attack uses a weapon key or a skill key naming a weapons category, a skill check uses a skill key, and target_id (when the check is an attack) must be one of the listed enemy ids.`;
 
+// An "Ask GM:" turn has no outcome sheet, so it gets this short format instead
+// of V2_SCHEMA_BLOCK. Without any format block the model answered in plain
+// prose 2 of 4 times in the real-AI evals (2026-10-01).
+const ASK_GM_SCHEMA_BLOCK = `OUTPUT: respond with ONLY a single JSON object, no prose, no markdown fences:
+{"narrative":"","ooc_note":"string","choices":[{"id":"c1","text":"string","action_type":"string"},{"id":"c2","text":"string","action_type":"string"}]}
+Put the answer to the player's question in ooc_note. Leave narrative empty. Your entire response must be this JSON object and nothing else.`;
+
 function layer1(isAskGM) {
   if (isAskGM) {
     return `ASTRA RISING RULES ENGINE:
@@ -135,7 +142,11 @@ function buildTurnPrompt({ state, sheetText, isAskGM = false, activeModules = []
   const rules = buildRulesContext(state, activeModules, { includeComputed: false });
   const parts = [layer1(isAskGM), layer2(), layer3(state)];
   if (rules) parts.push(rules);
-  if (isAskGM || !sheetText) {
+  if (isAskGM) {
+    parts.push(ASK_GM_SCHEMA_BLOCK);
+    return parts.join('\n\n');
+  }
+  if (!sheetText) {
     return parts.join('\n\n');
   }
   parts.push(sheetText, V2_SCHEMA_BLOCK);

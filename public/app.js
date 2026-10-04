@@ -2664,7 +2664,11 @@ function GameScreen({
     diceRolls: latestDiceRolls
   }))), /*#__PURE__*/React.createElement("div", {
     className: "flex-shrink-0 p-2 flex flex-col gap-1.5 w-full"
-  }, snapshots.length > 0 && /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: handleSaveSnapshot,
+    disabled: loading,
+    className: "flex items-center gap-1.5 text-xs px-2 py-1.5 rounded border border-gray-600 text-gray-300 hover:border-blue-500 hover:text-blue-300 cursor-pointer w-full disabled:opacity-50 disabled:cursor-not-allowed"
+  }, /*#__PURE__*/React.createElement("span", null, "Save checkpoint")), snapshots.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "relative"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowSnapshots(s => !s),

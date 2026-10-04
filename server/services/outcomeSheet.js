@@ -144,7 +144,7 @@ function rollHazardRow(dice, currentSta, hazardDice, thresholds) {
 function rollInitiative(dice, character, activeEnemies) {
   const im = computeIM(character.stats?.rs || 0);
   const entries = [{
-    id: 'player', name: character.name, is_player: true,
+    id: 'player', name: character.display_name || character.name, is_player: true,
     initiative_roll: dice.d(10) + im, rs: character.stats?.rs || 0, has_acted: false,
   }];
   for (const enemy of activeEnemies) {

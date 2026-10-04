@@ -77,6 +77,14 @@ describe('outcomeSheet.js', () => {
     expect(sheet.initiative[0].initiative_roll).toBeGreaterThanOrEqual(sheet.initiative[1].initiative_roll);
   });
 
+  test('the turn order shows the name the player chose, not the roster name', () => {
+    const dice = createScriptedDice([9, 3]);
+    const state = makeState({ scene: makeCombatState() });
+    state.character = { ...state.character, display_name: 'Vekk' };
+    const sheet = buildSheet(state, null, dice, rules, houseRules);
+    expect(sheet.initiative.find(e => e.is_player).name).toBe('Vekk');
+  });
+
   test('the hazard row pre-rolls all three severities', () => {
     const dice = createScriptedDice([50]);
     const sheet = buildSheet(makeState(), null, dice, rules, houseRules);

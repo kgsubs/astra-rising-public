@@ -14,6 +14,15 @@ const houseRules = require('../server/data/house_rules.json');
 const { makeState } = require('./helpers/astraFixtures');
 
 describe('promptBuilder.js', () => {
+  // Without a format block the model answered Ask GM in plain prose 2 of 4
+  // times in the real-AI evals (2026-10-01).
+  test('an Ask GM turn is told the exact reply format, answer in ooc_note', () => {
+    const prompt = buildTurnPrompt({ state: makeState(), sheetText: null, isAskGM: true });
+    expect(prompt).toMatch(/OUTPUT: respond with ONLY a single JSON object/);
+    expect(prompt).toMatch(/"ooc_note":"string"/);
+    expect(prompt).not.toMatch(/OUTCOME SHEET/);
+  });
+
   test('the prompt header is ASTRA RISING RULES ENGINE, not the old game\'s rules-engine header', () => {
     const prompt = buildTurnPrompt({ state: makeState(), sheetText: 'OUTCOME SHEET (turn 1).', isAskGM: false });
     expect(prompt).toContain('ASTRA RISING RULES ENGINE');
