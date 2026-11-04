@@ -1,6 +1,6 @@
 # Astra Rising
 
-*I loved playing [Star Frontiers](https://en.wikipedia.org/wiki/Star_Frontiers) as a kid. When I couldn’t find a free, well-designed, mobile-friendly version with an AI game master, I built this one.*
+*I loved playing [Star Frontiers](https://en.wikipedia.org/wiki/Star_Frontiers) as a kid. When I couldn’t find a free, well-designed, mobile-friendly version to play solo, I built this AI-powered one.*
 
 **[Try the live app](https://astrarising.com)**
 
